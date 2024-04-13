@@ -7,9 +7,15 @@ namespace TruePath;
 /// <summary>
 /// Same as <see cref="AbsolutePath"/>, but also validates that the path is absolute during its creation.
 /// </summary>
-public readonly struct StrictAbsolutePath(string value)
+public readonly struct StrictAbsolutePath
 {
-    private readonly AbsolutePath _underlying = new(value);
+    private readonly AbsolutePath _underlying;
+    public StrictAbsolutePath(string value)
+    {
+        if (!Path.IsPathRooted(value))
+            throw new ArgumentException($"Path \"{value}\" is not absolute.");
+        _underlying = new AbsolutePath(value);
+    }
 
     /// <summary>The normalized path string.</summary>
     public string Value => _underlying.Value;

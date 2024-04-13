@@ -13,6 +13,6 @@ public class RelativePathTests
 
         var path = @"Users/John Doe\Documents";
         var relativePath = new RelativePath(path);
-        Assert.Equal(@"C:\Users\John Doe\Documents", relativePath.Value);
+        Assert.Equal(@"Users\John Doe\Documents", relativePath.Value);
     }
 }
