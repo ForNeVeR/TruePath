@@ -15,7 +15,7 @@ public readonly struct StrictAbsolutePath(string value)
     public string Value => _underlying.Value;
 
     public StrictAbsolutePath? Parent => _underlying.Parent is { } path ? new(path.Value) : null;
-        // TODO: Optimize, the strict check here is not necessary.
+        // TODO[#36]: Optimize, the strict check here is not necessary.
 
     public string FileName => _underlying.FileName;
 
