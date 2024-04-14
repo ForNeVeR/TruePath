@@ -13,4 +13,6 @@ public readonly struct RelativePath(string value)
 {
     /// <summary>The normalized path string.</summary>
     public string Value { get; } = PathStrings.Normalize(value);
+
+    public override string ToString() => Value;
 }
