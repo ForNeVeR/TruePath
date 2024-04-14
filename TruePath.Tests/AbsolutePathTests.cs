@@ -15,4 +15,15 @@ public class AbsolutePathTests
         var absolutePath = new AbsolutePath(path);
         Assert.Equal(@"C:\Users\John Doe\Documents", absolutePath.Value);
     }
+
+    [Theory]
+    [InlineData("/foo/bar", "/foo", false)]
+    [InlineData("/foo/", "/foo/bar/", true)]
+    [InlineData("/foo", "/foo1/bar/", false)]
+    [InlineData("/foo", "/foo1", false)]
+    [InlineData("/foo", "/foo", true)]
+    public void IsPrefixOf(string prefix, string other, bool result)
+    {
+        Assert.Equal(result, new AbsolutePath(prefix).IsPrefixOf(new AbsolutePath(other)));
+    }
 }

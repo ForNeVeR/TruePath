@@ -6,8 +6,6 @@ namespace TruePath;
 
 internal static class PathStrings
 {
-    public static string Normalize(string path)
-    {
-        return path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-    }
+    public static string Normalize(string path) =>
+        path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar).TrimEnd(Path.DirectorySeparatorChar);
 }
