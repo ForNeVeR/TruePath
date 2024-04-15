@@ -22,4 +22,8 @@ SPDX-License-Identifier: MIT
         <None Visible="false" Include="..\CHANGELOG.md" Pack="true" PackagePath="\" />
         <None Visible="false" Include="..\README.md" Pack="true" PackagePath="\" />
     </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="TruePath.Tests"/>
+    </ItemGroup>
 </Project>
