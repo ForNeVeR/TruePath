@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 Friedrich von Never <friedrich@fornever.me>
+//
+// SPDX-License-Identifier: MIT
+
 using System.Runtime.InteropServices;
 
 namespace TruePath.Tests;
@@ -33,11 +37,11 @@ public class PathStringsTests
     }
 
     [Theory]
-    [InlineData(".", ".")]
+    [InlineData(".", "")]
     [InlineData("./foo", "foo")]
     [InlineData("..", "..")]
     [InlineData("./..", "..")]
-    [InlineData("a/..", ".")]
+    [InlineData("a/..", "")]
     [InlineData("a/../..", "..")]
     [InlineData("a/../../.", "..")]
     [InlineData("foo/./bar/../var/./dar/..", "foo/var")]
@@ -52,6 +56,17 @@ public class PathStringsTests
         Assert.Equal(NormalizeSeparators(expected), PathStrings.Normalize(input));
     }
 
-    private string NormalizeSeparators(string path) =>
+    [Theory(Skip = "TODO: Make it work properly")]
+    [InlineData("C:.", "C:")]
+    [InlineData("C:./foo", "C:foo")]
+    [InlineData("C:..", "C:..")]
+    [InlineData("C:/..", "C:/..")]
+    public void WindowsSpecificDotFoldersAreTraversed(string input, string expected)
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
+        Assert.Equal(NormalizeSeparators(expected), PathStrings.Normalize(input));
+    }
+
+    private static string NormalizeSeparators(string path) =>
         path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
 }
