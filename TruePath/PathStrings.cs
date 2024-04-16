@@ -10,7 +10,7 @@ internal static class PathStrings
 {
     public static string Normalize(string path)
     {
-        // TODO: Optimize this. It is possible to do with less allocations.
+        // TODO[36]: Optimize this. It is possible to do with less allocations.
         var segments = new List<(int Start, int End)>();
 
         int? currentSegmentStart = 0;
