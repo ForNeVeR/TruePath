@@ -38,6 +38,8 @@ public readonly struct AbsolutePath(string value)
         return other.Value.Length == Value.Length || other.Value[Value.Length] == Path.DirectorySeparatorChar;
     }
 
+    public RelativePath RelativeTo(AbsolutePath basePath) => new(Path.GetRelativePath(basePath.Value, Value));
+
     public static AbsolutePath operator /(AbsolutePath basePath, RelativePath b) =>
         new(Path.Combine(basePath.Value, b.Value));
     public static AbsolutePath operator /(AbsolutePath basePath, string b) => basePath / new RelativePath(b);
