@@ -31,7 +31,8 @@ public readonly struct AbsolutePath(string value)
     }
 
     /// <remarks>
-    /// Checks for a non-strict prefix: if the paths are equal then they are still considered prefixes of each other. </remarks>
+    /// Checks for a non-strict prefix: if the paths are equal then they are still considered prefixes of each other.
+    /// </remarks>
     public bool IsPrefixOf(AbsolutePath other)
     {
         if (!(Value.Length <= other.Value.Length && other.Value.StartsWith(Value))) return false;
