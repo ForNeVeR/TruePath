@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: 2024 Friedrich von Never <friedrich@fornever.me>
+#
+# SPDX-License-Identifier: MIT
+
+# This file is auto-generated.
+name: Main
+on: {}
+jobs:
+  licenses:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: REUSE license check
+      uses: fsfe/reuse-action@v3

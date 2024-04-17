@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4393F95C-25AD-46F1-AEEF-85259893CF58}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		.gitignore = .gitignore
+		CONTRIBUTING.md = CONTRIBUTING.md
+		TruePath.sln.license = TruePath.sln.license
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{8C064598-EE83-463D-9822-BAFA70B2C278}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\github-actions.fsx = scripts\github-actions.fsx
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".reuse", ".reuse", "{9EC74741-2D3D-4273-BD6B-A06722350E05}"
+	ProjectSection(SolutionItems) = preProject
+		.reuse\dep5 = .reuse\dep5
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{10D9133A-772F-4364-929E-EEAE2E5DF04D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{55C1E2A5-1630-4C22-A403-65DA2B1B969D}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\main.yml = .github\workflows\main.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LICENSES", "LICENSES", "{0E6F7E51-BAE3-459C-A0E3-8082FA094F62}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSES\MIT.txt = LICENSES\MIT.txt
+		LICENSES\CC0-1.0.txt = LICENSES\CC0-1.0.txt
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{55C1E2A5-1630-4C22-A403-65DA2B1B969D} = {10D9133A-772F-4364-929E-EEAE2E5DF04D}
+	EndGlobalSection
+EndGlobal
