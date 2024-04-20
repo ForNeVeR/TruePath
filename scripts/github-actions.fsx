@@ -48,7 +48,51 @@ let workflows = [
 
             step(name = "Verify encoding", shell = "pwsh", run = "scripts/Test-Encoding.ps1")
         ]
+    ]
 
+    workflow "release" [
+        name "Release"
+        yield! mainTriggers
+        onPushTags "v*"
+        job "nuget" [
+            runsOn ubuntu
+            checkout
+            writeContentPermissions
+
+            let configuration = "Release"
+
+            let versionStepId = "version"
+            let versionField = "${{ steps." + versionStepId + ".outputs.version }}"
+            getVersionWithScript(stepId = versionStepId, scriptPath = "scripts/Get-Version.ps1")
+            dotNetPack(version = versionField)
+
+            let releaseNotes = "./release-notes.md"
+            prepareChangelog(releaseNotes)
+
+            let projectName = "TruePath"
+            let packageId = "TruePath"
+            let artifacts includeSNuPkg = [
+                $"./{projectName}/bin/{configuration}/{packageId}.{versionField}.nupkg"
+                if includeSNuPkg then $"./{projectName}/bin/{configuration}/{packageId}.{versionField}.snupkg"
+            ]
+            let allArtifacts = [
+                yield! artifacts true
+            ]
+            uploadArtifacts [
+                releaseNotes
+                yield! allArtifacts
+            ]
+            yield! ifCalledOnTagPush [
+                createRelease(
+                    name = $"TruePath v{versionField}",
+                    releaseNotesPath = releaseNotes,
+                    files = allArtifacts
+                )
+                yield! pushToNuGetOrg "NUGET_TOKEN" (
+                    artifacts false
+                )
+            ]
+        ]
     ]
 ]
 

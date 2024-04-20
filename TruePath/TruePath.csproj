@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    
+    <ItemGroup>
+      <PackageReference Include="ChangelogAutomation.MSBuild" Version="2.0.0" PrivateAssets="All" />
+    </ItemGroup>
+
+    <ItemGroup Label="Packaging">
+        <None Visible="false" Include="..\LICENSES\**" Pack="true" PackagePath="\LICENSES" />
+        <None Visible="false" Include="..\CHANGELOG.md" Pack="true" PackagePath="\" />
+        <None Visible="false" Include="..\README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+</Project>

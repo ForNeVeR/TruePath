@@ -1,0 +1,18 @@
+<!--
+SPDX-FileCopyrightText: 2024 Friedrich von Never <friedrich@fornever.me>
+
+SPDX-License-Identifier: MIT
+-->
+
+<Project>
+    <PropertyGroup Label="Packaging">
+        <Version>0.0.0</Version>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Copyright>© 2024 Friedrich von Never</Copyright>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <PropertyGroup Label="Build">
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    </PropertyGroup>
+</Project>

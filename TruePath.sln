@@ -10,12 +10,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		CONTRIBUTING.md = CONTRIBUTING.md
 		TruePath.sln.license = TruePath.sln.license
 		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+		CHANGELOG.md = CHANGELOG.md
+		MAINTAINING.md = MAINTAINING.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{8C064598-EE83-463D-9822-BAFA70B2C278}"
 	ProjectSection(SolutionItems) = preProject
 		scripts\github-actions.fsx = scripts\github-actions.fsx
 		scripts\Test-Encoding.ps1 = scripts\Test-Encoding.ps1
+		scripts\Get-Version.ps1 = scripts\Get-Version.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".reuse", ".reuse", "{9EC74741-2D3D-4273-BD6B-A06722350E05}"
@@ -32,6 +36,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\main.yml = .github\workflows\main.yml
 		.github\workflows\main.yml.license = .github\workflows\main.yml.license
+		.github\workflows\release.yml = .github\workflows\release.yml
+		.github\workflows\release.yml.license = .github\workflows\release.yml.license
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LICENSES", "LICENSES", "{0E6F7E51-BAE3-459C-A0E3-8082FA094F62}"
@@ -39,6 +45,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LICENSES", "LICENSES", "{0E
 		LICENSES\MIT.txt = LICENSES\MIT.txt
 		LICENSES\CC0-1.0.txt = LICENSES\CC0-1.0.txt
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TruePath", "TruePath\TruePath.csproj", "{DB806921-D806-452A-99FB-94FC725291DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,5 +58,11 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{55C1E2A5-1630-4C22-A403-65DA2B1B969D} = {10D9133A-772F-4364-929E-EEAE2E5DF04D}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DB806921-D806-452A-99FB-94FC725291DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB806921-D806-452A-99FB-94FC725291DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB806921-D806-452A-99FB-94FC725291DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB806921-D806-452A-99FB-94FC725291DC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
