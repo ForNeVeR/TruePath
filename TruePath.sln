@@ -23,6 +23,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".reuse", ".reuse", "{9EC747
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{10D9133A-772F-4364-929E-EEAE2E5DF04D}"
+	ProjectSection(SolutionItems) = preProject
+		.github\dependabot.yml = .github\dependabot.yml
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{55C1E2A5-1630-4C22-A403-65DA2B1B969D}"
 	ProjectSection(SolutionItems) = preProject
