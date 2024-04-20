@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <PackageDescription>File path abstraction library for .NET.</PackageDescription>
     </PropertyGroup>
 
     <ItemGroup>
