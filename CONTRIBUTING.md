@@ -19,14 +19,6 @@ Use the following shell command:
 $ dotnet build
 ```
 
-Pack
-----
-To prepare a NuGet package with the tool, use the following shell command:
-
-```console
-$ dotnet pack
-```
-
 License Automation
 ------------------
 If the CI asks you to update the file licenses, follow one of these:
