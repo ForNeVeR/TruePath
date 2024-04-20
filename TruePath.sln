@@ -49,6 +49,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LICENSES", "LICENSES", "{0E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TruePath", "TruePath\TruePath.csproj", "{DB806921-D806-452A-99FB-94FC725291DC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TruePath.Tests", "TruePath.Tests\TruePath.Tests.csproj", "{7E3E01D3-19A2-4583-9895-E2AEDC3ED07A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,5 +67,9 @@ Global
 		{DB806921-D806-452A-99FB-94FC725291DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB806921-D806-452A-99FB-94FC725291DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB806921-D806-452A-99FB-94FC725291DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E3E01D3-19A2-4583-9895-E2AEDC3ED07A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E3E01D3-19A2-4583-9895-E2AEDC3ED07A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E3E01D3-19A2-4583-9895-E2AEDC3ED07A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E3E01D3-19A2-4583-9895-E2AEDC3ED07A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
