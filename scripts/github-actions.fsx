@@ -15,6 +15,10 @@ let mainBranch = "main"
 let workflows = [
     workflow "main" [
         name "Main"
+        onPushTo mainBranch
+        onPullRequestTo mainBranch
+        onWorkflowDispatch
+
         job "licenses" [
             runsOn "ubuntu-22.04"
             checkout
