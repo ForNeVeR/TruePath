@@ -19,7 +19,6 @@ let images = [
     "windows-2022"
 ]
 
-
 let workflows = [
     let mainTriggers = [
         onPushTo mainBranch
@@ -31,6 +30,11 @@ let workflows = [
     workflow "main" [
         name "Main"
         yield! mainTriggers
+
+        job "check" [
+            checkout
+            yield! dotNetBuildAndTest(projectFileExtensions = [".csproj"])
+        ] |> addMatrix images
 
         job "licenses" [
             runsOn ubuntu

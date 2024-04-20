@@ -19,6 +19,14 @@ Use the following shell command:
 $ dotnet build
 ```
 
+Test
+----
+Use the following shell command:
+
+```console
+$ dotnet test
+```
+
 License Automation
 ------------------
 If the CI asks you to update the file licenses, follow one of these:

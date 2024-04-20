@@ -11,6 +11,35 @@ on:
   - cron: 0 0 * * 6
   workflow_dispatch: 
 jobs:
+  check:
+    strategy:
+      matrix:
+        image:
+        - macos-12
+        - ubuntu-22.04
+        - windows-2022
+      fail-fast: false
+    runs-on: ${{ matrix.image }}
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: 1
+      NUGET_PACKAGES: ${{ github.workspace }}/.github/nuget-packages
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: NuGet cache
+      uses: actions/cache@v4
+      with:
+        key: ${{ runner.os }}.nuget.${{ hashFiles('**/*.csproj') }}
+        path: ${{ env.NUGET_PACKAGES }}
+    - name: Build
+      run: dotnet build
+    - name: Test
+      run: dotnet test
+      timeout-minutes: 10
   licenses:
     runs-on: ubuntu-22.04
     steps:
