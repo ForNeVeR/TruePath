@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2024 Friedrich von Never <friedrich@fornever.me>
 SPDX-License-Identifier: MIT
 -->
 
-TruePath [![Status Zero][status-zero]][andivionian-status-classifier] [![NuGet package][nuget.badge]][nuget.page]
+TruePath [![Status Ventis][status-ventis]][andivionian-status-classifier] [![NuGet package][nuget.badge]][nuget.page]
 ========
 This is a library containing a set of types to work with file system paths in .NET.
 
@@ -54,7 +54,7 @@ By contributing to this repository, you agree that any new files you contribute 
 
 You are welcome to explicitly state your copyright in the file's header as described in [the contributor guide][docs.contributing], but the project maintainers may do this for you as well.
 
-[andivionian-status-classifier]: https://andivionian.fornever.me/v1/#status-zero-
+[andivionian-status-classifier]: https://andivionian.fornever.me/v1/#status-ventis-
 [docs.contributing]: CONTRIBUTING.md
 [docs.maintaining]: MAINTAINING.md
 [file-system-globbing.nuget]: https://www.nuget.org/packages/Microsoft.Extensions.FileSystemGlobbing
@@ -62,4 +62,4 @@ You are welcome to explicitly state your copyright in the file's header as descr
 [nuget.badge]: https://img.shields.io/nuget/v/TruePath
 [nuget.page]: https://www.nuget.org/packages/TruePath
 [reuse.spec]: https://reuse.software/spec/
-[status-zero]: https://img.shields.io/badge/status-zero-lightgrey.svg
+[status-ventis]: https://img.shields.io/badge/status-ventis-yellow.svg
