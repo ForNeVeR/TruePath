@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 Friedrich von Never <friedrich@fornever.md>
+//
+// SPDX-License-Identifier: MIT
+
 namespace TruePath;
 
 /// <summary>
