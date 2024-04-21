@@ -33,7 +33,7 @@ public static class PathStrings
     ///     </list>
     /// </para>
     /// <para>
-    ///     Note that this operation is guaranteed to never perform any disk I/O, and is purely string manipulation.
+    ///     Note that this operation will never perform any file IO, and is purely string manipulation.
     /// </para>
     /// </summary>
     public static string Normalize(string path)

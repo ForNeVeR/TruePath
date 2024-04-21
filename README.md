@@ -8,6 +8,38 @@ TruePath [![Status Zero][status-zero]][andivionian-status-classifier] [![NuGet p
 ========
 This is a library containing a set of types to work with file system paths in .NET.
 
+Types
+-----
+The library offers several struct (i.e. low to zero memory overhead) types wrapping path strings. The types are designed to not involve any disk IO operations by default, and thus provide excellent performance during common operations. This comes with a drawback, though: **path comparison is only performed as string comparison so far**, which means that the library doesn't provide any means to compare paths in a case-insensitive way.
+
+This is a subject to change in future releases, where we will provide more control over this: better platform-wide defaults (such as case-insensitive comparison on Windows and macOS), and options to enable more IO-intensive comparison (to check sensitivity settings of particular file path components during comparison). <!-- TODO: Open an issue on this -->
+
+The paths are stored in the **normalized form**.
+
+- All the `Path.AltDirectorySeparatorChar` are converted to `Path.DirectorySeparatorChar` (e.g. `/` to `\` on Windows).
+- Any repeated separators in the input are collapsed to only one separator (e.g. `//` to just `/` on Unix).
+- Any sequence of current and parent directory marks (subsequently, `.` and `..`) is resolved if possible (meaning they
+  will not be replaced if they are in the root position: paths such as `.` or `../..` will not be affected by the
+  normalization, while e.g. `foo/../.` will be resolved to just `foo`).
+
+Note that the normalization operation will not perform any file IO, and is purely string manipulation.
+
+### `LocalPath`
+This is the type that may either be a relative or an absolute. Small showcase:
+```csharp
+var myRoot = new LocalPath("foo/bar");
+var fooDirectory = myRoot.Parent;
+
+var bazSubdirectory = myRoot / "baz";
+var alsoBazSubdirectory = myRoot / new LocalPath("baz");
+```
+
+### `AbsolutePath`
+This functions basically the same as the `LocalPath`, but it is _always_ an absolute path, which is checked in the constructor.
+
+### `LocalPathPattern`
+This is a marker type that doesn't offer any advanced functionality over the contained string. It is used to mark paths that include wildcards, for further integration with external libraries, such as [Microsoft.Extensions.FileSystemGlobbing][file-system-globbing.nuget].
+
 Documentation
 -------------
 - [Contributor Guide][docs.contributing]
@@ -25,6 +57,7 @@ You are welcome to explicitly state your copyright in the file's header as descr
 [andivionian-status-classifier]: https://andivionian.fornever.me/v1/#status-zero-
 [docs.contributing]: CONTRIBUTING.md
 [docs.maintaining]: MAINTAINING.md
+[file-system-globbing.nuget]: https://www.nuget.org/packages/Microsoft.Extensions.FileSystemGlobbing
 [nuget.badge]: https://img.shields.io/nuget/v/TruePath
 [nuget.page]: https://www.nuget.org/packages/TruePath
 [reuse.spec]: https://reuse.software/spec/
