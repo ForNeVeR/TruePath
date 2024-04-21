@@ -56,7 +56,7 @@ public class PathStringsTests
         Assert.Equal(NormalizeSeparators(expected), PathStrings.Normalize(input));
     }
 
-    [Theory(Skip = "TODO[36]: Make it work properly")]
+    [Theory(Skip = "TODO[#16]: Make it work properly")]
     [InlineData("C:.", "C:")]
     [InlineData("C:./foo", "C:foo")]
     [InlineData("C:..", "C:..")]

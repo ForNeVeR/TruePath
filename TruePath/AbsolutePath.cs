@@ -24,7 +24,7 @@ public readonly struct AbsolutePath
 
     /// <summary>The parent of this path. Will be <c>null</c> for a rooted absolute path.</summary>
     public AbsolutePath? Parent => _underlying.Parent is { } path ? new(path.Value) : null;
-        // TODO[#36]: Optimize, the strict check here is not necessary.
+        // TODO[#17]: Optimize, the strict check here is not necessary.
 
     /// <summary>The full name of the last component of this path.</summary>
     public string FileName => _underlying.FileName;

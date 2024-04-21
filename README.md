@@ -12,7 +12,7 @@ Types
 -----
 The library offers several struct (i.e. low to zero memory overhead) types wrapping path strings. The types are designed to not involve any disk IO operations by default, and thus provide excellent performance during common operations. This comes with a drawback, though: **path comparison is only performed as string comparison so far**, which means that the library doesn't provide any means to compare paths in a case-insensitive way.
 
-This is a subject to change in future releases, where we will provide more control over this: better platform-wide defaults (such as case-insensitive comparison on Windows and macOS), and options to enable more IO-intensive comparison (to check sensitivity settings of particular file path components during comparison). <!-- TODO: Open an issue on this -->
+This is a subject to change in future releases, where we will provide more control over this: better platform-wide defaults (such as case-insensitive comparison on Windows and macOS), and options to enable more IO-intensive comparison (to check sensitivity settings of particular file path components during comparison). See [issue #20][issue.20] on the current progress on this change.
 
 The paths are stored in the **normalized form**.
 
@@ -58,6 +58,7 @@ You are welcome to explicitly state your copyright in the file's header as descr
 [docs.contributing]: CONTRIBUTING.md
 [docs.maintaining]: MAINTAINING.md
 [file-system-globbing.nuget]: https://www.nuget.org/packages/Microsoft.Extensions.FileSystemGlobbing
+[issue.20]: https://github.com/ForNeVeR/TruePath/issues/20
 [nuget.badge]: https://img.shields.io/nuget/v/TruePath
 [nuget.page]: https://www.nuget.org/packages/TruePath
 [reuse.spec]: https://reuse.software/spec/

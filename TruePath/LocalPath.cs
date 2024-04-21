@@ -30,7 +30,6 @@ public readonly struct LocalPath(string value)
     /// The parent of this path. Will be <c>null</c> for a rooted absolute path, or relative path pointing to the
     /// current directory.
     /// </summary>
-    // TODO: Add tests for parent of `.` and `""` and `..`: what should they be actually?
     public LocalPath? Parent => Path.GetDirectoryName(Value) is { } parent ? new(parent) : null;
 
     /// <summary>The full name of the last component of this path.</summary>
