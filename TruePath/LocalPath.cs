@@ -14,6 +14,15 @@ public readonly struct LocalPath(string value)
     public string Value { get; } = PathStrings.Normalize(value);
 
     /// <summary>
+    /// <para>Checks whether th path is absolute.</para>
+    /// <para>
+    ///     Currently, any rooted paths are considered absolute, but this is a subject to change: on Windows, there
+    ///     will be an additional requirement for a path to be either UNC or start from a disk letter.
+    /// </para>
+    /// </summary>
+    public bool IsAbsolute => Path.IsPathRooted(Value);
+
+    /// <summary>
     /// The parent of this path. Will be <c>null</c> for a rooted absolute path, or relative path pointing to the
     /// current directory.
     /// </summary>

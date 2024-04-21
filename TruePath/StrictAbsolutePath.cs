@@ -13,9 +13,9 @@ public readonly struct StrictAbsolutePath
     private readonly LocalPath _underlying;
     public StrictAbsolutePath(string value)
     {
-        if (!Path.IsPathRooted(value))
-            throw new ArgumentException($"Path \"{value}\" is not absolute.");
         _underlying = new LocalPath(value);
+        if (!_underlying.IsAbsolute)
+            throw new ArgumentException($"Path \"{value}\" is not absolute.");
     }
 
     /// <summary>The normalized path string.</summary>
