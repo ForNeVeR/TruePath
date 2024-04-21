@@ -4,15 +4,15 @@
 
 namespace TruePath.Tests;
 
-public class AbsolutePathTests
+public class LocalPathTests
 {
     [Fact]
-    public void PathIsNormalizedOnCreation()
+    public void AbsolutePathIsNormalizedOnCreation()
     {
         if (!OperatingSystem.IsWindows()) return;
 
         var path = @"C:/Users/John Doe\Documents";
-        var absolutePath = new AbsolutePath(path);
+        var absolutePath = new LocalPath(path);
         Assert.Equal(@"C:\Users\John Doe\Documents", absolutePath.Value);
     }
 
@@ -24,6 +24,16 @@ public class AbsolutePathTests
     [InlineData("/foo", "/foo", true)]
     public void IsPrefixOf(string prefix, string other, bool result)
     {
-        Assert.Equal(result, new AbsolutePath(prefix).IsPrefixOf(new AbsolutePath(other)));
+        Assert.Equal(result, new LocalPath(prefix).IsPrefixOf(new LocalPath(other)));
+    }
+
+    [Fact]
+    public void RelativePathIsNormalizedOnCreation()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var path = @"Users/John Doe\Documents";
+        var relativePath = new LocalPath(path);
+        Assert.Equal(@"Users\John Doe\Documents", relativePath.Value);
     }
 }
