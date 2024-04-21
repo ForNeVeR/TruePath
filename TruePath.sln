@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.props = Directory.Build.props
 		CHANGELOG.md = CHANGELOG.md
 		MAINTAINING.md = MAINTAINING.md
+		LICENSE.txt = LICENSE.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{8C064598-EE83-463D-9822-BAFA70B2C278}"
