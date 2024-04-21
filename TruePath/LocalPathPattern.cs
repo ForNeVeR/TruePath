@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-﻿namespace TruePath;
+namespace TruePath;
 
 /// <summary>
 /// <para>An opaque pattern that may be checked if it corresponds to a local path.</para>

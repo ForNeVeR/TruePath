@@ -11,6 +11,31 @@ namespace TruePath;
 /// </remarks>
 public readonly struct RelativePath(string value)
 {
+    public bool Equals(RelativePath other)
+    {
+        return Value == other.Value;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is RelativePath other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return Value.GetHashCode();
+    }
+
+    public static bool operator ==(RelativePath left, RelativePath right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(RelativePath left, RelativePath right)
+    {
+        return !left.Equals(right);
+    }
+
     /// <summary>The normalized path string.</summary>
     public string Value { get; } = PathStrings.Normalize(value);
 

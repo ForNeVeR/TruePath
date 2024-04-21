@@ -30,4 +30,34 @@ public readonly struct StrictAbsolutePath
     public static StrictAbsolutePath operator /(StrictAbsolutePath basePath, string b) => basePath / new RelativePath(b);
 
     public RelativePath AsRelative() => _underlying.AsRelative();
+
+    public override string ToString()
+    {
+        return Value;
+    }
+
+    public bool Equals(StrictAbsolutePath other)
+    {
+        return _underlying.Equals(other._underlying);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is StrictAbsolutePath other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return _underlying.GetHashCode();
+    }
+
+    public static bool operator ==(StrictAbsolutePath left, StrictAbsolutePath right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(StrictAbsolutePath left, StrictAbsolutePath right)
+    {
+        return !left.Equals(right);
+    }
 }

@@ -30,6 +30,16 @@ public readonly struct AbsolutePath(string value)
         return Value.GetHashCode();
     }
 
+    public static bool operator ==(AbsolutePath left, AbsolutePath right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(AbsolutePath left, AbsolutePath right)
+    {
+        return !left.Equals(right);
+    }
+
     /// <remarks>
     /// Checks for a non-strict prefix: if the paths are equal then they are still considered prefixes of each other.
     /// </remarks>
