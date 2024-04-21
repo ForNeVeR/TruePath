@@ -8,7 +8,7 @@ TruePath [![Status Zero][status-zero]][andivionian-status-classifier] [![NuGet p
 ========
 This is a library containing a set of types to work with file system paths in .NET.
 
-Types
+Usage
 -----
 The library offers several struct (i.e. low to zero memory overhead) types wrapping path strings. The types are designed to not involve any disk IO operations by default, and thus provide excellent performance during common operations. This comes with a drawback, though: **path comparison is only performed as string comparison so far**, which means that the library doesn't provide any means to compare paths in a case-insensitive way.
 
