@@ -83,5 +83,5 @@ public readonly struct LocalPath(string value)
     /// </remarks>
     public static LocalPath operator /(LocalPath basePath, string b) => basePath / new LocalPath(b);
 
-    public static implicit operator LocalPath(StrictAbsolutePath path) => new(path.Value);
+    public static implicit operator LocalPath(AbsolutePath path) => new(path.Value);
 }

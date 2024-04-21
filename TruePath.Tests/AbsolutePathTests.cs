@@ -4,7 +4,7 @@
 
 namespace TruePath.Tests;
 
-public class StrictAbsolutePathTests
+public class AbsolutePathTests
 {
     [Fact]
     public void PathIsNormalizedOnCreation()
@@ -12,7 +12,7 @@ public class StrictAbsolutePathTests
         if (!OperatingSystem.IsWindows()) return;
 
         var path = @"C:/Users/John Doe\Documents";
-        var absolutePath = new StrictAbsolutePath(path);
+        var absolutePath = new AbsolutePath(path);
         Assert.Equal(@"C:\Users\John Doe\Documents", absolutePath.Value);
     }
 
@@ -20,7 +20,7 @@ public class StrictAbsolutePathTests
     public void ConstructorThrowsOnNonRootedPath()
     {
         var path = "uprooted";
-        var ex = Assert.Throws<ArgumentException>(() => new StrictAbsolutePath(path));
+        var ex = Assert.Throws<ArgumentException>(() => new AbsolutePath(path));
         Assert.Equal("""Path "uprooted" is not absolute.""", ex.Message);
     }
 }
