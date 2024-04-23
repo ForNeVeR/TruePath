@@ -18,6 +18,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - `LocalPathPattern` (for paths including wildcards; note this is a marker type that doesn't offer any advanced functionality over the contained string).
 - New static classes:
   - `PathStrings` for path normalization (see the type's documentation on what exactly we consider as **normalization**).
+- Currently supported features:
+  - path normalization (in-memory only, no disk IO performed),
+  - path concatenation via `/` operator,
+  - check for absolute path (work in progress; doesn't completely work for Windows paths yet),
+  - get path parent,
+  - get the last path component's name,
+  - check for path prefix,
+  - get a relative part between two paths,
+  - check paths for equality (case-insensitive only, yet).
 
 ## [0.0.0] - 2024-04-20
 This is the first published version of the package. It doesn't contain any features, and serves the purpose of kickstarting the publication system, and to be an anchor for further additions to the package.
