@@ -11,7 +11,7 @@ public class AbsolutePathTests
     {
         if (!OperatingSystem.IsWindows()) return;
 
-        var path = @"C:/Users/John Doe\Documents";
+        const string path = @"C:/Users/John Doe\Documents";
         var absolutePath = new AbsolutePath(path);
         Assert.Equal(@"C:\Users\John Doe\Documents", absolutePath.Value);
     }
@@ -19,8 +19,13 @@ public class AbsolutePathTests
     [Fact]
     public void ConstructorThrowsOnNonRootedPath()
     {
-        var path = "uprooted";
+        const string path = "uprooted";
+        const string expectedMessage = $"Path \"{path}\" is not absolute.";
         var ex = Assert.Throws<ArgumentException>(() => new AbsolutePath(path));
-        Assert.Equal("""Path "uprooted" is not absolute.""", ex.Message);
+        Assert.Equal(expectedMessage, ex.Message);
+
+        var localPath = new LocalPath("uprooted");
+        ex = Assert.Throws<ArgumentException>(() => new AbsolutePath(localPath));
+        Assert.Equal(expectedMessage, ex.Message);
     }
 }

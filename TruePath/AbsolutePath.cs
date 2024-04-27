@@ -11,7 +11,7 @@ namespace TruePath;
 /// <remarks>For a path that's not guaranteed to be absolute, use the <see cref="LocalPath"/> type.</remarks>
 public readonly struct AbsolutePath
 {
-    private readonly LocalPath _underlying;
+    internal readonly LocalPath Underlying;
     /// <summary>
     /// Creates an <see cref="AbsolutePath"/> instance by normalizing the path from the passed string according to the
     /// rules stated in <see cref="LocalPath"/>.
@@ -20,20 +20,26 @@ public readonly struct AbsolutePath
     /// <exception cref="ArgumentException">Thrown if the passed string does not represent an absolute path.</exception>
     public AbsolutePath(string value)
     {
-        _underlying = new LocalPath(value);
-        if (!_underlying.IsAbsolute)
+        Underlying = new LocalPath(value);
+        if (!Underlying.IsAbsolute)
             throw new ArgumentException($"Path \"{value}\" is not absolute.");
     }
 
+    /// <summary>
+    /// Creates an <see cref="AbsolutePath"/> instance by converting a <paramref name="localPath"/> object.
+    /// </summary>
+    /// <exception cref="ArgumentException">Thrown if the passed path is not absolute.</exception>
+    public AbsolutePath(LocalPath localPath) : this(localPath.Value) {}
+
     /// <summary>The normalized path string.</summary>
-    public string Value => _underlying.Value;
+    public string Value => Underlying.Value;
 
     /// <summary>The parent of this path. Will be <c>null</c> for a rooted absolute path.</summary>
-    public AbsolutePath? Parent => _underlying.Parent is { } path ? new(path.Value) : null;
+    public AbsolutePath? Parent => Underlying.Parent is { } path ? new(path.Value) : null;
         // TODO[#17]: Optimize, the strict check here is not necessary.
 
     /// <summary>The full name of the last component of this path.</summary>
-    public string FileName => _underlying.FileName;
+    public string FileName => Underlying.FileName;
 
     /// <remarks>
     /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the
@@ -55,7 +61,7 @@ public readonly struct AbsolutePath
     /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
     public bool Equals(AbsolutePath other)
     {
-        return _underlying.Equals(other._underlying);
+        return Underlying.Equals(other.Underlying);
     }
 
     /// <inheritdoc cref="Equals(AbsolutePath)"/>
@@ -67,7 +73,7 @@ public readonly struct AbsolutePath
     /// <inheritdoc cref="Object.GetHashCode"/>
     public override int GetHashCode()
     {
-        return _underlying.GetHashCode();
+        return Underlying.GetHashCode();
     }
 
     /// <inheritdoc cref="Equals(AbsolutePath)"/>

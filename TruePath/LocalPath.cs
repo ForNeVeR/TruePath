@@ -21,7 +21,7 @@ public readonly struct LocalPath(string value)
     /// <para>Checks whether th path is absolute.</para>
     /// <para>
     ///     Currently, any rooted paths are considered absolute, but this is a subject to change: on Windows, there
-    ///     will be an additional requirement for a path to be either UNC or start from a disk letter.
+    ///     will be an additional requirement for a path to be either a DOS device path or start from a disk letter.
     /// </para>
     /// </summary>
     public bool IsAbsolute => Path.IsPathRooted(Value);
@@ -86,6 +86,7 @@ public readonly struct LocalPath(string value)
     /// <returns>The relative path from the base path to this path.</returns>
     public LocalPath RelativeTo(LocalPath basePath) => new(Path.GetRelativePath(basePath.Value, Value));
 
+    // ReSharper disable once GrammarMistakeInComment // RIDER-111735
     /// <remarks>
     /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the
     /// <paramref name="basePath"/> will be ignored.
@@ -93,6 +94,7 @@ public readonly struct LocalPath(string value)
     public static LocalPath operator /(LocalPath basePath, LocalPath b) =>
         new(Path.Combine(basePath.Value, b.Value));
 
+    // ReSharper disable once GrammarMistakeInComment // RIDER-111735
     /// <remarks>
     /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the
     /// <paramref name="basePath"/> will be ignored.
@@ -100,8 +102,14 @@ public readonly struct LocalPath(string value)
     public static LocalPath operator /(LocalPath basePath, string b) => basePath / new LocalPath(b);
 
     /// <summary>
-    /// Implicitly converts a string to a <see cref="LocalPath"/>.
+    /// Implicitly converts an <see cref="AbsolutePath"/> to a <see cref="LocalPath"/>.
     /// </summary>
     /// <remarks>Note that this conversion doesn't lose any information.</remarks>
-    public static implicit operator LocalPath(AbsolutePath path) => new(path.Value);
+    public static implicit operator LocalPath(AbsolutePath path) => path.Underlying;
+
+    // ReSharper disable once GrammarMistakeInComment // RIDER-111735
+    /// <summary>Converts an <see cref="AbsolutePath"/> to a <see cref="LocalPath"/>.</summary>
+    public LocalPath(AbsolutePath path) : this(path.Value)
+    {
+    }
 }

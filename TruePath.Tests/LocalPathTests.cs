@@ -11,7 +11,7 @@ public class LocalPathTests
     {
         if (!OperatingSystem.IsWindows()) return;
 
-        var path = @"C:/Users/John Doe\Documents";
+        const string path = @"C:/Users/John Doe\Documents";
         var absolutePath = new LocalPath(path);
         Assert.Equal(@"C:\Users\John Doe\Documents", absolutePath.Value);
     }
@@ -32,8 +32,18 @@ public class LocalPathTests
     {
         if (!OperatingSystem.IsWindows()) return;
 
-        var path = @"Users/John Doe\Documents";
+        const string path = @"Users/John Doe\Documents";
         var relativePath = new LocalPath(path);
         Assert.Equal(@"Users\John Doe\Documents", relativePath.Value);
+    }
+
+    [Fact]
+    public void LocalPathConvertedFromAbsolute()
+    {
+        var absolutePath = new AbsolutePath("/foo/bar");
+        LocalPath localPath1 = absolutePath;
+        var localPath2 = new LocalPath(absolutePath);
+
+        Assert.Equal(localPath1, localPath2);
     }
 }

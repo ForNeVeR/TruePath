@@ -37,6 +37,8 @@ var alsoBazSubdirectory = myRoot / new LocalPath("baz");
 ### `AbsolutePath`
 This functions basically the same as the `LocalPath`, but it is _always_ an absolute path, which is checked in the constructor.
 
+To convert from `LocalPath` to `AbsolutePath` and vice versa, you can use the constructors of `AbsolutePath` and `LocalPath` respectively. Any `AbsolutePath` constructor (from either a string or a `LocalPath`) has same check for absolute path, and any `LocalPath` constructor (from either a string or an `AbsolutePath`) doesn't have any checks.
+
 ### `LocalPathPattern`
 This is a marker type that doesn't offer any advanced functionality over the contained string. It is used to mark paths that include wildcards, for further integration with external libraries, such as [Microsoft.Extensions.FileSystemGlobbing][file-system-globbing.nuget].
 
