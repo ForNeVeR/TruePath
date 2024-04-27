@@ -23,6 +23,10 @@ SPDX-License-Identifier: MIT
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
     </PropertyGroup>
 
+    <PropertyGroup Condition="$(CI) != ''">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+
     <ItemGroup Condition="$(IsPackable) == 'true'">
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
         <PackageReference Include="ChangelogAutomation.MSBuild" Version="2.0.0" PrivateAssets="All" />
