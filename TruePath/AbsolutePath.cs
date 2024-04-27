@@ -12,6 +12,12 @@ namespace TruePath;
 public readonly struct AbsolutePath
 {
     private readonly LocalPath _underlying;
+    /// <summary>
+    /// Creates an <see cref="AbsolutePath"/> instance by normalizing the path from the passed string according to the
+    /// rules stated in <see cref="LocalPath"/>.
+    /// </summary>
+    /// <param name="value">Path string to normalize.</param>
+    /// <exception cref="ArgumentException">Thrown if the passed string does not represent an absolute path.</exception>
     public AbsolutePath(string value)
     {
         _underlying = new LocalPath(value);
@@ -42,28 +48,35 @@ public readonly struct AbsolutePath
     /// </remarks>
     public static AbsolutePath operator /(AbsolutePath basePath, string b) => basePath / new LocalPath(b);
 
+    /// <returns>The normalized path string contained in this object.</returns>
     public override string ToString() => Value;
 
+    /// <summary>Compares the path with another.</summary>
+    /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
     public bool Equals(AbsolutePath other)
     {
         return _underlying.Equals(other._underlying);
     }
 
+    /// <inheritdoc cref="Equals(AbsolutePath)"/>
     public override bool Equals(object? obj)
     {
         return obj is AbsolutePath other && Equals(other);
     }
 
+    /// <inheritdoc cref="Object.GetHashCode"/>
     public override int GetHashCode()
     {
         return _underlying.GetHashCode();
     }
 
+    /// <inheritdoc cref="Equals(AbsolutePath)"/>
     public static bool operator ==(AbsolutePath left, AbsolutePath right)
     {
         return left.Equals(right);
     }
 
+    /// <inheritdoc cref="Equals(AbsolutePath)"/>
     public static bool operator !=(AbsolutePath left, AbsolutePath right)
     {
         return !left.Equals(right);

@@ -17,5 +17,6 @@ namespace TruePath;
 /// </param>
 public record struct LocalPathPattern(string Value)
 {
+    /// <returns>The pattern text contained in this object.</returns>
     public override string ToString() => Value;
 }
