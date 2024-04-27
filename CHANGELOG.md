@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Update and publish XML documentation with the package.
 - Enable the Source Link.
 - [#29](https://github.com/ForNeVeR/TruePath/issues/29): add converting constructors for `LocalPath` and `AbsolutePath`.
+- `AbsolutePath` and `LocalPath` now support `IEquatable<T>` interface.
 
 ## [1.0.0] - 2024-04-21
 ### Added

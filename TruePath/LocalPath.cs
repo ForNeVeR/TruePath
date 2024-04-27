@@ -12,7 +12,7 @@ namespace TruePath;
 ///     know what form of normalization does the path use.
 /// </para>
 /// </summary>
-public readonly struct LocalPath(string value)
+public readonly struct LocalPath(string value) : IEquatable<LocalPath>
 {
     /// <summary>The normalized path string.</summary>
     public string Value { get; } = PathStrings.Normalize(value);
