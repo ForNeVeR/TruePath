@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: dotnet-licenses
+Upstream-Name: TruePath
 Upstream-Contact: Friedrich von Never <friedrich@fornever.me>
-Source: https://github.com/ForNeVeR/dotnet-licenses
+Source: https://github.com/ForNeVeR/TruePath
 
 Files: .idea/**/*
 Copyright: 2024 Friedrich von Never <friedrich@fornever.me>
