@@ -8,6 +8,16 @@ TruePath [![Status Ventis][status-ventis]][andivionian-status-classifier] [![NuG
 ========
 This is a library containing a set of types to work with file system paths in .NET.
 
+Motivation
+----------
+Historically, .NET has been lacking a good set of types to work with file system paths. The `System.IO.Path` class has a variety of methods that operate on path strings, but it doesn't provide any types to represent paths themselves. It's impossible top tell whether a method accepts an absolute path, a relative path, a file name, or something file-related at all, only looking at its signature: all these types are represented by plain strings. Also, comparing different paths is not straightforward.
+
+This library aims to fill this gap by providing a set of types that represent paths in a strongly-typed way. Now, you can require a path in a method's parameters, and it is guaranteed that the passed path will be well-formed and will have certain properties.
+
+Also, the methods in the library provide some qualities that are missing from the `System.IO.Path`: say, we aim to provide several ways of path normalization and comparison, the ones that will and will not perform disk IO to resolve paths on case-insensitive file systems.
+
+If you miss some other operations, do not hesitate to [open an issue][issues] or [go to the discussions section][discussions].
+
 Usage
 -----
 The library offers several struct (i.e. low to zero memory overhead) types wrapping path strings. The types are designed to not involve any disk IO operations by default, and thus provide excellent performance during common operations. This comes with a drawback, though: **path comparison is only performed as string comparison so far**, which means that the library doesn't provide any means to compare paths in a case-insensitive way.
@@ -57,10 +67,12 @@ By contributing to this repository, you agree that any new files you contribute 
 You are welcome to explicitly state your copyright in the file's header as described in [the contributor guide][docs.contributing], but the project maintainers may do this for you as well.
 
 [andivionian-status-classifier]: https://andivionian.fornever.me/v1/#status-ventis-
+[discussions]: https://github.com/ForNeVeR/TruePath/discussions
 [docs.contributing]: CONTRIBUTING.md
 [docs.maintaining]: MAINTAINING.md
 [file-system-globbing.nuget]: https://www.nuget.org/packages/Microsoft.Extensions.FileSystemGlobbing
 [issue.20]: https://github.com/ForNeVeR/TruePath/issues/20
+[issues]: https://github.com/ForNeVeR/TruePath/issues
 [nuget.badge]: https://img.shields.io/nuget/v/TruePath
 [nuget.page]: https://www.nuget.org/packages/TruePath
 [reuse.spec]: https://reuse.software/spec/
