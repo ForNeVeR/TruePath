@@ -16,6 +16,8 @@ This library aims to fill this gap by providing a set of types that represent pa
 
 Also, the methods in the library provide some qualities that are missing from the `System.IO.Path`: say, we aim to provide several ways of path normalization and comparison, the ones that will and will not perform disk IO to resolve paths on case-insensitive file systems.
 
+The library is inspired by the path libraries used in other ecosystems: in particular, Java's [java.nio.file.Path][java.path] and [Kotlin's extensions][kotlin.path].
+
 If you miss some other operations, do not hesitate to [open an issue][issues] or [go to the discussions section][discussions].
 
 Usage
@@ -73,6 +75,8 @@ You are welcome to explicitly state your copyright in the file's header as descr
 [file-system-globbing.nuget]: https://www.nuget.org/packages/Microsoft.Extensions.FileSystemGlobbing
 [issue.20]: https://github.com/ForNeVeR/TruePath/issues/20
 [issues]: https://github.com/ForNeVeR/TruePath/issues
+[java.path]: https://docs.oracle.com/en%2Fjava%2Fjavase%2F21%2Fdocs%2Fapi%2F%2F/java.base/java/nio/file/Path.html
+[kotlin.path]: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io.path/java.nio.file.-path/
 [nuget.badge]: https://img.shields.io/nuget/v/TruePath
 [nuget.page]: https://www.nuget.org/packages/TruePath
 [reuse.spec]: https://reuse.software/spec/
