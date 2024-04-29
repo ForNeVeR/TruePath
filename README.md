@@ -71,7 +71,7 @@ Documentation
 
 License
 -------
-All the project's sources are licensed under the term of [the MIT license][docs.license].
+The project is distributed under the terms of [the MIT license][docs.license].
 
 The license indication in the project's sources is compliant with the [REUSE specification v3.0][reuse.spec].
 
