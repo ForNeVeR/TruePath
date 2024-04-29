@@ -71,16 +71,14 @@ Documentation
 
 License
 -------
-This project's licensing follows the [REUSE specification v 3.0][reuse.spec]. Consult each file's headers and the REUSE specification for possible details.
+All the project's sources are licensed under the term of [the MIT license][docs.license].
 
-### Contribution Policy
-By contributing to this repository, you agree that any new files you contribute will be covered by the MIT license. If you want to contribute a file under a different license, you should clearly mark it in the file's header, according to the REUSE specification.
-
-You are welcome to explicitly state your copyright in the file's header as described in [the contributor guide][docs.contributing], but the project maintainers may do this for you as well.
+The license indication in the project's sources is compliant with the [REUSE specification v3.0][reuse.spec].
 
 [andivionian-status-classifier]: https://andivionian.fornever.me/v1/#status-ventis-
 [discussions]: https://github.com/ForNeVeR/TruePath/discussions
 [docs.contributing]: CONTRIBUTING.md
+[docs.license]: LICENSE.txt
 [docs.maintaining]: MAINTAINING.md
 [file-system-globbing.nuget]: https://www.nuget.org/packages/Microsoft.Extensions.FileSystemGlobbing
 [issue.20]: https://github.com/ForNeVeR/TruePath/issues/20
