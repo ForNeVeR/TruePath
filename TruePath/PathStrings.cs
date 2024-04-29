@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace TruePath;
@@ -36,6 +37,7 @@ public static class PathStrings
     ///     Note that this operation will never perform any file IO, and is purely string manipulation.
     /// </para>
     /// </summary>
+    [SkipLocalsInit] // is necessary to prevent the CLR from filling stackalloc with zeros.
     public static string Normalize(string path)
     {
         int written = 0;

@@ -9,9 +9,10 @@ SPDX-License-Identifier: MIT
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <PackageDescription>File path abstraction library for .NET.</PackageDescription>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="TruePath.Tests"/>
+        <InternalsVisibleTo Include="TruePath.Tests" />
     </ItemGroup>
 </Project>
