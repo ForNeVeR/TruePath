@@ -20,6 +20,16 @@ The library is inspired by the path libraries used in other ecosystems: in parti
 
 If you miss some other operations, do not hesitate to [open an issue][issues] or [go to the discussions section][discussions].
 
+Project Summary
+---------------
+TruePath allows the user to employ two main approaches to work with paths.
+
+For cases when you want the path kinds to be checked at compile time, you can use the `AbsolutePath` and (WIP) <!-- TODO[#23] --> `RelativePath` types. This guarantees that you will work with proper absolute or relative paths, and it's impossible to mix them in an unsupported way that sometimes leads to surprising results (such as `Path.Combine("/usr", "/bin")` being equals to `"/bin"`).
+
+If you just need a more convenient API to work with paths, and it's not important to use strict path kinds, just rely on the functionality provided by `LocalPath`: it is opaque in a sense it wraps both absolute and relative paths, and you can use it in a more flexible way. It _may_ still cause surprising behavior, though: `new LocalPath("/usr") / "/bin"` is still an equivalent of `"/bin"` (which is not the case for `AbsolutePath` and `RelativePath`).
+
+The latter approach will cost a bit of performance, as the library will have to check the path kind at runtime.
+
 Usage
 -----
 The library offers several struct (i.e. low to zero memory overhead) types wrapping path strings. The types are designed to not involve any disk IO operations by default, and thus provide excellent performance during common operations. This comes with a drawback, though: **path comparison is only performed as string comparison so far**, which means that the library doesn't provide any means to compare paths in a case-insensitive way.
