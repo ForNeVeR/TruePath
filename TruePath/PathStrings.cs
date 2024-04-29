@@ -101,13 +101,8 @@ public static class PathStrings
             }
 
             // skip the following / or \
-            while (true)
-            {
-                if (separator < source.Length && (source[separator] == Path.DirectorySeparatorChar || source[separator] == Path.AltDirectorySeparatorChar))
-                    separator++;
-                else
-                    break;
-            }
+            while (separator < source.Length && (source[separator] == Path.DirectorySeparatorChar || source[separator] == Path.AltDirectorySeparatorChar))
+                separator++;
 
             // next iter
             source = source.Slice(separator);
