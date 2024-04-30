@@ -12,7 +12,7 @@ namespace TruePath;
 ///     know what form of normalization does the path use.
 /// </para>
 /// </summary>
-public readonly struct LocalPath(string value) : IEquatable<LocalPath>
+public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, IPath<LocalPath>
 {
     /// <summary>The normalized path string.</summary>
     public string Value { get; } = PathStrings.Normalize(value);
@@ -26,13 +26,13 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>
     /// </summary>
     public bool IsAbsolute => Path.IsPathRooted(Value);
 
-    /// <summary>
-    /// The parent of this path. Will be <c>null</c> for a rooted absolute path, or relative path pointing to the
-    /// current directory.
-    /// </summary>
+    /// <inheritdoc cref="IPath.Parent"/>
     public LocalPath? Parent => Path.GetDirectoryName(Value) is { } parent ? new(parent) : null;
 
-    /// <summary>The full name of the last component of this path.</summary>
+    /// <inheritdoc cref="IPath.Parent"/>
+    IPath? IPath.Parent => Parent;
+
+    /// <inheritdoc cref="IPath.FileName"/>
     public string FileName => Path.GetFileName(Value);
 
     /// <returns>The normalized path string contained in this object.</returns>
@@ -87,6 +87,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>
     public LocalPath RelativeTo(LocalPath basePath) => new(Path.GetRelativePath(basePath.Value, Value));
 
     // ReSharper disable once GrammarMistakeInComment // RIDER-111735
+    /// <summary>Appends another path to this one.</summary>
     /// <remarks>
     /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the
     /// <paramref name="basePath"/> will be ignored.
@@ -95,6 +96,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>
         new(Path.Combine(basePath.Value, b.Value));
 
     // ReSharper disable once GrammarMistakeInComment // RIDER-111735
+    /// <summary>Appends another path to this one.</summary>
     /// <remarks>
     /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the
     /// <paramref name="basePath"/> will be ignored.

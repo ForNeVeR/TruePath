@@ -9,7 +9,7 @@ namespace TruePath;
 /// disk letter (on Windows).
 /// </summary>
 /// <remarks>For a path that's not guaranteed to be absolute, use the <see cref="LocalPath"/> type.</remarks>
-public readonly struct AbsolutePath : IEquatable<AbsolutePath>
+public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<AbsolutePath>
 {
     internal readonly LocalPath Underlying;
     /// <summary>
@@ -34,11 +34,14 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>
     /// <summary>The normalized path string.</summary>
     public string Value => Underlying.Value;
 
-    /// <summary>The parent of this path. Will be <c>null</c> for a rooted absolute path.</summary>
+    /// <inheritdoc cref="IPath.Parent"/>
     public AbsolutePath? Parent => Underlying.Parent is { } path ? new(path.Value) : null;
         // TODO[#17]: Optimize, the strict check here is not necessary.
 
-    /// <summary>The full name of the last component of this path.</summary>
+    /// <inheritdoc cref="IPath.Parent"/>
+    IPath? IPath.Parent => Parent;
+
+    /// <inheritdoc cref="IPath.FileName"/>
     public string FileName => Underlying.FileName;
 
     /// <remarks>
