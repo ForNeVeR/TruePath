@@ -31,7 +31,7 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
     /// <exception cref="ArgumentException">Thrown if the passed path is not absolute.</exception>
     public AbsolutePath(LocalPath localPath) : this(localPath.Value) {}
 
-    /// <inheritdoc cref="IPath.Value"/>
+    /// <summary>The normalized path string.</summary>
     public string Value => Underlying.Value;
 
     /// <inheritdoc cref="IPath.Parent"/>
@@ -43,9 +43,6 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
 
     /// <inheritdoc cref="IPath.FileName"/>
     public string FileName => Underlying.FileName;
-
-    /// <inheritdoc cref="IPath.FileEntryKind"/>
-    public FileEntryKind FileEntryKind => this.GetKind();
 
     /// <remarks>
     /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the
