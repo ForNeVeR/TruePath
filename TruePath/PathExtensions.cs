@@ -16,7 +16,7 @@ public static class PathExtensions
     /// <typeparam name="TPath"></typeparam>
     /// <param name="path"></param>
     /// <returns></returns>
-    public static string GetExtension<TPath>(this TPath path) where TPath : IPath
+    public static string GetExtension(this IPath path)
     {
         var fileExtenstion = Path.GetExtension(path.FileName);
         if (string.IsNullOrEmpty(fileExtenstion))
