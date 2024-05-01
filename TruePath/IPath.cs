@@ -7,7 +7,15 @@ namespace TruePath;
 /// <summary>Represents a path in a file system.</summary>
 public interface IPath
 {
-    /// <summary>The full name of the last component of this path.</summary>
+    /// <summary>The normalized path string.</summary>
+    string Value { get; }
+
+    /// <summary>
+    /// The kind of the file system entry. This is determined by the file system, not by the path itself.
+    /// </summary>
+    FileEntryKind FileEntryKind { get; }
+
+    /// <summary> The full name of the last component of this path.</summary>
     string FileName { get; }
 
     /// <summary>
