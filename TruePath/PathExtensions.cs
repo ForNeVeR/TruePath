@@ -37,33 +37,4 @@ public static class PathExtensions
     {
         return GetExtension(path).TrimStart('.');
     }
-
-    /// <summary>
-    /// Gets the kind of the file system entry.
-    /// </summary>
-    /// <typeparam name="TPath"></typeparam>
-    /// <param name="path"></param>
-    /// <returns></returns>
-    public static FileEntryKind GetKind<TPath>(this TPath path) where TPath : IPath
-    {
-        // Check if the path exists
-        if (!File.Exists(path.Value) && !Directory.Exists(path.Value))
-        {
-            return FileEntryKind.Unknown;
-        }
-        //
-        var attributes = File.GetAttributes(path.Value);
-        if (attributes.HasFlag(FileAttributes.Directory))
-        {
-            // Check for reparse point, which is used by symlinks and junctions
-            if (attributes.HasFlag(FileAttributes.ReparsePoint))
-            {
-                // TODO: define if it is symlinks and junctions
-                return FileEntryKind.Unknown;
-            }
-            return FileEntryKind.Directory;
-        }
-
-        return FileEntryKind.File;
-    }
 }
