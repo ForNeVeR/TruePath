@@ -14,7 +14,7 @@ namespace TruePath;
 /// </summary>
 public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, IPath<LocalPath>
 {
-    /// <summary>The normalized path string.</summary>
+    /// <inheritdoc cref="IPath.Value"/>
     public string Value { get; } = PathStrings.Normalize(value);
 
     /// <summary>
@@ -34,6 +34,9 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
 
     /// <inheritdoc cref="IPath.FileName"/>
     public string FileName => Path.GetFileName(Value);
+
+    /// <inheritdoc cref="IPath.FileEntryKind"/>
+    public FileEntryKind FileEntryKind => this.GetKind();
 
     /// <returns>The normalized path string contained in this object.</returns>
     public override string ToString() => Value;
