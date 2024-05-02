@@ -6,7 +6,7 @@ using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace TruePath;
+namespace TruePath.Benchmarks;
 
 /// <summary>Helper methods to manipulate paths as strings.</summary>
 public static class PathStrings

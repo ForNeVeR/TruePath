@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System;
-using System.Security.Cryptography;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 
@@ -70,6 +68,6 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        var summary = BenchmarkRunner.Run<NormalizePathBenchmark>();
+        _ = BenchmarkRunner.Run<NormalizePathBenchmark>();
     }
 }
