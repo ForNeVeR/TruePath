@@ -10,8 +10,6 @@ namespace TruePath;
 /// </summary>
 public enum FileEntryKind
 {
-    /// <summary>An unknown kind of file system entry.</summary>
-    Unknown,
     /// <summary>A file.</summary>
     File,
     /// <summary>A directory.</summary>
