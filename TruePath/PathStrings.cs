@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -41,7 +42,10 @@ public static class PathStrings
     public static string Normalize(string path)
     {
         int written = 0;
-        Span<char> normalized = stackalloc char[path.Length];
+
+        char[]? array = path.Length < (IntPtr.Size == 4 ? 512 : 4096) ? null : ArrayPool<char>.Shared.Rent(path.Length);
+
+        Span<char> normalized = array != null ? array.AsSpan() : stackalloc char[path.Length];
         ReadOnlySpan<char> source = path.AsSpan();
 
         var buffer = normalized;
@@ -54,6 +58,7 @@ public static class PathStrings
 
             if (altSeparator == -1 && separator == -1) { last = true; separator = source.Length - 1; }
             else if (separator == -1) separator = altSeparator;
+            else if (altSeparator == -1) { }
             else separator = Math.Min(separator, altSeparator);
 
             separator++;
@@ -114,6 +119,9 @@ public static class PathStrings
                 break;
             }
         }
+
+        if (array != null)
+            ArrayPool<char>.Shared.Return(array);
 
         // why create an empty string when you can reuse it
         if (written == 0)
