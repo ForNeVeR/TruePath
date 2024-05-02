@@ -192,4 +192,190 @@ public static class PathStrings
         // alloc new path
         return new string(normalized.Slice(0, written));
     }
+
+    public static string Normalize3(string path)
+    {
+        int written = 0;
+
+        var array = ArrayPool<char>.Shared.Rent(path.Length);
+        Span<char> normalized = array;
+        ReadOnlySpan<char> source = path.AsSpan();
+
+        var buffer = normalized;
+
+        while (true)
+        {
+            bool last = false;
+            var separator = source.IndexOf(Path.DirectorySeparatorChar);
+            var altSeparator = source.IndexOf(Path.AltDirectorySeparatorChar);
+
+            if (altSeparator == -1 && separator == -1) { last = true; separator = source.Length - 1; }
+            else if (separator == -1) separator = altSeparator;
+            else if (altSeparator == -1) { }
+            else separator = Math.Min(separator, altSeparator);
+
+            separator++;
+            var block = source.Slice(0, separator);
+
+            bool skip;
+            // skip if '.'
+            if (block.Length == 1 && block[0] == '.')
+                skip = true;
+            // skip if './'
+            else if (block.Length == 2 && block[0] == '.' && (block[1] == Path.DirectorySeparatorChar || block[1] == Path.AltDirectorySeparatorChar))
+                skip = true;
+            // cut if '..' or '../'
+            else if (written != 0 && block.Length is 2 or 3 && block.StartsWith(".."))
+            {
+                var jump = normalized.Slice(0, written - 1).LastIndexOf(Path.DirectorySeparatorChar);
+
+                if (jump == -1 && written > 1)
+                {
+                    written = 0;
+                    buffer = normalized;
+                    skip = true;
+                }
+                else if (jump != -1)
+                {
+                    written = jump;
+                    buffer = normalized.Slice(written + 1);
+                    skip = true;
+                }
+                else
+                    skip = false;
+            }
+            else
+                skip = false;
+
+            // append sliced path
+            if (!skip)
+            {
+                block.CopyTo(buffer);
+                written += separator;
+                // replace \ with / if ends with \
+                if (separator > 0 && buffer[separator - 1] == Path.AltDirectorySeparatorChar)
+                    buffer[separator - 1] = Path.DirectorySeparatorChar;
+                buffer = buffer.Slice(separator);
+            }
+
+            // skip the following / or \
+            while (separator < source.Length && (source[separator] == Path.DirectorySeparatorChar || source[separator] == Path.AltDirectorySeparatorChar))
+                separator++;
+
+            // next iter
+            source = source.Slice(separator);
+            // append everything else if there`s no more '\' or '/'
+            if (last)
+            {
+                source.CopyTo(buffer);
+                written += source.Length;
+                break;
+            }
+        }
+
+
+        // why create an empty string when you can reuse it
+        if (written == 0)
+            return string.Empty;
+
+        // remove / at the end of path
+        if (written > 2 && normalized[written - 1] == Path.DirectorySeparatorChar)
+            written--;
+
+        // alloc new path
+        var result = new string(normalized.Slice(0, written));
+        ArrayPool<char>.Shared.Return(array);
+        return result;
+    }
+
+    public static string Normalize4(string path)
+    {
+        int written = 0;
+
+        var array = ArrayPool<char>.Shared.Rent(path.Length);
+        Span<char> normalized = array;
+        ReadOnlySpan<char> source = path.AsSpan();
+
+        var buffer = normalized;
+
+        while (true)
+        {
+            bool last = false;
+            var sv = SearchValues.Create([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar]);
+            var separator = source.IndexOfAny(sv);
+
+            if (separator == -1) { last = true; separator = source.Length - 1; }
+
+            separator++;
+            var block = source.Slice(0, separator);
+
+            bool skip;
+            // skip if '.'
+            if (block.Length == 1 && block[0] == '.')
+                skip = true;
+            // skip if './'
+            else if (block.Length == 2 && block[0] == '.' && sv.Contains(block[1]))
+                skip = true;
+            // cut if '..' or '../'
+            else if (written != 0 && block.Length is 2 or 3 && block.StartsWith(".."))
+            {
+                var jump = normalized.Slice(0, written - 1).LastIndexOfAny(sv);
+
+                if (jump == -1 && written > 1)
+                {
+                    written = 0;
+                    buffer = normalized;
+                    skip = true;
+                }
+                else if (jump != -1)
+                {
+                    written = jump;
+                    buffer = normalized.Slice(written + 1);
+                    skip = true;
+                }
+                else
+                    skip = false;
+            }
+            else
+                skip = false;
+
+            // append sliced path
+            if (!skip)
+            {
+                block.CopyTo(buffer);
+                written += separator;
+                // replace \ with / if ends with \
+                if (separator > 0 && buffer[separator - 1] == Path.AltDirectorySeparatorChar)
+                    buffer[separator - 1] = Path.DirectorySeparatorChar;
+                buffer = buffer.Slice(separator);
+            }
+
+            // skip the following / or \
+            while (separator < source.Length && sv.Contains(source[separator]))
+                separator++;
+
+            // next iter
+            source = source.Slice(separator);
+            // append everything else if there`s no more '\' or '/'
+            if (last)
+            {
+                source.CopyTo(buffer);
+                written += source.Length;
+                break;
+            }
+        }
+
+        // why create an empty string when you can reuse it
+        if (written == 0)
+            return string.Empty;
+
+        // remove / at the end of path
+        if (written > 2 && normalized[written - 1] == Path.DirectorySeparatorChar)
+            written--;
+
+        // alloc new path
+        var result = new string(normalized.Slice(0, written));
+        ArrayPool<char>.Shared.Return(array);
+        return result;
+    }
 }

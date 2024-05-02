@@ -42,6 +42,28 @@ public class NormalizePathBenchmark
         }
         return pp;
     }
+
+    [Benchmark]
+    public string[] Normalize3()
+    {
+        var pp = new string[N];
+        for (int i = 0; i < N; ++i)
+        {
+            pp[i] = PathStrings.Normalize3(Input);
+        }
+        return pp;
+    }
+
+    [Benchmark]
+    public string[] Normalize4()
+    {
+        var pp = new string[N];
+        for (int i = 0; i < N; ++i)
+        {
+            pp[i] = PathStrings.Normalize4(Input);
+        }
+        return pp;
+    }
 }
 
 public class Program
