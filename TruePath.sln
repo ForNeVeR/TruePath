@@ -52,6 +52,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TruePath", "TruePath\TruePa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TruePath.Tests", "TruePath.Tests\TruePath.Tests.csproj", "{7E3E01D3-19A2-4583-9895-E2AEDC3ED07A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TruePath.Benchmarks", "TruePath.Benchmarks\TruePath.Benchmarks.csproj", "{4FB7CAE4-241F-4DA8-ABC7-699BEAFBC637}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,5 +74,9 @@ Global
 		{7E3E01D3-19A2-4583-9895-E2AEDC3ED07A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E3E01D3-19A2-4583-9895-E2AEDC3ED07A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E3E01D3-19A2-4583-9895-E2AEDC3ED07A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FB7CAE4-241F-4DA8-ABC7-699BEAFBC637}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FB7CAE4-241F-4DA8-ABC7-699BEAFBC637}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FB7CAE4-241F-4DA8-ABC7-699BEAFBC637}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FB7CAE4-241F-4DA8-ABC7-699BEAFBC637}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
