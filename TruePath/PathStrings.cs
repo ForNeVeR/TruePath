@@ -43,7 +43,7 @@ public static class PathStrings
     {
         int written = 0;
 
-        char[]? array = path.Length < (IntPtr.Size == 4 ? 512 : 4096) ? null : ArrayPool<char>.Shared.Rent(path.Length);
+        char[]? array = path.Length <= 512 ? null : ArrayPool<char>.Shared.Rent(path.Length);
 
         Span<char> normalized = array != null ? array.AsSpan() : stackalloc char[path.Length];
         ReadOnlySpan<char> source = path.AsSpan();
@@ -120,9 +120,6 @@ public static class PathStrings
             }
         }
 
-        if (array != null)
-            ArrayPool<char>.Shared.Return(array);
-
         // why create an empty string when you can reuse it
         if (written == 0)
             return string.Empty;
@@ -132,6 +129,9 @@ public static class PathStrings
             written--;
 
         // alloc new path
-        return new string(normalized.Slice(0, written));
+        var result = new string(normalized.Slice(0, written));
+        if (array != null)
+            ArrayPool<char>.Shared.Return(array);
+        return result;
     }
 }
