@@ -12,10 +12,8 @@ public class PathExtensionsTests
     [InlineData("foo/bar", null)]
     public void GetExtensionWithDotTests(string path, string? expected)
     {
-        IPath l = new LocalPath(path);
-        var pathResult = l.GetExtensionWithDot();
-        var value = l.FileName;
-        Assert.Equal(expected,  l.GetExtensionWithDot());
+        IPath sut = new LocalPath(path);
+        Assert.Equal(expected,  sut.GetExtensionWithDot());
 
         //IPath a = new AbsolutePath(path);
         //Assert.Equal(expected, a.GetExtensionWithDot());
