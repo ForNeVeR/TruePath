@@ -3,17 +3,22 @@
 // SPDX-License-Identifier: MIT
 
 namespace TruePath;
+
 /// <summary>
 /// Extension methods for <see cref="IPath"/> and <see cref="IPath{TPath}"/>.
 /// </summary>
 public static class PathExtensions
 {
     /// <summary>
-    /// Gets the extension of the file name of the path with the dot.
+    /// <para>Gets the extension of the file name of the <paramref name="path"/> with the dot character.</para>
+    /// <para>For example, for the path <c>file.txt</c>, this method will return a string <c>.txt</c>.</para>
+    /// <para>
+    ///     <b>Note</b> that this method will return <c>null</c> for paths without extensions, and will return an empty
+    ///     string for paths whose names end with a dot (even though it is an unusual path). This behavior allows to
+    ///     distinguish such paths.
+    /// </para>
     /// </summary>
-    /// <param name="path"></param>
-    /// <returns>
-    /// The extension of the file name of the path with the dot.
+    /// <returns>The extension of the file name of the path with the dot.
     /// </returns>
     public static string? GetExtensionWithDot(this IPath path)
     {
@@ -22,15 +27,18 @@ public static class PathExtensions
             return null;
         return fileExtenstion;
     }
+
     /// <summary>
-    /// Gets the extension of the file name of the path without the dot.
+    /// <para>Gets the extension of the file name of the <paramref name="path"/> without the dot character.</para>
+    /// <para>For example, for the path <c>file.txt</c>, this method will return a string <c>txt</c>.</para>
+    /// <para>
+    ///     <b>Note</b> that this method will return <c>null</c> for paths without extensions, and will return an empty
+    ///     string for paths whose names end with a dot (even though it is an unusual path). This behavior allows to
+    ///     distinguish such paths.
+    /// </para>
     /// </summary>
-    /// <param name="path"></param>
     /// <returns>
     /// The extension of the file name of the path without the dot.
     /// </returns>
-    public static string? GetExtensionWithoutDot(this IPath path)
-    {
-        return GetExtensionWithDot(path)?.TrimStart('.');
-    }
+    public static string? GetExtensionWithoutDot(this IPath path) => GetExtensionWithDot(path)?.TrimStart('.');
 }
