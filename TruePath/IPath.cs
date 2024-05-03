@@ -10,7 +10,7 @@ public interface IPath
     /// <summary>The normalized path string.</summary>
     string Value { get; }
 
-    /// <summary> The full name of the last component of this path.</summary>
+    /// <summary>The name of the last component of this path.</summary>
     string FileName { get; }
 
     /// <summary>

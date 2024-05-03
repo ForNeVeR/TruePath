@@ -44,7 +44,6 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
     /// <inheritdoc cref="IPath.FileName"/>
     public string FileName => Underlying.FileName;
 
-
     /// <remarks>
     /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the
     /// <paramref name="basePath"/> will be ignored.
