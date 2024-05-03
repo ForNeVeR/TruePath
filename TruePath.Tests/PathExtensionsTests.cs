@@ -7,12 +7,13 @@ namespace TruePath.Tests;
 public class PathExtensionsTests
 {
     [Theory]
+    [InlineData("..", ".")]
     [InlineData("foo/bar.txt", ".txt")]
     [InlineData("/foo/bar.txt", ".txt")]
-    [InlineData("foo/bar.", "")]
-    [InlineData("foo/bar", null)]
+    [InlineData("foo/bar.", ".")]
+    [InlineData("foo/bar", "")]
     [InlineData(".gitignore", ".gitignore")]
-    public void GetExtensionWithDotTests(string path, string? expected)
+    public void GetExtensionWithDotTests(string path, string expected)
     {
         IPath local = new LocalPath(path);
         Assert.Equal(expected,  local.GetExtensionWithDot());
@@ -24,12 +25,14 @@ public class PathExtensionsTests
     }
 
     [Theory]
+    [InlineData(".", "")]
+    [InlineData("..", "")]
     [InlineData("foo/bar.txt", "txt")]
     [InlineData("/foo/bar.txt", "txt")]
     [InlineData("foo/bar.", "")]
-    [InlineData("foo/bar", null)]
+    [InlineData("foo/bar", "")]
     [InlineData(".gitignore", "gitignore")]
-    public void GetExtensionWithoutDotTests(string path, string? expected)
+    public void GetExtensionWithoutDotTests(string path, string expected)
     {
         IPath l = new LocalPath(path);
         Assert.Equal(expected, l.GetExtensionWithoutDot());
