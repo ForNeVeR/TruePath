@@ -11,6 +11,7 @@ public class PathExtensionsTests
     [InlineData("/foo/bar.txt", ".txt")]
     [InlineData("foo/bar.", "")]
     [InlineData("foo/bar", null)]
+    [InlineData(".gitignore", ".gitignore")]
     public void GetExtensionWithDotTests(string path, string? expected)
     {
         IPath local = new LocalPath(path);
@@ -27,6 +28,7 @@ public class PathExtensionsTests
     [InlineData("/foo/bar.txt", "txt")]
     [InlineData("foo/bar.", "")]
     [InlineData("foo/bar", null)]
+    [InlineData(".gitignore", "gitignore")]
     public void GetExtensionWithoutDotTests(string path, string? expected)
     {
         IPath l = new LocalPath(path);
