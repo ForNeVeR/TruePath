@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 Friedrich von Never <friedrich@fornever.me>
+// SPDX-FileCopyrightText: 2024 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 //
 // SPDX-License-Identifier: MIT
 
@@ -31,7 +31,7 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
     /// <exception cref="ArgumentException">Thrown if the passed path is not absolute.</exception>
     public AbsolutePath(LocalPath localPath) : this(localPath.Value) {}
 
-    /// <summary>The normalized path string.</summary>
+    /// <inheritdoc cref="IPath.Value"/>
     public string Value => Underlying.Value;
 
     /// <inheritdoc cref="IPath.Parent"/>

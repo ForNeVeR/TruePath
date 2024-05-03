@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 Friedrich von Never <friedrich@fornever.me>
+// SPDX-FileCopyrightText: 2024 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 //
 // SPDX-License-Identifier: MIT
 
@@ -7,7 +7,10 @@ namespace TruePath;
 /// <summary>Represents a path in a file system.</summary>
 public interface IPath
 {
-    /// <summary>The full name of the last component of this path.</summary>
+    /// <summary>The normalized path string.</summary>
+    string Value { get; }
+
+    /// <summary>The name of the last component of this path.</summary>
     string FileName { get; }
 
     /// <summary>

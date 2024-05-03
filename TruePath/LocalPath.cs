@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 Friedrich von Never <friedrich@fornever.md>
+// SPDX-FileCopyrightText: 2024 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 //
 // SPDX-License-Identifier: MIT
 
@@ -14,7 +14,7 @@ namespace TruePath;
 /// </summary>
 public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, IPath<LocalPath>
 {
-    /// <summary>The normalized path string.</summary>
+    /// <inheritdoc cref="IPath.Value"/>
     public string Value { get; } = PathStrings.Normalize(value);
 
     /// <summary>

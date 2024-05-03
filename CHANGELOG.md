@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased] (1.2.0)
 ### Added
 - New `IPath` and `IPath<TPath>` interfaces that allow to process any paths (`LocalPath` and `AbsolutePath`) in a polymorphic way.
+- `GetExtensionWithDot` and `GetExtensionWithoutDot` extension methods for `IPath`.
 
 ### Changed
 - [#19](https://github.com/ForNeVeR/TruePath/issues/19): Optimize `PathStrings.Normalize` method.

@@ -61,8 +61,22 @@ This functions basically the same as the `LocalPath`, but it is _always_ an abso
 
 To convert from `LocalPath` to `AbsolutePath` and vice versa, you can use the constructors of `AbsolutePath` and `LocalPath` respectively. Any `AbsolutePath` constructor (from either a string or a `LocalPath`) has same check for absolute path, and any `LocalPath` constructor (from either a string or an `AbsolutePath`) doesn't have any checks.
 
+### `IPath`
+This is an interface that is implemented by both `LocalPath` and `AbsolutePath`. It allows to process any paths in a polymorphic way.
+
 ### `LocalPathPattern`
 This is a marker type that doesn't offer any advanced functionality over the contained string. It is used to mark paths that include wildcards, for further integration with external libraries, such as [Microsoft.Extensions.FileSystemGlobbing][file-system-globbing.nuget].
+
+### Path Features
+Aside from the strict types, the following features are supported for the paths:
+- `IPath::Value` returns the normalized path string;
+- `IPath::FileName` returns the last component of the path;
+- `IPath::Parent` returns the parent path item (`null` for the root path or top-level relative path);
+- `IPath<T>` supports operators to join it with `LocalPath` or a `string` (note that in both cases appending an absolute path to path of another kind will take over: the last absolute path in chain will win and destroy all the previous ones; this is the standard behavior of path-combining methods — use `AbsolutePath` in combination with `RelativePath` if you want to avoid this behavior);
+- `LocalPath::IsAbsolute` to check the path kind (since it supports both kinds);
+- `LocalPath::IsPrefixOf` to check path prefixes;
+- `LocalPath::RelativeTo` to get a relative part between two paths, if possible;
+- extension methods on `IPath`: `GetExtensionWithDot` and `GetExtensionWithoutDot` to get the file extension with or without the leading dot (note that `GetExtensionWithDot` will behave differently for paths ending with dots and paths without dot at all, which allows to reconstruct such a file name from its part without extension and the "extension with dot").
 
 Documentation
 -------------
