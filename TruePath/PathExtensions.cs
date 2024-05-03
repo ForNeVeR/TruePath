@@ -17,6 +17,7 @@ public static class PathExtensions
     ///     string for paths whose names end with a dot (even though it is an unusual path). This behavior allows to
     ///     distinguish such paths.
     /// </para>
+    /// <para>File name entirely consisting of extension, such as <c>.gitignore</c>, is returned as-is.</para>
     /// </summary>
     /// <returns>The extension of the file name of the path with the dot.
     /// </returns>
@@ -35,6 +36,10 @@ public static class PathExtensions
     ///     <b>Note</b> that this method will return <c>null</c> for paths without extensions, and will return an empty
     ///     string for paths whose names end with a dot (even though it is an unusual path). This behavior allows to
     ///     distinguish such paths.
+    /// </para>
+    /// <para>
+    ///     File name entirely consisting of extension, such as <c>.gitignore</c>, is returned with its leading dot
+    ///     trimmed.
     /// </para>
     /// </summary>
     /// <returns>
