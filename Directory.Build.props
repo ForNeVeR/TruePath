@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
     <PropertyGroup Label="Packaging">
         <Version>1.1.0</Version>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <Copyright>© 2024 Friedrich von Never</Copyright>
+        <Copyright>2024 TruePath contributors &lt;https://github.com/ForNeVeR/TruePath&gt;</Copyright>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <IncludeSymbols>true</IncludeSymbols>
