@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 namespace TruePath.Tests;
+
 public class PathExtensionsTests
 {
     [Theory]
@@ -12,13 +13,14 @@ public class PathExtensionsTests
     [InlineData("foo/bar", null)]
     public void GetExtensionWithDotTests(string path, string? expected)
     {
-        IPath sut = new LocalPath(path);
-        Assert.Equal(expected,  sut.GetExtensionWithDot());
+        IPath local = new LocalPath(path);
+        Assert.Equal(expected,  local.GetExtensionWithDot());
 
-        //IPath a = new AbsolutePath(path);
-        //Assert.Equal(expected, a.GetExtensionWithDot());
+        if (!path.StartsWith('/')) return;
+
+        IPath a = new AbsolutePath(path);
+        Assert.Equal(expected, a.GetExtensionWithDot());
     }
-
 
     [Theory]
     [InlineData("foo/bar.txt", "txt")]
@@ -30,8 +32,9 @@ public class PathExtensionsTests
         IPath l = new LocalPath(path);
         Assert.Equal(expected, l.GetExtensionWithoutDot());
 
-        //IPath a = new AbsolutePath(path);
-        //Assert.Equal(expected, a.GetExtensionWithoutDot());
-    }
+        if (!path.StartsWith('/')) return;
 
+        IPath a = new AbsolutePath(path);
+        Assert.Equal(expected, a.GetExtensionWithoutDot());
+    }
 }
