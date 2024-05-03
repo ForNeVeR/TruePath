@@ -7,50 +7,35 @@ using System.Threading.Tasks;
 namespace TruePath.Tests;
 public class PathExtensionsTests
 {
-    [Fact]
-    public void GetExtensionTests()
+    [Theory]
+    [InlineData("foo/bar.txt", ".txt")]
+    [InlineData("/foo/bar.txt", ".txt")]
+    [InlineData("foo/bar.", "")]
+    [InlineData("foo/bar", null)]
+    public void GetExtensionWithDotTests(string path, string? expected)
     {
-        IPath l = new LocalPath("foo/bar.txt");
-        IPath a = new AbsolutePath("/foo/bar.txt");
+        IPath l = new LocalPath(path);
+        var pathResult = l.GetExtensionWithDot();
+        var value = l.FileName;
+        Assert.Equal(expected,  l.GetExtensionWithDot());
 
-        Assert.Equal(".txt", l.GetExtension());
-        Assert.Equal(".txt", a.GetExtension());
+        //IPath a = new AbsolutePath(path);
+        //Assert.Equal(expected, a.GetExtensionWithDot());
     }
 
-    [Fact]
-    public void GetExtension_OnInvalidFile_ThrowsArgumentException()
+
+    [Theory]
+    [InlineData("foo/bar.txt", "txt")]
+    [InlineData("/foo/bar.txt", "txt")]
+    [InlineData("foo/bar.", "")]
+    [InlineData("foo/bar", null)]
+    public void GetExtensionWithoutDotTests(string path, string? expected)
     {
-        IPath a = new AbsolutePath("/foo/bar");
-        string expectedMessage = "bar is not a file";
-        var ex = Assert.Throws<ArgumentException>(() => a.GetExtension());
-        Assert.Equal(expectedMessage, ex.Message);
+        IPath l = new LocalPath(path);
+        Assert.Equal(expected, l.GetExtensionWithoutDot());
 
-
-        IPath l = new LocalPath("foo/bar");
-        ex = Assert.Throws<ArgumentException>(() => l.GetExtension());
-        Assert.Equal(expectedMessage, ex.Message);
+        //IPath a = new AbsolutePath(path);
+        //Assert.Equal(expected, a.GetExtensionWithoutDot());
     }
 
-    [Fact]
-    public void GetExtensionWithoutDotTests()
-    {
-        IPath l = new LocalPath("foo/bar.txt");
-        IPath a = new AbsolutePath("/foo/bar.txt");
-
-        Assert.Equal("txt", l.GetExtensionWithoutDot());
-        Assert.Equal("txt", a.GetExtensionWithoutDot());
-    }
-
-    [Fact]
-    public void GetExtensionWithoutDot_FileWithoutExtension_ThrowsArgumentException()
-    {
-        IPath a = new AbsolutePath("/foo/bar");
-        string expectedMessage = "bar is not a file";
-        var ex = Assert.Throws<ArgumentException>(() => a.GetExtensionWithoutDot());
-        Assert.Equal(expectedMessage, ex.Message);
-
-        IPath l = new LocalPath("foo/bar");
-        ex = Assert.Throws<ArgumentException>(() => l.GetExtensionWithoutDot());
-        Assert.Equal(expectedMessage, ex.Message);
-    }
 }

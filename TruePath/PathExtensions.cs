@@ -11,30 +11,28 @@ namespace TruePath;
 public static class PathExtensions
 {
     /// <summary>
-    /// Gets the extension of the file name of the path.
+    /// Gets the extension of the file name of the path with the dot.
     /// </summary>
-    /// <typeparam name="TPath"></typeparam>
     /// <param name="path"></param>
-    /// <returns></returns>
-    public static string GetExtension<TPath>(this TPath path) where TPath : IPath
+    /// <returns>
+    /// The extension of the file name of the path with the dot.
+    /// </returns>
+    public static string? GetExtensionWithDot(this IPath path)
     {
         var fileExtenstion = Path.GetExtension(path.FileName);
-        if (string.IsNullOrEmpty(fileExtenstion))
-        {
-            throw new ArgumentException(string.Format("{0} is not a file", path.FileName));
-        }
+        if (string.IsNullOrEmpty(fileExtenstion) && !path.FileName.EndsWith('.'))
+            return null;
         return fileExtenstion;
     }
     /// <summary>
     /// Gets the extension of the file name of the path without the dot.
     /// </summary>
-    /// <typeparam name="TPath"></typeparam>
-    /// <param name="path">
-    /// The path to get the extension from.
-    /// </param>
-    /// <returns>The extension of the file name of the path without the dot.</returns>
-    public static string GetExtensionWithoutDot<TPath>(this TPath path) where TPath : IPath
+    /// <param name="path"></param>
+    /// <returns>
+    /// The extension of the file name of the path without the dot.
+    /// </returns>
+    public static string? GetExtensionWithoutDot(this IPath path)
     {
-        return GetExtension(path).TrimStart('.');
+        return GetExtensionWithDot(path)?.TrimStart('.');
     }
 }
