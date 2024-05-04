@@ -42,11 +42,19 @@ let workflows = [
 
             step(name = "REUSE license check", uses = "fsfe/reuse-action@v3")
         ]
+
         job "encoding" [
             runsOn ubuntu
             checkout
 
             step(name = "Verify encoding", shell = "pwsh", run = "scripts/Test-Encoding.ps1")
+        ]
+
+        job "nowarn-empty" [
+            runsOn ubuntu
+            checkout
+
+            step(name = "Verify with NoWarn as empty", run = "dotnet build /p:NoWarn='' --no-incremental")
         ]
     ]
 

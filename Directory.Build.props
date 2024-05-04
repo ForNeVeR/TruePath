@@ -16,9 +16,11 @@ SPDX-License-Identifier: MIT
     </PropertyGroup>
 
     <PropertyGroup Label="Build">
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <NoWarn>CS0419;CS1570;CS1571;CS1572;CS1573;CS1574;CS1580;CS1581;CS1584;CS1587;CS1589;CS1590;CS1591;CS1592;CS1598;CS1710;CS1711;CS1712;$(NoWarn)</NoWarn>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
     </PropertyGroup>

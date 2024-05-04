@@ -53,3 +53,9 @@ jobs:
     - name: Verify encoding
       shell: pwsh
       run: scripts/Test-Encoding.ps1
+  nowarn-empty:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Verify with NoWarn as empty
+      run: dotnet build /p:NoWarn='' --no-incremental
