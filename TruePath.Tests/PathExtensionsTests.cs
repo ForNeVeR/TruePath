@@ -44,6 +44,7 @@ public class PathExtensionsTests
     }
 
     [Theory]
+    [InlineData("..", ".")]
     [InlineData("foo/bar.txt", "bar")]
     [InlineData("/foo/bar.txt", "bar")]
     [InlineData("foo/bar.", "bar")]
@@ -58,5 +59,18 @@ public class PathExtensionsTests
 
         IPath a = new AbsolutePath(path);
         Assert.Equal(expected, a.GetFilenameWithoutExtension());
+    }
+
+    [Theory]
+    [InlineData("..")]
+    [InlineData("file.txt")]
+    [InlineData("file..txt")]
+    [InlineData(".gitignore")]
+    [InlineData("gitignore.")]
+    public void FileNameInvariantTests(string inputPath)
+    {
+        var path = new LocalPath(inputPath);
+        var fileName = path.FileName;
+        Assert.Equal(fileName, path.GetFilenameWithoutExtension() + path.GetExtensionWithDot());
     }
 }

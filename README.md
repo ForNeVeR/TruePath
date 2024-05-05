@@ -76,7 +76,11 @@ Aside from the strict types, the following features are supported for the paths:
 - `LocalPath::IsAbsolute` to check the path kind (since it supports both kinds);
 - `LocalPath::IsPrefixOf` to check path prefixes;
 - `LocalPath::RelativeTo` to get a relative part between two paths, if possible;
-- extension methods on `IPath`: `GetExtensionWithDot` and `GetExtensionWithoutDot` to get the file extension with or without the leading dot (note that `GetExtensionWithDot` will behave differently for paths ending with dots and paths without dot at all, which allows to reconstruct such a file name from its part without extension and the "extension with dot").
+- extension methods on `IPath`:
+  - `GetExtensionWithDot` and `GetExtensionWithoutDot` to get the file extension with or without the leading dot (note that `GetExtensionWithDot` will behave differently for paths ending with dots and paths without dot at all);
+  - `GetFileNameWithoutExtension` to get the file name without the extension (and without the trailing dot, if any)
+
+    (Note how `GetFileNameWithoutExtension()` works nicely together with `GetExtensionWithDot()` to reconstruct the resulting path from their concatenation, however weird the initial name was — no extension, trailing dot, no base name.)
 
 Documentation
 -------------

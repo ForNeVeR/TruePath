@@ -41,12 +41,12 @@ public static class PathExtensions
 
     /// <summary>
     /// <para>Gets the file name of the <paramref name="path"/> without the extension.</para>
-    /// <para>For example, for the path <c>file.txt</c>, this method will return a string <c>file</c></para>
+    /// <para>For example, for the path <c>file.txt</c>, this method will return a string <c>file</c>.</para>
     /// </summary>
     /// <returns>
-    /// The file name of the path without the extension. If the path has no extension, the file name is returned as-is.
+    /// The file name of the path without the extension. If the path has no extension, the file name is returned as-is
+    /// (one trailing dot will be stripped, though).
     /// </returns>
-    /// <remarks></remarks>
     public static string GetFilenameWithoutExtension(this IPath path) =>
         Path.GetFileNameWithoutExtension(path.FileName);
 }

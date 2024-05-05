@@ -13,6 +13,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased] (1.2.0)
 ### Added
 - New `IPath` and `IPath<TPath>` interfaces that allow to process any paths (`LocalPath` and `AbsolutePath`) in a polymorphic way.
+- [#41](https://github.com/ForNeVeR/TruePath/issues/41): `GetFileNameWithoutExtension` extension method for `IPath`.
+
+  Thanks to [@Komroncube][komroncube].
 - [#42](https://github.com/ForNeVeR/TruePath/issues/42): `GetExtensionWithDot` and `GetExtensionWithoutDot` extension methods for `IPath`.
 
   Thanks to @Komroncube.
@@ -52,6 +55,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 This is the first published version of the package. It doesn't contain any features, and serves the purpose of kickstarting the publication system, and to be an anchor for further additions to the package.
 
 [docs.readme]: README.md
+
+[komroncube]: https://github.com/Komroncube
 
 [0.0.0]: https://github.com/ForNeVeR/TruePath/releases/tag/v0.0.0
 [1.0.0]: https://github.com/ForNeVeR/TruePath/compare/v0.0.0...v1.0.0
