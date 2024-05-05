@@ -38,4 +38,15 @@ public static class PathExtensions
     ///     reconstruct the original name from its name without extension and its extension without dot.
     /// </remarks>
     public static string GetExtensionWithoutDot(this IPath path) => GetExtensionWithDot(path).TrimStart('.');
+
+    /// <summary>
+    /// <para>Gets the file name of the <paramref name="path"/> without the extension.</para>
+    /// <para>For example, for the path <c>file.txt</c>, this method will return a string <c>file</c></para>
+    /// </summary>
+    /// <returns>
+    /// The file name of the path without the extension. If the path has no extension, the file name is returned as-is.
+    /// </returns>
+    /// <remarks></remarks>
+    public static string GetFilenameWithoutExtension(this IPath path) =>
+        Path.GetFileNameWithoutExtension(path.FileName);
 }

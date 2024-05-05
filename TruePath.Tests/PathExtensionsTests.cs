@@ -42,4 +42,21 @@ public class PathExtensionsTests
         IPath a = new AbsolutePath(path);
         Assert.Equal(expected, a.GetExtensionWithoutDot());
     }
+
+    [Theory]
+    [InlineData("foo/bar.txt", "bar")]
+    [InlineData("/foo/bar.txt", "bar")]
+    [InlineData("foo/bar.", "bar")]
+    [InlineData("foo/bar", "bar")]
+    [InlineData(".gitignore", "")]
+    public void GetFilenameWithoutExtensionTests(string path, string expected)
+    {
+        IPath l = new LocalPath(path);
+        Assert.Equal(expected, l.GetFilenameWithoutExtension());
+
+        if (!path.StartsWith('/')) return;
+
+        IPath a = new AbsolutePath(path);
+        Assert.Equal(expected, a.GetFilenameWithoutExtension());
+    }
 }
