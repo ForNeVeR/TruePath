@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] (1.2.0)
+## [1.2.0] - 2024-05-05
 ### Added
 - New `IPath` and `IPath<TPath>` interfaces that allow to process any paths (`LocalPath` and `AbsolutePath`) in a polymorphic way.
 - [#41](https://github.com/ForNeVeR/TruePath/issues/41): `GetFileNameWithoutExtension` extension method for `IPath`.
@@ -18,12 +18,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   Thanks to [@Komroncube][komroncube].
 - [#42](https://github.com/ForNeVeR/TruePath/issues/42): `GetExtensionWithDot` and `GetExtensionWithoutDot` extension methods for `IPath`.
 
-  Thanks to [@Komroncube][komroncube].
+  Thanks to [@Komroncube][komroncube] and [@y0ung3r](https://github.com/y0ung3r).
 
 ### Changed
 - [#19](https://github.com/ForNeVeR/TruePath/issues/19): Optimize `PathStrings.Normalize` method.
 
   Thanks to [@BadRyuner](https://github.com/BadRyuner).
+- Improve the project documentation.
 
 ## [1.1.0] - 2024-04-27
 ### Added
@@ -61,4 +62,5 @@ This is the first published version of the package. It doesn't contain any featu
 [0.0.0]: https://github.com/ForNeVeR/TruePath/releases/tag/v0.0.0
 [1.0.0]: https://github.com/ForNeVeR/TruePath/compare/v0.0.0...v1.0.0
 [1.1.0]: https://github.com/ForNeVeR/TruePath/compare/v1.0.0...v1.1.0
-[Unreleased]: https://github.com/ForNeVeR/TruePath/compare/v1.1.0...HEAD
+[1.2.0]: https://github.com/ForNeVeR/TruePath/compare/v1.1.0...v1.2.0
+[Unreleased]: https://github.com/ForNeVeR/TruePath/compare/v1.2.0...HEAD
