@@ -15,15 +15,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - New `IPath` and `IPath<TPath>` interfaces that allow to process any paths (`LocalPath` and `AbsolutePath`) in a polymorphic way.
 - [#41](https://github.com/ForNeVeR/TruePath/issues/41): `GetFileNameWithoutExtension` extension method for `IPath`.
 
-  Thanks to [@Komroncube][komroncube].
+  Thanks to @Komroncube.
 - [#42](https://github.com/ForNeVeR/TruePath/issues/42): `GetExtensionWithDot` and `GetExtensionWithoutDot` extension methods for `IPath`.
 
-  Thanks to [@Komroncube][komroncube] and [@y0ung3r](https://github.com/y0ung3r).
+  Thanks to @Komroncube and @y0ung3r.
 
 ### Changed
 - [#19](https://github.com/ForNeVeR/TruePath/issues/19): Optimize `PathStrings.Normalize` method.
 
-  Thanks to [@BadRyuner](https://github.com/BadRyuner).
+  Thanks to @BadRyuner.
 - Improve the project documentation.
 
 ## [1.1.0] - 2024-04-27
@@ -56,8 +56,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 This is the first published version of the package. It doesn't contain any features, and serves the purpose of kickstarting the publication system, and to be an anchor for further additions to the package.
 
 [docs.readme]: README.md
-
-[komroncube]: https://github.com/Komroncube
 
 [0.0.0]: https://github.com/ForNeVeR/TruePath/releases/tag/v0.0.0
 [1.0.0]: https://github.com/ForNeVeR/TruePath/compare/v0.0.0...v1.0.0
