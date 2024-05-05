@@ -18,7 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   Thanks to [@Komroncube][komroncube].
 - [#42](https://github.com/ForNeVeR/TruePath/issues/42): `GetExtensionWithDot` and `GetExtensionWithoutDot` extension methods for `IPath`.
 
-  Thanks to [@Komroncube](https://github.com/komroncube).
+  Thanks to [@Komroncube][komroncube].
 
 ### Changed
 - [#19](https://github.com/ForNeVeR/TruePath/issues/19): Optimize `PathStrings.Normalize` method.
