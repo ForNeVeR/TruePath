@@ -18,12 +18,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   Thanks to [@Komroncube][komroncube].
 - [#42](https://github.com/ForNeVeR/TruePath/issues/42): `GetExtensionWithDot` and `GetExtensionWithoutDot` extension methods for `IPath`.
 
-  Thanks to @Komroncube.
+  Thanks to [@Komroncube](https://github.com/komroncube).
 
 ### Changed
 - [#19](https://github.com/ForNeVeR/TruePath/issues/19): Optimize `PathStrings.Normalize` method.
 
-  Thanks ot @BadRyuner.
+  Thanks to [@BadRyuner](https://github.com/BadRyuner).
 
 ## [1.1.0] - 2024-04-27
 ### Added
