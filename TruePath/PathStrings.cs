@@ -73,9 +73,19 @@ public static class PathStrings
             // cut if '..' or '../'
             else if (written != 0 && block.Length is 2 or 3 && block.StartsWith(".."))
             {
-                var jump = normalized.Slice(0, written - 1).LastIndexOf(Path.DirectorySeparatorChar);
+                var alreadyWrittenPart = normalized[..(written - 1)];
+                var jump = alreadyWrittenPart.LastIndexOf(Path.DirectorySeparatorChar);
 
-                if (jump == -1 && written > 1)
+                // Check if the last entry in the normalized path is "..": in this case, no need to skip (we keep a
+                // train of ../../.. in the normalized path's root because they are impossible to get rid of during
+                // normalization).
+                var lastEntryStartIndex = jump + 1;
+                var lastEntry = alreadyWrittenPart[lastEntryStartIndex..];
+                if (lastEntry is "..")
+                {
+                    skip = false;
+                }
+                else if (jump == -1 && written > 1)
                 {
                     written = 0;
                     buffer = normalized;
