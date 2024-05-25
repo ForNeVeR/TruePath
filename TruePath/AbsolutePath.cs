@@ -44,6 +44,13 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
     /// <inheritdoc cref="IPath.FileName"/>
     public string FileName => Underlying.FileName;
 
+    /// <summary>
+    /// Calculates the relative path from a base path to this path.
+    /// </summary>
+    /// <param name="basePath">The base path from which to calculate the relative path.</param>
+    /// <returns>The relative path from the base path to this path.</returns>
+    public LocalPath RelativeTo(AbsolutePath basePath) => new(Path.GetRelativePath(basePath.Value, Value));
+
     /// <remarks>
     /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the
     /// <paramref name="basePath"/> will be ignored.
