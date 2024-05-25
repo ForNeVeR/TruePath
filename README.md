@@ -42,7 +42,7 @@ The paths are stored in the **normalized form**.
 - Any repeated separators in the input are collapsed to only one separator (e.g. `//` to just `/` on Unix).
 - Any sequence of current and parent directory marks (subsequently, `.` and `..`) is resolved if possible (meaning they
   will not be replaced if they are in the root position: paths such as `.` or `../..` will not be affected by the
-  normalization, while e.g. `foo/../.` will be resolved to just `foo`).
+  normalization, while e.g. `foo/bar/../.` will be resolved to just `foo`).
 
 Note that the normalization operation will not perform any file IO, and is purely string manipulation.
 
