@@ -12,31 +12,41 @@ namespace TruePath;
 public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<AbsolutePath>
 {
     internal readonly LocalPath Underlying;
+
+    /// <summary>
+    /// Creates an <see cref="AbsolutePath"/> instance by normalizing the path from the passed string according to the
+    /// rules stated in <see cref="LocalPath"/>.
+    /// </summary>
+    /// <param name="value">Path string to normalize.</param>
+    /// <param name="checkAbsoluteness">Flag indicating whether absoluteness of path should be checked</param>
+    /// <exception cref="ArgumentException">Thrown if the passed string does not represent an absolute path.</exception>>
+    private AbsolutePath(string value, bool checkAbsoluteness)
+    {
+        Underlying = new LocalPath(value);
+
+        if (checkAbsoluteness && Underlying.IsAbsolute is false)
+            throw new ArgumentException($"Path \"{value}\" is not absolute.");
+    }
+
     /// <summary>
     /// Creates an <see cref="AbsolutePath"/> instance by normalizing the path from the passed string according to the
     /// rules stated in <see cref="LocalPath"/>.
     /// </summary>
     /// <param name="value">Path string to normalize.</param>
     /// <exception cref="ArgumentException">Thrown if the passed string does not represent an absolute path.</exception>
-    public AbsolutePath(string value)
-    {
-        Underlying = new LocalPath(value);
-        if (!Underlying.IsAbsolute)
-            throw new ArgumentException($"Path \"{value}\" is not absolute.");
-    }
+    public AbsolutePath(string value) : this(value, checkAbsoluteness: true) { }
 
     /// <summary>
     /// Creates an <see cref="AbsolutePath"/> instance by converting a <paramref name="localPath"/> object.
     /// </summary>
     /// <exception cref="ArgumentException">Thrown if the passed path is not absolute.</exception>
-    public AbsolutePath(LocalPath localPath) : this(localPath.Value) {}
+    public AbsolutePath(LocalPath localPath) : this(localPath.Value, checkAbsoluteness: true) { }
 
     /// <inheritdoc cref="IPath.Value"/>
     public string Value => Underlying.Value;
 
     /// <inheritdoc cref="IPath.Parent"/>
-    public AbsolutePath? Parent => Underlying.Parent is { } path ? new(path.Value) : null;
-        // TODO[#17]: Optimize, the strict check here is not necessary.
+    public AbsolutePath? Parent => Underlying.Parent is { } path ? new(path.Value, checkAbsoluteness: false) : null;
 
     /// <inheritdoc cref="IPath.Parent"/>
     IPath? IPath.Parent => Parent;
