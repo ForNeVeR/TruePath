@@ -6,6 +6,27 @@ namespace TruePath.Tests;
 
 public class AbsolutePathTests
 {
+    [Theory]
+    [InlineData("/home/user", "/home/user/documents")]
+    [InlineData("/home/usEr", "/home/User/documents")]
+    [InlineData("/home/user/documents", "/home/user/documents")]
+    [InlineData("/home/user/documents", "/home/user")]
+    public void IsPrefixOfShouldBeEquivalentToStartsWith(string pathA, string pathB)
+    {
+        if (OperatingSystem.IsWindows()) return;
+
+        // Arrange
+        var a = new AbsolutePath(pathA);
+        var b = new AbsolutePath(pathB);
+
+        // Act
+        var isPrefix = a.IsPrefixOf(b);
+        var startsWith = b.Value.StartsWith(a.Value);
+
+        // Assert
+        Assert.Equal(isPrefix, startsWith);
+    }
+
     [Fact]
     public void CurrentWorkingDirectoryShouldReturnCorrectAbsolutePath()
     {

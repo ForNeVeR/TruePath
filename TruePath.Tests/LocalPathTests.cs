@@ -6,6 +6,25 @@ namespace TruePath.Tests;
 
 public class LocalPathTests
 {
+    [Theory]
+    [InlineData("user", "user/documents")]
+    [InlineData("usEr", "User/documents")]
+    [InlineData("user/documents", "user/documents")]
+    [InlineData("user/documents", "user")]
+    public void IsPrefixOfShouldBeEquivalentToStartsWith(string pathA, string pathB)
+    {
+        // Arrange
+        var a = new LocalPath(pathA);
+        var b = new LocalPath(pathB);
+
+        // Act
+        var isPrefix = a.IsPrefixOf(b);
+        var startsWith = b.Value.StartsWith(a.Value);
+
+        // Assert
+        Assert.Equal(isPrefix, startsWith);
+    }
+
     [Fact]
     public void AbsolutePathIsNormalizedOnCreation()
     {

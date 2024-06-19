@@ -69,10 +69,10 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
         return !left.Equals(right);
     }
 
-    /// <remarks>
-    /// Checks for a non-strict prefix: if the paths are equal then they are still considered prefixes of each other.
-    /// </remarks>
-    /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
+    /// <inheritdoc cref="IPath.StartsWith"/>
+    public bool StartsWith(LocalPath other) => Value.StartsWith(other.Value);
+
+    /// <inheritdoc cref="IPath.IsPrefixOf"/>
     public bool IsPrefixOf(LocalPath other)
     {
         if (!(Value.Length <= other.Value.Length && other.Value.StartsWith(Value))) return false;
