@@ -7,6 +7,29 @@ namespace TruePath.Tests;
 public class AbsolutePathTests
 {
     [Fact]
+    public void CurrentWorkingDirectoryShouldReturnCorrectAbsolutePath()
+    {
+        // Arrange
+        var expectedPath = Directory.GetCurrentDirectory();
+
+        // Act
+        var actualPath = new AbsolutePath().CurrentWorkingDirectory;
+
+        // Assert
+        Assert.Equal(expectedPath, actualPath.Value);
+    }
+
+    [Fact]
+    public void CurrentWorkingDirectoryShouldBeAbsolute()
+    {
+        // Act
+        var path = new AbsolutePath().CurrentWorkingDirectory;
+
+        // Assert
+        Assert.True(Path.IsPathRooted(path.Value));
+    }
+
+    [Fact]
     public void PathIsNormalizedOnCreation()
     {
         if (!OperatingSystem.IsWindows()) return;

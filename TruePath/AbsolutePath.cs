@@ -55,6 +55,14 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
     public string FileName => Underlying.FileName;
 
     /// <summary>
+    /// Gets the current working directory as an AbsolutePath instance.
+    /// </summary>
+    /// <value>
+    /// The current working directory.
+    /// </value>
+    public AbsolutePath CurrentWorkingDirectory => new(Environment.CurrentDirectory);
+
+    /// <summary>
     /// Calculates the relative path from a base path to this path.
     /// </summary>
     /// <param name="basePath">The base path from which to calculate the relative path.</param>
