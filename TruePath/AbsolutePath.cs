@@ -54,14 +54,13 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
     /// <inheritdoc cref="IPath.FileName"/>
     public string FileName => Underlying.FileName;
 
-    /// <inheritdoc cref="IPath.StartsWith"/>
+    /// <inheritdoc cref="IPath{TPath}.StartsWith(TPath)"/>
     public bool StartsWith(AbsolutePath other) => Value.StartsWith(other.Value);
 
-    /// <inheritdoc cref="IPath.IsPrefixOf"/>
+    /// <inheritdoc cref="IPath{TPath}.IsPrefixOf(TPath)"/>
     public bool IsPrefixOf(AbsolutePath other)
     {
-        if (!(Value.Length <= other.Value.Length && other.Value.StartsWith(Value))) return false;
-        return other.Value.Length == Value.Length || other.Value[Value.Length] == Path.DirectorySeparatorChar;
+        return Value.Length <= other.Value.Length && other.Value.StartsWith(Value);
     }
 
     /// <summary>

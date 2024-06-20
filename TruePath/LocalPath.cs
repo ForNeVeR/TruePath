@@ -69,10 +69,10 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
         return !left.Equals(right);
     }
 
-    /// <inheritdoc cref="IPath.StartsWith"/>
+    /// <inheritdoc cref="IPath{TPath}.StartsWith(TPath)"/>
     public bool StartsWith(LocalPath other) => Value.StartsWith(other.Value);
 
-    /// <inheritdoc cref="IPath.IsPrefixOf"/>
+    /// <inheritdoc cref="IPath{TPath}.IsPrefixOf(TPath)"/>
     public bool IsPrefixOf(LocalPath other)
     {
         if (!(Value.Length <= other.Value.Length && other.Value.StartsWith(Value))) return false;

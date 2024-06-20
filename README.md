@@ -85,6 +85,11 @@ Aside from the strict types, the following features are supported for the paths:
 
     (Note how `GetFileNameWithoutExtension()` works nicely together with `GetExtensionWithDot()` to reconstruct the resulting path from their concatenation, however weird the initial name was — no extension, trailing dot, no base name.)
 
+### Unreleased
+
+- `IPath::IsPrefixOf` to check path prefixes.
+- `IPath::StartsWith` to check if the current path starts with a specified path.
+
 Documentation
 -------------
 - [Contributor Guide][docs.contributing]
