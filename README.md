@@ -61,6 +61,9 @@ This functions basically the same as the `LocalPath`, but it is _always_ an abso
 
 To convert from `LocalPath` to `AbsolutePath` and vice versa, you can use the constructors of `AbsolutePath` and `LocalPath` respectively. Any `AbsolutePath` constructor (from either a string or a `LocalPath`) has same check for absolute path, and any `LocalPath` constructor (from either a string or an `AbsolutePath`) doesn't have any checks.
 
+#### Static Members
+- `AbsolutePath.CurrentWorkingDirectory`: returns `Environment.CurrentDirectory` as an `AbsolutePath` instance.
+
 ### `IPath`
 This is an interface that is implemented by both `LocalPath` and `AbsolutePath`. It allows to process any paths in a polymorphic way.
 
