@@ -60,7 +60,7 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
     /// <value>
     /// The current working directory.
     /// </value>
-    public AbsolutePath CurrentWorkingDirectory => new(Environment.CurrentDirectory);
+    public static AbsolutePath CurrentWorkingDirectory => new(Environment.CurrentDirectory);
 
     /// <summary>
     /// Calculates the relative path from a base path to this path.

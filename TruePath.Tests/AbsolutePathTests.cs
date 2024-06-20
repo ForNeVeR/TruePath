@@ -13,7 +13,7 @@ public class AbsolutePathTests
         var expectedPath = Directory.GetCurrentDirectory();
 
         // Act
-        var actualPath = new AbsolutePath().CurrentWorkingDirectory;
+        var actualPath = AbsolutePath.CurrentWorkingDirectory;
 
         // Assert
         Assert.Equal(expectedPath, actualPath.Value);
@@ -23,7 +23,7 @@ public class AbsolutePathTests
     public void CurrentWorkingDirectoryShouldBeAbsolute()
     {
         // Act
-        var path = new AbsolutePath().CurrentWorkingDirectory;
+        var path = AbsolutePath.CurrentWorkingDirectory;
 
         // Assert
         Assert.True(Path.IsPathRooted(path.Value));
