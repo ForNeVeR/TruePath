@@ -76,19 +76,15 @@ Aside from the strict types, the following features are supported for the paths:
 - `IPath::FileName` returns the last component of the path;
 - `IPath::Parent` returns the parent path item (`null` for the root path or top-level relative path);
 - `IPath<T>` supports operators to join it with `LocalPath` or a `string` (note that in both cases appending an absolute path to path of another kind will take over: the last absolute path in chain will win and destroy all the previous ones; this is the standard behavior of path-combining methods — use `AbsolutePath` in combination with `RelativePath` if you want to avoid this behavior);
+- `IPath::IsPrefixOf` to check path prefixes;
+- `IPath::StartsWith` to check if the current path starts with a specified path;
 - `LocalPath::IsAbsolute` to check the path kind (since it supports both kinds);
-- `LocalPath::IsPrefixOf` to check path prefixes;
 - `LocalPath::RelativeTo` to get a relative part between two paths, if possible;
 - extension methods on `IPath`:
   - `GetExtensionWithDot` and `GetExtensionWithoutDot` to get the file extension with or without the leading dot (note that `GetExtensionWithDot` will behave differently for paths ending with dots and paths without dot at all);
   - `GetFileNameWithoutExtension` to get the file name without the extension (and without the trailing dot, if any)
 
     (Note how `GetFileNameWithoutExtension()` works nicely together with `GetExtensionWithDot()` to reconstruct the resulting path from their concatenation, however weird the initial name was — no extension, trailing dot, no base name.)
-
-### Unreleased
-
-- `IPath::IsPrefixOf` to check path prefixes.
-- `IPath::StartsWith` to check if the current path starts with a specified path.
 
 Documentation
 -------------

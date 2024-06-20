@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased] (1.3.0)
 ### Added
+- `IPath::IsPrefixOf` to check path prefixes.
+- `IPath::StartsWith` to check if the current path starts with a specified path.
 - [#38: Introduce `AbsolutePath::CurrentWorkingDirectory`](https://github.com/ForNeVeR/TruePath/issues/38).
 
 ### Changed
