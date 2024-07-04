@@ -45,7 +45,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: REUSE license check
-      uses: fsfe/reuse-action@v3
+      uses: fsfe/reuse-action@v4
   encoding:
     runs-on: ubuntu-22.04
     steps:
