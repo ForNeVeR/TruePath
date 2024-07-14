@@ -62,6 +62,17 @@ public class NormalizePathBenchmark
         }
         return pp;
     }
+
+    [Benchmark]
+    public string[] NormalizeWithWindowsDiskDrive()
+    {
+        var pp = new string[N];
+        for (int i = 0; i < N; ++i)
+        {
+            pp[i] = PathStrings.NormalizeWithWindowsDiskDrive(Input);
+        }
+        return pp;
+    }
 }
 
 public class Program
