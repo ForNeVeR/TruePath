@@ -2,4 +2,5 @@
 //
 // SPDX-License-Identifier: MIT
 
+global using System.Runtime.InteropServices;
 global using Xunit;

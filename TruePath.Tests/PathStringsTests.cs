@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Runtime.InteropServices;
-
 namespace TruePath.Tests;
 
 public class PathStringsTests
