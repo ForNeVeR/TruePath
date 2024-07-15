@@ -4,14 +4,13 @@
 
 using System.Buffers;
 using System.Runtime.CompilerServices;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace TruePath;
 
 /// <summary>Helper methods to manipulate paths as strings.</summary>
 public static class PathStrings
 {
-    private static readonly SearchValues<char> DriveLetters = SearchValues.Create("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    private static readonly SearchValues<char> DriveLetters = SearchValues.Create("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
 
     /// <summary>
     /// <para>

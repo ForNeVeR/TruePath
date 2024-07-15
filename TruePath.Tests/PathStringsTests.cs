@@ -3,10 +3,11 @@
 // SPDX-License-Identifier: MIT
 
 using System.Runtime.InteropServices;
+using Xunit.Abstractions;
 
 namespace TruePath.Tests;
 
-public class PathStringsTests
+public class PathStringsTests(ITestOutputHelper output)
 {
     [Fact]
     public void SlashesShouldBeNormalized()
@@ -92,6 +93,8 @@ public class PathStringsTests
         input = driveLetter + input;
         expected = driveLetter + expected;
 
+        output.WriteLine($"{driveLetter} is selected as the drive letter.");
+
         //Act
         var actual = PathStrings.Normalize(input);
 
@@ -111,6 +114,13 @@ public class PathStringsTests
 
         var letterIndex = rnd.Next(lowerBound, upperBound + 1); // include upperBound
 
-        return Convert.ToChar(letterIndex) + ":";
+        var letter = Convert.ToChar(letterIndex);
+
+        if (rnd.NextSingle() >= 0.5)
+        {
+            letter = char.ToLower(letter);
+        }
+
+        return letter + ":";
     }
 }
