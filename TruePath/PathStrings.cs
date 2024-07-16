@@ -133,7 +133,6 @@ public static class PathStrings
             }
         }
 
-        // why create an empty string when you can reuse it
         if (written == 0 && containsDriveLetter)
         {
             return new string(path.AsSpan(0, 2));
