@@ -18,7 +18,7 @@ public class DiskUtilsTests
         var nonCanonicalPath = new string(currentDirectory) + string.Concat(Enumerable.Repeat(@"\..", back));
 
         // Act
-        var actual = DiskUtils.GetWindowsRealPathByPath(nonCanonicalPath);
+        var actual = DiskUtils.GetWindowsRealPath(nonCanonicalPath);
 
         // Assert
         Assert.Equal(expected, actual);
@@ -34,7 +34,7 @@ public class DiskUtilsTests
         var nonCanonicalPath = new string(MakeNonCanonicalPath(expected).ToArray());
 
         // Act
-        var actual = DiskUtils.GetWindowsRealPathByPath(nonCanonicalPath);
+        var actual = DiskUtils.GetWindowsRealPath(nonCanonicalPath);
 
         // Assert
         Assert.Equal(expected, actual);

@@ -7,8 +7,20 @@ using Microsoft.Win32.SafeHandles;
 
 namespace TruePath;
 
-public static partial class Syscall
+/// <summary>
+/// Provides interop methods for the libc library.
+/// </summary>
+public static partial class Libc
 {
+    /// <summary>
+    /// Resolves the absolute path of the specified <paramref name="path"/> and stores it in the provided <paramref name="buffer"/>.
+    /// </summary>
+    /// <param name="path">The file path to resolve.</param>
+    /// <param name="buffer">A pointer to a buffer where the resolved absolute path will be stored.</param>
+    /// <returns>A <see cref="SafeFileHandle"/> representing the resolved path, or an invalid handle if the function fails.</returns>
+    /// <remarks>
+    /// This method is an interop call to the 'realpath' function in the libc library. The <paramref name="buffer"/> should be allocated with enough space to hold the resolved path.
+    /// </remarks>
     [LibraryImport("libc",
         EntryPoint = "realpath",
         SetLastError = true,
@@ -17,23 +29,40 @@ public static partial class Syscall
     internal static partial SafeFileHandle realpath(string path, IntPtr buffer);
 }
 
+/// <summary>
+/// Utility class for handling disk operations and obtaining real paths.
+/// </summary>
 public static partial class DiskUtils
 {
     // from https://github.com/dotnet/corefx/blob/9c06da6a34fcefa6fb37776ac57b80730e37387c/src/Common/src/System/IO/PathInternal.Windows.cs#L52
+    /// <summary>
+    /// The maximum path length for Windows.
+    /// </summary>
     public const short WindowsMaxPath = short.MaxValue;
-    public static string GetAutoRealPath(string path)
+
+    /// <summary>
+    /// Gets the real (absolute) path of the specified <paramref name="path"/> depending on the operating system.
+    /// </summary>
+    /// <param name="path">The file path to resolve.</param>
+    /// <returns>The resolved absolute path.</returns>
+    public static string GetRealPath(string path)
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            return GetWindowsRealPathByPath(path);
+            return GetWindowsRealPath(path);
         }
 
         return GetPosixRealPath(path);
     }
 
+    /// <summary>
+    /// Gets the real (absolute) path of the specified <paramref name="path"/> for POSIX systems.
+    /// </summary>
+    /// <param name="path">The file path to resolve.</param>
+    /// <returns>The resolved absolute path, or the original path if resolution fails.</returns>
     public static string GetPosixRealPath(string path)
     {
-        using var ptr = Syscall.realpath(path, IntPtr.Zero);
+        using var ptr = Libc.realpath(path, IntPtr.Zero);
 
         if (ptr.DangerousGetHandle() == IntPtr.Zero)
         {
@@ -45,7 +74,12 @@ public static partial class DiskUtils
         return result ?? path;
     }
 
-    public static string GetWindowsRealPathByPath(string path)
+    /// <summary>
+    /// Gets the real (absolute) path of the specified <paramref name="path"/> for Windows systems.
+    /// </summary>
+    /// <param name="path">The file path to resolve.</param>
+    /// <returns>The resolved absolute path, or the original path if resolution fails.</returns>
+    public static string GetWindowsRealPath(string path)
     {
         using var handle = CreateFile(path,
             FileAccess.ReadEa,
@@ -63,6 +97,11 @@ public static partial class DiskUtils
         return GetWindowsRealPathByHandle(handle.DangerousGetHandle()) ?? path;
     }
 
+    /// <summary>
+    /// Gets the real (absolute) path by file handle for Windows systems.
+    /// </summary>
+    /// <param name="handle">The file handle.</param>
+    /// <returns>The resolved absolute path, or <c>null</c> if resolution fails.</returns>
     private static unsafe string? GetWindowsRealPathByHandle(IntPtr handle)
     {
         // this is called for each storage environment for the Data, Journals and Temp paths
@@ -284,6 +323,17 @@ public static partial class DiskUtils
         Delete = 0x03
     }
 
+    /// <summary>
+    /// Creates or opens a file or I/O device.
+    /// </summary>
+    /// <param name="filename">The name of the file or device to be created or opened.</param>
+    /// <param name="access">The requested access to the file or device.</param>
+    /// <param name="share">The requested sharing mode of the file or device.</param>
+    /// <param name="securityAttributes">A pointer to a <c>SECURITY_ATTRIBUTES</c> structure or <c>IntPtr.Zero</c>.</param>
+    /// <param name="creationDisposition">An action to take on a file or device that exists or does not exist.</param>
+    /// <param name="flagsAndAttributes">The file or device attributes and flags.</param>
+    /// <param name="templateFile">A valid handle to a template file, or <c>IntPtr.Zero</c>.</param>
+    /// <returns>A <see cref="SafeFileHandle"/> for the opened file or device.</returns>
     [LibraryImport("kernel32.dll",
         EntryPoint = "CreateFileW",
         SetLastError = true,
@@ -297,6 +347,14 @@ public static partial class DiskUtils
         FileAttributes flagsAndAttributes,
         nint templateFile);
 
+    /// <summary>
+    /// Retrieves the final path for the specified file handle.
+    /// </summary>
+    /// <param name="hFile">The file handle.</param>
+    /// <param name="buffer">A buffer that receives the final path.</param>
+    /// <param name="bufferLength">The size of the buffer, in characters.</param>
+    /// <param name="dwFlags">The flags to specify the path format.</param>
+    /// <returns>The length of the string copied to the buffer.</returns>
     [LibraryImport("kernel32.dll",
         EntryPoint = "GetFinalPathNameByHandleW",
         SetLastError = true,
