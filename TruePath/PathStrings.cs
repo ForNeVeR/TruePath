@@ -10,6 +10,8 @@ namespace TruePath;
 /// <summary>Helper methods to manipulate paths as strings.</summary>
 public static class PathStrings
 {
+    private static readonly SearchValues<char> DriveLetters = SearchValues.Create("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+
     /// <summary>
     /// <para>
     ///     Will convert a path string to a normalized path, using path separator specific for the current system.
@@ -40,12 +42,14 @@ public static class PathStrings
     [SkipLocalsInit] // is necessary to prevent the CLR from filling stackalloc with zeros.
     public static string Normalize(string path)
     {
+        bool containsDriveLetter = SourceContainsDriveLetter(path.AsSpan());
+
         int written = 0;
 
         char[]? array = path.Length <= 512 ? null : ArrayPool<char>.Shared.Rent(path.Length);
 
         Span<char> normalized = array != null ? array.AsSpan() : stackalloc char[path.Length];
-        ReadOnlySpan<char> source = path.AsSpan();
+        ReadOnlySpan<char> source = containsDriveLetter ? path.AsSpan()[2..] : path.AsSpan();
 
         var buffer = normalized;
 
@@ -129,18 +133,53 @@ public static class PathStrings
             }
         }
 
-        // why create an empty string when you can reuse it
+        if (written == 0 && containsDriveLetter)
+        {
+            return new string(path.AsSpan(0, 2));
+        }
+
         if (written == 0)
+        {
             return string.Empty;
+        }
 
         // remove / at the end of path
         if (written > 2 && normalized[written - 1] == Path.DirectorySeparatorChar)
             written--;
 
         // alloc new path
-        var result = new string(normalized.Slice(0, written));
+        string? result;
+
+        if (containsDriveLetter)
+        {
+            var normalizedRef = new ReadOnlySpan<char>(normalized.ToArray(), 0, written);
+            result = string.Concat(path.AsSpan(0, 2), normalizedRef.Slice(0, written));
+        }
+        else
+        {
+            result = new string(normalized.Slice(0, written));
+        }
+
+        normalized.Slice(0, written);
         if (array != null)
             ArrayPool<char>.Shared.Return(array);
         return result;
+    }
+
+    /// <summary>
+    /// Determines whether the specified source contains a drive letter.
+    /// </summary>
+    /// <param name="source">A read-only span of characters to be checked.</param>
+    /// <returns>
+    ///   <c>true</c> if the source contains a drive letter (e.g., 'C:'); otherwise, <c>false</c>.
+    /// </returns>
+    private static bool SourceContainsDriveLetter(ReadOnlySpan<char> source)
+    {
+        if (source.Length < 2) return false;
+
+        var letter = source[0];
+        var colon = source[1];
+
+        return DriveLetters.Contains(letter) && colon == ':';
     }
 }

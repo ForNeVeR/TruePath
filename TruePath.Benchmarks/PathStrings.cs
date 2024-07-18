@@ -378,4 +378,142 @@ public static class PathStrings
         ArrayPool<char>.Shared.Return(array);
         return result;
     }
+
+    public static string NormalizeWithWindowsDiskDrive(string path)
+    {
+        bool containsDriveLetter = SourceContainsDriveLetter(path.AsSpan());
+
+        int written = 0;
+
+        char[]? array = path.Length <= 512 ? null : ArrayPool<char>.Shared.Rent(path.Length);
+
+        Span<char> normalized = array != null ? array.AsSpan() : stackalloc char[path.Length];
+        ReadOnlySpan<char> source = containsDriveLetter ? path.AsSpan()[2..] : path.AsSpan();
+
+        var buffer = normalized;
+
+        while (true)
+        {
+            bool last = false;
+            var separator = source.IndexOf(Path.DirectorySeparatorChar);
+            var altSeparator = source.IndexOf(Path.AltDirectorySeparatorChar);
+
+            if (altSeparator == -1 && separator == -1) { last = true; separator = source.Length - 1; }
+            else if (separator == -1) separator = altSeparator;
+            else if (altSeparator == -1) { }
+            else separator = Math.Min(separator, altSeparator);
+
+            separator++;
+            var block = source.Slice(0, separator);
+
+            bool skip;
+            // skip if '.'
+            if (block.Length == 1 && block[0] == '.')
+                skip = true;
+            // skip if './'
+            else if (block.Length == 2 && block[0] == '.' && (block[1] == Path.DirectorySeparatorChar || block[1] == Path.AltDirectorySeparatorChar))
+                skip = true;
+            // cut if '..' or '../'
+            else if (written != 0 && block.Length is 2 or 3 && block.StartsWith(".."))
+            {
+                var alreadyWrittenPart = normalized[..(written - 1)];
+                var jump = alreadyWrittenPart.LastIndexOf(Path.DirectorySeparatorChar);
+
+                // Check if the last entry in the normalized path is "..": in this case, no need to skip (we keep a
+                // train of ../../.. in the normalized path's root because they are impossible to get rid of during
+                // normalization).
+                var lastEntryStartIndex = jump + 1;
+                var lastEntry = alreadyWrittenPart[lastEntryStartIndex..];
+                if (lastEntry is "..")
+                {
+                    skip = false;
+                }
+                else if (jump == -1 && written > 1)
+                {
+                    written = 0;
+                    buffer = normalized;
+                    skip = true;
+                }
+                else if (jump != -1)
+                {
+                    written = jump;
+                    buffer = normalized.Slice(written + 1);
+                    skip = true;
+                }
+                else
+                    skip = false;
+            }
+            else
+                skip = false;
+
+            // append sliced path
+            if (!skip)
+            {
+                block.CopyTo(buffer);
+                written += separator;
+                // replace \ with / if ends with \
+                if (separator > 0 && buffer[separator - 1] == Path.AltDirectorySeparatorChar)
+                    buffer[separator - 1] = Path.DirectorySeparatorChar;
+                buffer = buffer.Slice(separator);
+            }
+
+            // skip the following / or \
+            while (separator < source.Length && (source[separator] == Path.DirectorySeparatorChar || source[separator] == Path.AltDirectorySeparatorChar))
+                separator++;
+
+            // next iter
+            source = source.Slice(separator);
+            // append everything else if there`s no more '\' or '/'
+            if (last)
+            {
+                source.CopyTo(buffer);
+                written += source.Length;
+                break;
+            }
+        }
+
+        // why create an empty string when you can reuse it
+        if (written == 0 && containsDriveLetter)
+        {
+            return new string(path.AsSpan(0, 2));
+        }
+
+        if (written == 0)
+        {
+            return string.Empty;
+        }
+
+        // remove / at the end of path
+        if (written > 2 && normalized[written - 1] == Path.DirectorySeparatorChar)
+            written--;
+
+        // alloc new path
+        string? result;
+
+        if (containsDriveLetter)
+        {
+            var normalizedRef = new ReadOnlySpan<char>(normalized.ToArray(), 0, written);
+            result = string.Concat(path.AsSpan(0, 2), normalizedRef.Slice(0, written));
+        }
+        else
+        {
+            result = new string(normalized.Slice(0, written));
+        }
+
+        normalized.Slice(0, written);
+        if (array != null)
+            ArrayPool<char>.Shared.Return(array);
+        return result;
+    }
+
+    private static readonly SearchValues<char> DriveLetters = SearchValues.Create("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    private static bool SourceContainsDriveLetter(ReadOnlySpan<char> source)
+    {
+        if (source.Length < 2) return false;
+
+        var letter = source[0];
+        var colon = source[1];
+
+        return DriveLetters.Contains(letter) && colon == ':';
+    }
 }

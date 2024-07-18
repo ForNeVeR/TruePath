@@ -10,6 +10,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Changed
+- [#16: Support Windows disk drives in the normalization algorithm](https://github.com/ForNeVeR/TruePath/issues/16).
+
+  Thanks to @Kataane.
+
 ## [1.3.0] - 2024-06-21
 ### Added
 - [#39: Add `AbsolutePath::RelativeTo`](https://github.com/ForNeVeR/TruePath/issues/39).

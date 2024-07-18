@@ -4,7 +4,7 @@
 
 namespace TruePath.Tests;
 
-public class PathStringsTests
+public class PathStringsTests(ITestOutputHelper output)
 {
     [Fact]
     public void SlashesShouldBeNormalized()
@@ -60,17 +60,64 @@ public class PathStringsTests
         Assert.Equal(NormalizeSeparators(expected), PathStrings.Normalize(input));
     }
 
-    [Theory(Skip = "TODO[#16]: Make it work properly")]
-    [InlineData("C:.", "C:")]
-    [InlineData("C:./foo", "C:foo")]
-    [InlineData("C:..", "C:..")]
-    [InlineData("C:/..", "C:/..")]
+    [Theory]
+    [InlineData(".", "")]
+    [InlineData("./foo", "foo")]
+    [InlineData("..", "..")]
+    [InlineData("./..", "..")]
+    [InlineData("a/..", "")]
+    [InlineData("a/../..", "..")]
+    [InlineData("a/../../.", "..")]
+    [InlineData("a/../../..", "../..")]
+    [InlineData("foo/./bar/../var/./dar/..", "foo/var")]
+    [InlineData("foo/.bar", "foo/.bar")]
+    [InlineData("/.", "/")]
+    [InlineData("/..", "/..")]
+    [InlineData("/../..", "/../..")]
+    [InlineData("/../../foo/..", "/../..")]
+    [InlineData("x/foo/bar/../..", "x")]
+    [InlineData("x/foo/bar/.../.", "x/foo/bar/...")]
+    [InlineData("x/foo/..bar/", "x/foo/..bar")]
+    [InlineData("../../foo", "../../foo")]
+    [InlineData("../../../foo", "../../../foo")]
+    [InlineData("../foo/..", "..")]
     public void WindowsSpecificDotFoldersAreTraversed(string input, string expected)
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
-        Assert.Equal(NormalizeSeparators(expected), PathStrings.Normalize(input));
+
+        // Arrange
+        var driveLetter = RandomDriveLetter();
+        input = driveLetter + input;
+        expected = driveLetter + expected;
+
+        output.WriteLine($"{driveLetter} is selected as the drive letter.");
+
+        //Act
+        var actual = PathStrings.Normalize(input);
+
+        // Assert
+        Assert.Equal(NormalizeSeparators(expected), actual);
     }
 
     private static string NormalizeSeparators(string path) =>
         path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+
+    private static string RandomDriveLetter()
+    {
+        var rnd = new Random(Guid.NewGuid().GetHashCode());
+
+        int lowerBound = Convert.ToInt16('A');
+        int upperBound = Convert.ToInt16('Z');
+
+        var letterIndex = rnd.Next(lowerBound, upperBound + 1); // include upperBound
+
+        var letter = Convert.ToChar(letterIndex);
+
+        if (rnd.NextSingle() >= 0.5)
+        {
+            letter = char.ToLower(letter);
+        }
+
+        return letter + ":";
+    }
 }
