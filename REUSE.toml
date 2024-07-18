@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: 2024 Friedrich von Never <friedrich@fornever.me>
+#
+# SPDX-License-Identifier: MIT
+
+version = 1
+SPDX-PackageName = "TruePath"
+SPDX-PackageSupplier = "Friedrich von Never <friedrich@fornever.me>"
+SPDX-PackageDownloadLocation = "https://github.com/ForNeVeR/TruePath"
+
+[[annotations]]
+path = ".idea/**/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Friedrich von Never <friedrich@fornever.me>"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = "**.DotSettings"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Friedrich von Never <friedrich@fornever.me>"
+SPDX-License-Identifier = "MIT"
