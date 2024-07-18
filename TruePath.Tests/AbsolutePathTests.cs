@@ -110,7 +110,7 @@ public class AbsolutePathTests
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return;
 
-        var newDirectory = new AbsolutePath(Path.GetTempFileName());
+        var newDirectory = new AbsolutePath(Path.GetTempFileName()).Canonicalize();
         File.Delete(newDirectory.ToString());
         newDirectory /= "foobar";
         Directory.CreateDirectory(newDirectory.Value);
