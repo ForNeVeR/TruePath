@@ -16,6 +16,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
   Thanks to @Kataane.
 
+### Added
+- `DiskUtils::GetRealPath` to converts paths' case to correct, resolve relative paths, resolve symlinks.
+
+  Thanks to @Kataane.
+
 ## [1.3.0] - 2024-06-21
 ### Added
 - [#39: Add `AbsolutePath::RelativeTo`](https://github.com/ForNeVeR/TruePath/issues/39).

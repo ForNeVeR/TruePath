@@ -1,16 +1,19 @@
+// SPDX-FileCopyrightText: .NET Foundation and Contributors <https://github.com/dotnet/corefx/blob/9c06da6a34fcefa6fb37776ac57b80730e37387c/src/Common/src/System/IO/PathInternal.Windows.cs>
+// SPDX-FileCopyrightText: 2024 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+//
+// SPDX-License-Identifier: MIT
+
 using System.Buffers;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using Microsoft.Win32.SafeHandles;
-
-// ReSharper disable InconsistentNaming
 
 namespace TruePath;
 
 /// <summary>
 /// Provides interop methods for the libc library.
 /// </summary>
-public static partial class Libc
+internal static partial class Libc
 {
     /// <summary>
     /// Resolves the absolute path of the specified <paramref name="path"/> and stores it in the provided <paramref name="buffer"/>.
@@ -26,6 +29,7 @@ public static partial class Libc
         SetLastError = true,
         StringMarshalling = StringMarshalling.Custom,
         StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
+    // ReSharper disable InconsistentNaming
     internal static partial SafeFileHandle realpath(string path, IntPtr buffer);
 }
 
@@ -38,7 +42,7 @@ public static partial class DiskUtils
     /// <summary>
     /// The maximum path length for Windows.
     /// </summary>
-    public const short WindowsMaxPath = short.MaxValue;
+    private const short WindowsMaxPath = short.MaxValue;
 
     /// <summary>
     /// Gets the real (absolute) path of the specified <paramref name="path"/> depending on the operating system.
@@ -60,7 +64,7 @@ public static partial class DiskUtils
     /// </summary>
     /// <param name="path">The file path to resolve.</param>
     /// <returns>The resolved absolute path, or the original path if resolution fails.</returns>
-    public static string GetPosixRealPath(string path)
+    private static string GetPosixRealPath(string path)
     {
         using var ptr = Libc.realpath(path, IntPtr.Zero);
 
@@ -79,7 +83,7 @@ public static partial class DiskUtils
     /// </summary>
     /// <param name="path">The file path to resolve.</param>
     /// <returns>The resolved absolute path, or the original path if resolution fails.</returns>
-    public static string GetWindowsRealPath(string path)
+    private static string GetWindowsRealPath(string path)
     {
         using var handle = CreateFile(path,
             FileAccess.ReadEa,
@@ -338,7 +342,7 @@ public static partial class DiskUtils
         EntryPoint = "CreateFileW",
         SetLastError = true,
         StringMarshalling = StringMarshalling.Utf16)]
-    internal static partial SafeFileHandle CreateFile(
+    private static partial SafeFileHandle CreateFile(
         [MarshalAs(UnmanagedType.LPTStr)] string filename,
         FileAccess access,
         FileShare share,

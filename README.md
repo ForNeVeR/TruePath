@@ -86,6 +86,9 @@ Aside from the strict types, the following features are supported for the paths:
 
     (Note how `GetFileNameWithoutExtension()` works nicely together with `GetExtensionWithDot()` to reconstruct the resulting path from their concatenation, however weird the initial name was — no extension, trailing dot, no base name.)
 
+### `DiskUtils`
+- `DiskUtils::GetRealPath` converts case to correct, resolves relative paths, resolves symlinks.
+
 Documentation
 -------------
 - [Contributor Guide][docs.contributing]
