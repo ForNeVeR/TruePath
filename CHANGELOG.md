@@ -17,7 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   Thanks to @Kataane.
 
 ### Added
-- `DiskUtils::GetRealPath` to converts paths' case to correct, resolve relative paths, resolve symlinks.
+- `AbsolutePath::Canonicalize` to convert the path to absolute, convert to correct case on case-insensitive file systems, resolve symlinks.
 
   Thanks to @Kataane.
 

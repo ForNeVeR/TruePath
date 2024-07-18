@@ -49,7 +49,7 @@ public static partial class DiskUtils
     /// </summary>
     /// <param name="path">The file path to resolve.</param>
     /// <returns>The resolved absolute path.</returns>
-    public static string GetRealPath(string path)
+    internal static string GetRealPath(string path)
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {

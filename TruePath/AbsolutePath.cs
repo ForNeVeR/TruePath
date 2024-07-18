@@ -78,6 +78,11 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
     /// <returns>The relative path from the base path to this path.</returns>
     public LocalPath RelativeTo(AbsolutePath basePath) => new(Path.GetRelativePath(basePath.Value, Value));
 
+    /// <summary>
+    /// Converts the path to absolute, corrects the file name case on case-insensitive file systems, resolves symlinks.
+    /// </summary>
+    public AbsolutePath Canonicalize() => new(DiskUtils.GetRealPath(Value));
+
     /// <remarks>
     /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the
     /// <paramref name="basePath"/> will be ignored.

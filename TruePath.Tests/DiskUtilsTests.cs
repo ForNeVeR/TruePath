@@ -64,21 +64,6 @@ public class DiskUtilsTests
         Assert.Equal(expected, actual);
     }
 
-    [Fact]
-    public void DiskUtils_MacOs_PassBackPath_ReturnCanonicalPath()
-    {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return;
-
-        var newDirectory = new AbsolutePath(Path.GetTempPath());
-        File.Delete(newDirectory.ToString());
-        newDirectory /= "foobar";
-        Directory.CreateDirectory(newDirectory.Value);
-
-        var incorrectCaseDirectory = newDirectory.Parent!.Value / "FOOBAR";
-        var result = DiskUtils.GetRealPath(incorrectCaseDirectory.Value);
-        Assert.Equal(newDirectory.Value, result);
-    }
-
     private static string Back(List<string> folders, int stepsBack, string delimiter)
     {
         int finalIndex = folders.Count - stepsBack - 1;

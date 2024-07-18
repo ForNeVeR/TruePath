@@ -104,4 +104,19 @@ public class AbsolutePathTests
 
         Assert.Equal(expected, relativePath.Value);
     }
+
+    [Fact]
+    public void CanonicalizationCaseOnMacOs()
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return;
+
+        var newDirectory = new AbsolutePath(Path.GetTempPath());
+        File.Delete(newDirectory.ToString());
+        newDirectory /= "foobar";
+        Directory.CreateDirectory(newDirectory.Value);
+
+        var incorrectCaseDirectory = newDirectory.Parent!.Value / "FOOBAR";
+        var result = incorrectCaseDirectory.Canonicalize();
+        Assert.Equal(newDirectory.Value, result.Value);
+    }
 }
