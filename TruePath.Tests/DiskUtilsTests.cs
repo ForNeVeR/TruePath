@@ -12,7 +12,7 @@ public class DiskUtilsTests
     [Fact]
     public void DiskUtils_PassBackPath_ReturnCanonicalPath()
     {
-        var tempPath = new AbsolutePath(Path.GetTempPath());
+        var tempPath = new AbsolutePath(Path.GetTempPath()).Canonicalize();
         var expected = tempPath.Value;
         var nonCanonicalPath = (tempPath / "foobar" / "..").Value;
 
@@ -29,7 +29,7 @@ public class DiskUtilsTests
         // Arrange
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return;
 
-        var expected = new AbsolutePath(Path.GetTempPath());
+        var expected = new AbsolutePath(Path.GetTempPath()).Canonicalize();
         Assert.True(
             expected.Value.Split(Path.DirectorySeparatorChar)[1].Length > 0,
             $"""There should be at least one directory in the temporary path "{expected}" for this test.""");
