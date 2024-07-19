@@ -210,11 +210,11 @@ internal static partial class Kernel32
         nint templateFile);
 
     /// <summary>
-    // /// Control code for retrieving reparse point data.
-    // /// </summary>
-    // /// <remarks>
-    // /// For more information, see <see href="https://learn.microsoft.com/windows/win32/api/winioctl/ni-winioctl-fsctl_get_reparse_point"/>.
-    // /// </remarks>
+    /// Control code for retrieving reparse point data.
+    /// </summary>
+    /// <remarks>
+    /// For more information, see <see href="https://learn.microsoft.com/windows/win32/api/winioctl/ni-winioctl-fsctl_get_reparse_point"/>.
+    /// </remarks>
     internal const int FSCTL_GET_REPARSE_POINT = 0x000900a8;
 
     /// <summary>
