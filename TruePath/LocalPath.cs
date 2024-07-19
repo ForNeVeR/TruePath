@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Runtime.InteropServices;
+
 namespace TruePath;
 
 /// <summary>
@@ -124,4 +126,83 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     public LocalPath(AbsolutePath path) : this(path.Value)
     {
     }
+
+    /// <summary>
+    /// Determines the type of the file system entry (file, directory, symlink, or junction) for the given path.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="FileEntryKind"/> enumeration value representing the type of the file system entry, or <see langword="null"/> if the entry does not exist.
+    /// </returns>
+    /// <remarks>
+    /// This method checks if the specified path represents a file, directory, symbolic link, or junction. On Windows, it uses <see cref="DiskUtils.IsSymlink"/> and <see cref="DiskUtils.IsJunction"/> to further distinguish between directory types.
+    /// </remarks>
+    public FileEntryKind? ReadKind()
+    {
+        if (!File.Exists(Value) && !Directory.Exists(Value))
+        {
+            return null;
+        }
+
+        var attributes = File.GetAttributes(Value);
+
+        if (!attributes.HasFlag(FileAttributes.Directory))
+        {
+            return FileEntryKind.File;
+        }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            if (DiskUtils.IsJunction(Value))
+            {
+                return FileEntryKind.Junction;
+            }
+
+            if (attributes.HasFlag(FileAttributes.ReparsePoint))
+            {
+                return FileEntryKind.Symlink;
+            }
+
+            return FileEntryKind.Directory;
+        }
+
+        if (attributes.HasFlag(FileAttributes.ReparsePoint))
+        {
+            return FileEntryKind.Symlink;
+        }
+
+        return FileEntryKind.Directory;
+    }
 }
+
+
+/// <summary>
+/// Specifies the type of file system entry.
+/// </summary>
+public enum FileEntryKind
+{
+    /// <summary>
+    /// The type of the file system entry is unknown.
+    /// </summary>
+    Unknown,
+
+    /// <summary>
+    /// The file system entry is a regular file.
+    /// </summary>
+    File,
+
+    /// <summary>
+    /// The file system entry is a directory.
+    /// </summary>
+    Directory,
+
+    /// <summary>
+    /// The file system entry is a symbolic link.
+    /// </summary>
+    Symlink,
+
+    /// <summary>
+    /// The file system entry is a junction.
+    /// </summary>
+    Junction
+}
+
