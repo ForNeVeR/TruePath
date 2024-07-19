@@ -134,7 +134,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     /// A <see cref="FileEntryKind"/> enumeration value representing the type of the file system entry, or <see langword="null"/> if the entry does not exist.
     /// </returns>
     /// <remarks>
-    /// This method checks if the specified path represents a file, directory, symbolic link, or junction. On Windows, it uses <see cref="DiskUtils.IsSymlink"/> and <see cref="DiskUtils.IsJunction"/> to further distinguish between directory types.
+    /// This method checks if the specified path represents a file, directory, symbolic link, or junction. On Windows, it uses <see cref="File.GetAttributes"/> and <see cref="DiskUtils.IsJunction"/> to further distinguish between directory types.
     /// </remarks>
     public FileEntryKind? ReadKind()
     {
