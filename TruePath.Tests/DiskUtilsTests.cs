@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Text;
 using RuntimeInformation = System.Runtime.InteropServices.RuntimeInformation;
 
 namespace TruePath.Tests;
@@ -9,17 +10,11 @@ namespace TruePath.Tests;
 public class DiskUtilsTests
 {
     [Fact]
-    public void DiskUtils_OnWindows_PassBackPath_ReturnCanonicalPath()
+    public void DiskUtils_PassBackPath_ReturnCanonicalPath()
     {
-        // Arrange
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
-
-        var currentDirectory = Environment.CurrentDirectory;
-        var directories = currentDirectory.Split(@"\").ToList();
-        var back = Random.Shared.Next(directories.Count);
-        var expected = Back(directories, back, @"\");
-
-        var nonCanonicalPath = new string(currentDirectory) + string.Concat(Enumerable.Repeat(@"\..", back));
+        var tempPath = new AbsolutePath(Path.GetTempPath()).Canonicalize();
+        var expected = tempPath.Value;
+        var nonCanonicalPath = (tempPath / "foobar" / "..").Value;
 
         // Act
         var actual = DiskUtils.GetRealPath(nonCanonicalPath);
@@ -29,23 +24,26 @@ public class DiskUtilsTests
     }
 
     [Fact]
-    public void DiskUtils_OnWindows_PassNonCanonicalPath_ReturnCanonicalPath()
+    public void DiskUtils_OnCaseInsensitiveFs_PassNonCanonicalPath_ReturnCanonicalPath()
     {
         // Arrange
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return;
 
-        var expected = Environment.CurrentDirectory;
-        var nonCanonicalPath = new string(expected.MakeNonCanonicalPath().ToArray());
+        var expected = new AbsolutePath(Path.GetTempPath()).Canonicalize();
+        Assert.True(
+            expected.Value.Split(Path.DirectorySeparatorChar)[1].Length > 0,
+            $"""There should be at least one directory in the temporary path "{expected}" for this test.""");
+        var nonCanonicalPath = InvertCase(expected.Value);
+        Assert.NotEqual(expected.Value, nonCanonicalPath);
 
         // Act
         var actual = DiskUtils.GetRealPath(nonCanonicalPath);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.Equal(expected.Value, actual);
     }
 
-    [Fact]
-    public void DiskUtils_Posix_PassBackPath_ReturnCanonicalPath()
+    private static string InvertCase(string path)
     {
         // Arrange
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
@@ -75,5 +73,19 @@ public class DiskUtilsTests
         }
 
         return string.Join(delimiter, finalFolders);
+    }
+
+    private static IEnumerable<char> MakeNonCanonicalPath(string path)
+    {
+        foreach (var @char in path)
+        {
+            if (char.IsLetter(@char) && Random.Shared.NextSingle() >= 0.5)
+            {
+                yield return char.ToUpper(@char);
+                continue;
+            }
+
+            yield return @char;
+        }
     }
 }

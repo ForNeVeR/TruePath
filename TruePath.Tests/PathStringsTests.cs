@@ -2,11 +2,9 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Xunit.Abstractions;
-
 namespace TruePath.Tests;
 
-public class PathStringsTests(ITestOutputHelper output)
+public class PathStringsTests
 {
     [Fact]
     public void SlashesShouldBeNormalized()
@@ -87,39 +85,22 @@ public class PathStringsTests(ITestOutputHelper output)
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
 
-        // Arrange
-        var driveLetter = RandomDriveLetter();
-        input = driveLetter + input;
-        expected = driveLetter + expected;
+        var driveLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        driveLetters += driveLetters.ToLowerInvariant();
 
-        output.WriteLine($"{driveLetter} is selected as the drive letter.");
+        foreach (var driveLetter in driveLetters)
+        {
+            var inputPath = $"{driveLetter}:{input}";
+            var expectedPath = $"{driveLetter}:{expected}";
 
-        //Act
-        var actual = PathStrings.Normalize(input);
+            //Act
+            var actual = PathStrings.Normalize(inputPath);
 
-        // Assert
-        Assert.Equal(NormalizeSeparators(expected), actual);
+            // Assert
+            Assert.Equal(NormalizeSeparators(expectedPath), actual);
+        }
     }
 
     private static string NormalizeSeparators(string path) =>
         path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-
-    private static string RandomDriveLetter()
-    {
-        var rnd = new Random(Guid.NewGuid().GetHashCode());
-
-        int lowerBound = Convert.ToInt16('A');
-        int upperBound = Convert.ToInt16('Z');
-
-        var letterIndex = rnd.Next(lowerBound, upperBound + 1); // include upperBound
-
-        var letter = Convert.ToChar(letterIndex);
-
-        if (rnd.NextSingle() >= 0.5)
-        {
-            letter = char.ToLower(letter);
-        }
-
-        return letter + ":";
-    }
 }
