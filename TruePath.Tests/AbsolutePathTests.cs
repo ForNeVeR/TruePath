@@ -4,7 +4,7 @@
 
 namespace TruePath.Tests;
 
-public class AbsolutePathTests
+public partial class AbsolutePathTests
 {
     [Theory]
     [InlineData("/home/user", "/home/user/documents")]
