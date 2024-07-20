@@ -6,6 +6,46 @@ namespace TruePath.Tests;
 
 public class LocalPathTests
 {
+    [Fact]
+    public void AnyExclusivelyRelativePath()
+    {
+        // Arrange
+        var dots = new string(Enumerable.Repeat('.', Random.Shared.Next(1, 21)).ToArray());
+        var backslashes = new string(Enumerable.Repeat(Path.DirectorySeparatorChar, Random.Shared.Next(0, 20)).ToArray());
+        var result = string.Concat(dots.AsSpan(), backslashes.AsSpan()).ToArray();
+        Random.Shared.Shuffle(result.ToArray());
+        var path = new string(result);
+
+        var localPath = new LocalPath(path);
+
+        // Act
+        var parent = localPath.Parent;
+
+        // Assert
+        Assert.Null(parent);
+    }
+
+    [Theory]
+    [InlineData(".")]
+    [InlineData("..")]
+    [InlineData("../..")]
+    [InlineData("../../")]
+    [InlineData("../...")]
+    [InlineData(".../..")]
+    [InlineData("./.")]
+    [InlineData("../../.")]
+    public void ExclusivelyRelativePath(string path)
+    {
+        // Arrange
+        var localPath = new LocalPath(path);
+
+        // Act
+        var parent = localPath.Parent;
+
+        // Assert
+        Assert.Null(parent);
+    }
+
     [Theory]
     [InlineData("user", "user/documents")]
     [InlineData("usEr", "User/documents")]
@@ -14,6 +54,8 @@ public class LocalPathTests
     public void IsPrefixOfShouldBeEquivalentToStartsWith(string pathA, string pathB)
     {
         // Arrange
+        var y = PathStrings.Normalize("../..");
+
         var a = new LocalPath(pathA);
         var b = new LocalPath(pathB);
 

@@ -27,7 +27,18 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     public bool IsAbsolute => Path.IsPathRooted(Value);
 
     /// <inheritdoc cref="IPath.Parent"/>
-    public LocalPath? Parent => Path.GetDirectoryName(Value) is { } parent ? new(parent) : null;
+    public LocalPath? Parent {
+        get
+        {
+            var value = PathStrings.ResolveRelativePaths(Value);
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return null;
+            }
+
+            return Path.GetDirectoryName(Value) is { } parent ? new(parent) : null;
+        }
+    } 
 
     /// <inheritdoc cref="IPath.Parent"/>
     IPath? IPath.Parent => Parent;

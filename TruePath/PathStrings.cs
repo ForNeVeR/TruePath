@@ -182,4 +182,34 @@ public static class PathStrings
 
         return DriveLetters.Contains(letter) && colon == ':';
     }
+
+    /// <summary>
+    /// Resolves and normalizes relative paths in the given path string by removing redundant path components.
+    /// </summary>
+    /// <param name="source">The path string to process.</param>
+    /// <returns>
+    /// The normalized path string. If the source path contains only directory separators or dots, an empty string is returned. Otherwise, the original path is returned.
+    /// </returns>
+    /// <remarks>
+    /// This method iterates over the characters in the input path string and removes those that are directory separators or dots. If the resulting length of the path is zero, indicating that the path only contained separators or dots, it returns an empty string. Otherwise, it returns the original path unchanged.
+    /// </remarks>
+    internal static string ResolveRelativePaths(string source)
+    {
+        if (string.IsNullOrWhiteSpace(source))
+        {
+            return string.Empty;
+        }
+
+        var c = source.Length;
+
+        foreach (var @char in source)
+        {
+            if (@char == Path.DirectorySeparatorChar || @char == '.')
+            {
+                c--;
+            }
+        }
+
+        return c == 0 ? string.Empty : source;
+    }
 }
