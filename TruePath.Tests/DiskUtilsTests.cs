@@ -45,47 +45,12 @@ public class DiskUtilsTests
 
     private static string InvertCase(string path)
     {
-        // Arrange
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
-
-        var currentDirectory = Environment.CurrentDirectory;
-        var directories = currentDirectory.Split("/").ToList();
-        var back = Random.Shared.Next(directories.Count);
-        var expected = Back(directories, back, "/");
-
-        var nonCanonicalPath = new string(currentDirectory) + string.Concat(Enumerable.Repeat("/..", back));
-
-        // Act
-        var actual = DiskUtils.GetRealPath(nonCanonicalPath);
-
-        // Assert
-        Assert.Equal(expected, actual);
-    }
-
-    private static string Back(List<string> folders, int stepsBack, string delimiter)
-    {
-        int finalIndex = folders.Count - stepsBack - 1;
-        List<string> finalFolders = folders[..(finalIndex + 1)];
-
-        if (finalFolders.Count == 1)
+        var builder = new StringBuilder();
+        foreach (var c in path)
         {
-            return delimiter;
+            builder.Append(char.IsUpper(c) ? char.ToLower(c) : char.ToUpper(c));
         }
 
-        return string.Join(delimiter, finalFolders);
-    }
-
-    private static IEnumerable<char> MakeNonCanonicalPath(string path)
-    {
-        foreach (var @char in path)
-        {
-            if (char.IsLetter(@char) && Random.Shared.NextSingle() >= 0.5)
-            {
-                yield return char.ToUpper(@char);
-                continue;
-            }
-
-            yield return @char;
-        }
+        return builder.ToString();
     }
 }
