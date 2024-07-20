@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Runtime.InteropServices;
+
 namespace TruePath;
 
 /// <summary>
