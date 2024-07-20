@@ -49,7 +49,7 @@ public static class DiskUtils
     {
         using SafeFileHandle output = CreateFile(
             path,
-            Kernel32.FileAccess.ReadAttributes | Kernel32.FileAccess.WriteAttributes,
+            Kernel32.FileAccess.ReadAttributes,
             Kernel32.FileShare.Read,
             IntPtr.Zero,
             FileMode.Open,

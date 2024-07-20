@@ -2,10 +2,98 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Diagnostics;
+
 namespace TruePath.Tests;
 
 public class AbsolutePathTests
 {
+    [Fact]
+    public void ReadKind_NonExistent()
+    {
+        // Arrange
+        var currentDirectory = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid().ToString());
+        var localPath = new AbsolutePath(currentDirectory);
+
+        // Act
+        var kind = localPath.ReadKind();
+
+        // Assert
+        Assert.Null(kind);
+    }
+
+    [Fact]
+    public void ReadKind_IsDirectory()
+    {
+        // Arrange
+        var currentDirectory = Environment.CurrentDirectory;
+        var localPath = new AbsolutePath(currentDirectory);
+
+        // Act
+        var kind = localPath.ReadKind();
+
+        // Assert
+        Assert.Equal(FileEntryKind.Directory, kind);
+    }
+
+    [Fact]
+    public void ReadKind_IsFile()
+    {
+        // Arrange
+        string tempFilePath = Path.GetTempFileName();
+        var localPath = new AbsolutePath(tempFilePath);
+
+        // Act
+        var kind = localPath.ReadKind();
+
+        // Assert
+        Assert.Equal(FileEntryKind.File, kind);
+    }
+
+    [Fact]
+    public void OnWindows_ReadKind_IsJunction()
+    {
+        // Arrange
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
+
+        var currentDirectory = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid().ToString());
+        var localPath = new AbsolutePath(currentDirectory);
+
+        var tempDirectoryInfo = Path.GetTempPath();
+
+        var created = CreateJunction(currentDirectory, tempDirectoryInfo);
+
+        Assert.True(created);
+
+        // Act
+        var kind = localPath.ReadKind();
+
+        // Assert
+        Assert.Equal(FileEntryKind.Junction, kind);
+
+        Directory.Delete(currentDirectory, true);
+    }
+
+    [Fact]
+    public void ReadKind_IsSymlink()
+    {
+        // Arrange
+        var currentDirectory = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid().ToString());
+        var localPath = new AbsolutePath(currentDirectory);
+
+        var tempDirectoryInfo = Path.GetTempPath();
+
+        Directory.CreateSymbolicLink(currentDirectory, tempDirectoryInfo);
+
+        // Act
+        var kind = localPath.ReadKind();
+
+        // Assert
+        Assert.Equal(FileEntryKind.Symlink, kind);
+
+        Directory.Delete(currentDirectory, true);
+    }
+
     [Theory]
     [InlineData("/home/user", "/home/user/documents")]
     [InlineData("/home/usEr", "/home/User/documents")]
@@ -118,5 +206,29 @@ public class AbsolutePathTests
         var incorrectCaseDirectory = newDirectory.Parent!.Value / "FOOBAR";
         var result = incorrectCaseDirectory.Canonicalize();
         Assert.Equal(newDirectory.Value, result.Value);
+    }
+
+    private static bool CreateJunction(string path, string target)
+    {
+        return Mklink(path, target, "J");
+    }
+
+    private static bool Mklink(string path, string target, string type)
+    {
+        string cmdline = $"cmd /c mklink /{type} {path} {target}";
+
+        ProcessStartInfo si = new ProcessStartInfo("cmd.exe", cmdline)
+        {
+            UseShellExecute = false
+        };
+
+        Process? p = Process.Start(si);
+        if (p == null)
+        {
+            return false;
+        }
+        p.WaitForExit();
+
+        return p.ExitCode == 0;
     }
 }
