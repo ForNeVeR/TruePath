@@ -109,6 +109,12 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     /// <remarks>Note that this conversion doesn't lose any information.</remarks>
     public static implicit operator LocalPath(AbsolutePath path) => path.Underlying;
 
+    /// <summary>
+    /// Resolves this path to an absolute path based on the current working directory.
+    /// </summary>
+    /// <returns>An <see cref="AbsolutePath"/> that represents this path resolved against the current working directory.</returns>
+    public AbsolutePath ResolveToCurrentDirectory() => AbsolutePath.CurrentWorkingDirectory / this;
+
     // ReSharper disable once GrammarMistakeInComment // RIDER-111735
     /// <summary>Converts an <see cref="AbsolutePath"/> to a <see cref="LocalPath"/>.</summary>
     public LocalPath(AbsolutePath path) : this(path.Value)
