@@ -53,7 +53,29 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
     public bool Equals(LocalPath other)
     {
-        return Value == other.Value;
+        var comparer = PlatformDefaultPathComparer.Comparer;
+        return comparer.Compare(Value, other.Value) == 0;
+    }
+
+    /// <summary>
+    /// Determines whether the specified <see cref="LocalPath"/> is equal to the current <see cref="LocalPath"/> using the specified string comparer.
+    /// </summary>
+    /// <param name="other">The <see cref="LocalPath"/> to compare with the current <see cref="LocalPath"/>.</param>
+    /// <param name="comparer">The comparer to use for comparing the paths.</param>
+    /// <returns>
+    /// <see langword="true"/> if the specified <see cref="LocalPath"/> is equal to the current <see cref="LocalPath"/> using the specified string comparer; otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <remarks>
+    /// If the comparer is null, this method returns <see langword="false"/>.
+    /// </remarks>
+    public bool Equals(LocalPath other, IComparer<string>? comparer)
+    {
+        if (comparer is null)
+        {
+            return false;
+        }
+
+        return comparer.Compare(Value, other.Value) == 0;
     }
 
     /// <inheritdoc cref="Equals(LocalPath)"/>

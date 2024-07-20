@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace TruePath.Tests;
 
-public class AbsolutePathTests
+public partial class AbsolutePathTests
 {
     [Fact]
     public void ConstructionTest()

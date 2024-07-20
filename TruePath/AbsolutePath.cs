@@ -103,7 +103,29 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
     /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
     public bool Equals(AbsolutePath other)
     {
-        return Underlying.Equals(other.Underlying);
+        var comparer = PlatformDefaultPathComparer.Comparer;
+        return comparer.Compare(Underlying.Value, other.Underlying.Value) == 0;
+    }
+
+    /// <summary>
+    /// Determines whether the specified <see cref="AbsolutePath"/> is equal to the current <see cref="AbsolutePath"/> using the specified string comparer.
+    /// </summary>
+    /// <param name="other">The <see cref="AbsolutePath"/> to compare with the current <see cref="AbsolutePath"/>.</param>
+    /// <param name="comparer">The comparer to use for comparing the paths.</param>
+    /// <returns>
+    /// <see langword="true"/> if the specified <see cref="AbsolutePath"/> is equal to the current <see cref="AbsolutePath"/> using the specified string comparer; otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <remarks>
+    /// If the comparer is null, this method returns <see langword="false"/>.
+    /// </remarks>
+    public bool Equals(AbsolutePath other, IComparer<string>? comparer)
+    {
+        if (comparer is null)
+        {
+            return false;
+        }
+
+        return comparer.Compare(Value, other.Value) == 0;
     }
 
     /// <inheritdoc cref="Equals(AbsolutePath)"/>
