@@ -4,7 +4,7 @@
 
 namespace TruePath.Tests;
 
-public class LocalPathTests
+public partial class LocalPathTests
 {
     [Theory]
     [InlineData("user", "user/documents")]

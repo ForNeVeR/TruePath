@@ -35,7 +35,7 @@ public class DiskUtilsTests
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
 
         var expected = Environment.CurrentDirectory;
-        var nonCanonicalPath = new string(MakeNonCanonicalPath(expected).ToArray());
+        var nonCanonicalPath = new string(expected.MakeNonCanonicalPath().ToArray());
 
         // Act
         var actual = DiskUtils.GetRealPath(nonCanonicalPath);
@@ -75,19 +75,5 @@ public class DiskUtilsTests
         }
 
         return string.Join(delimiter, finalFolders);
-    }
-
-    private static IEnumerable<char> MakeNonCanonicalPath(string path)
-    {
-        foreach (var @char in path)
-        {
-            if (char.IsLetter(@char) && Random.Shared.NextSingle() >= 0.5)
-            {
-                yield return char.ToUpper(@char);
-                continue;
-            }
-
-            yield return @char;
-        }
     }
 }
