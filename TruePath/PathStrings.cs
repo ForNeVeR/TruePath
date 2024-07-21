@@ -10,7 +10,7 @@ namespace TruePath;
 /// <summary>Helper methods to manipulate paths as strings.</summary>
 public static class PathStrings
 {
-    private static readonly SearchValues<char> DriveLetters = SearchValues.Create("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+    internal const char VolumeSeparatorChar = ':';
 
     /// <summary>
     /// <para>
@@ -175,11 +175,11 @@ public static class PathStrings
     /// </returns>
     private static bool SourceContainsDriveLetter(ReadOnlySpan<char> source)
     {
-        if (source.Length < 2) return false;
+        if (source.Length < 2)
+        {
+            return false;
+        }
 
-        var letter = source[0];
-        var colon = source[1];
-
-        return DriveLetters.Contains(letter) && colon == ':';
+        return source[1] == VolumeSeparatorChar && (uint)((source[0] | 0x20) - 'a') <= (uint)('z' - 'a');
     }
 }
