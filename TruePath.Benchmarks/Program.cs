@@ -79,6 +79,6 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        _ = BenchmarkRunner.Run<NormalizePathBenchmark>();
+        _ = BenchmarkRunner.Run<DriveLetterBenchmark>();
     }
 }
