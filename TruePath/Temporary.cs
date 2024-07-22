@@ -17,7 +17,7 @@ public static class Temporary
     public static AbsolutePath SystemTempDirectory()
     {
         var tempPath = Path.GetTempPath();
-        return new AbsolutePath(tempPath);
+        return AbsolutePath.CurrentWorkingDirectory / tempPath;
     }
 
     /// <summary>
@@ -27,7 +27,7 @@ public static class Temporary
     public static AbsolutePath CreateTempFile()
     {
         var tempPath = Path.GetTempFileName();
-        return new AbsolutePath(tempPath);
+        return AbsolutePath.CurrentWorkingDirectory / tempPath;
     }
 
     /// <summary>
@@ -38,7 +38,6 @@ public static class Temporary
     public static AbsolutePath CreateTempFolder(string? prefix = null)
     {
         var tempDirectoryInfo = Directory.CreateTempSubdirectory(prefix);
-
-        return new AbsolutePath(tempDirectoryInfo.FullName);
+        return AbsolutePath.CurrentWorkingDirectory / tempDirectoryInfo.FullName;
     }
 }
