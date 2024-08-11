@@ -89,6 +89,13 @@ Aside from the strict types, the following features are supported for the paths:
 
     (Note how `GetFileNameWithoutExtension()` works nicely together with `GetExtensionWithDot()` to reconstruct the resulting path from their concatenation, however weird the initial name was — no extension, trailing dot, no base name.)
 
+### `Temporary`
+
+`TruePath.Temporary` class contains a set of utility methods to work with the system temp directory (most widely known as `TEMP` or `TMP` environment variable):
+- `Temporary::SystemTempDirectory()` will return it as an absolute path;
+- `Temporary::CreateTempFile()` will create a randomly-named file in the system temp directory and return an absolute path to it;
+- `Temporary::CreateTempFolder()` will create a randomly-named folder in the system temp directory and return an absolute path to it.
+
 Documentation
 -------------
 - [Contributor Guide][docs.contributing]

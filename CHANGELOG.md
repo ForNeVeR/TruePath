@@ -30,6 +30,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - `AbsolutePath::ReadKind` to check the file system object kind (file, directory, or something else) and whether it exists at all.
 
   Thanks to @Kataane.
+- [#76](https://github.com/ForNeVeR/TruePath/issues/76): a new `Temporary` class for creating a temp file or folder.
+
+  Thanks to @Illusion4.
 
 ## [1.3.0] - 2024-06-21
 ### Added
