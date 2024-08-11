@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - [#16: Support Windows disk drives in the normalization algorithm](https://github.com/ForNeVeR/TruePath/issues/16).
 
   Thanks to @Kataane.
+- More optimizations for `AbsolutePath`'s `/` operator: it will avoid the unnecessary check for absolute path.
 
 ### Added
 - `AbsolutePath::Canonicalize` to convert the path to absolute, convert to correct case on case-insensitive file systems, resolve symlinks.
