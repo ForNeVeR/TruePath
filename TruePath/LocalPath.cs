@@ -113,6 +113,10 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     /// Resolves this path to an absolute path based on the current working directory.
     /// </summary>
     /// <returns>An <see cref="AbsolutePath"/> that represents this path resolved against the current working directory.</returns>
+    /// <remarks>
+    /// Note that if this path is already absolute, it will just transform to <see cref="AbsolutePath"/>. The current
+    /// directory won't matter for such a case.
+    /// </remarks>
     public AbsolutePath ResolveToCurrentDirectory() => AbsolutePath.CurrentWorkingDirectory / this;
 
     // ReSharper disable once GrammarMistakeInComment // RIDER-111735
