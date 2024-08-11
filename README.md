@@ -78,7 +78,7 @@ Aside from the strict types, the following features are supported for the paths:
 - `IPath<T>` supports operators to join it with `LocalPath` or a `string` (note that in both cases appending an absolute path to path of another kind will take over: the last absolute path in chain will win and destroy all the previous ones; this is the standard behavior of path-combining methods — use `AbsolutePath` in combination with `RelativePath` if you want to avoid this behavior);
 - `IPath::IsPrefixOf` to check path prefixes;
 - `IPath::StartsWith` to check if the current path starts with a specified path;
-- `AbsolutePath::Canonicalize` to convert the path to absolute, convert to correct case on case-insensitive file systems, resolve symlinks.
+- `AbsolutePath::Canonicalize` to convert the path to the correct case on case-insensitive file systems, resolve symlinks.
 - `LocalPath::IsAbsolute` to check the path kind (since it supports both kinds);
 - `LocalPath::ResolveToCurrentDirectory`: effectively calculates `currentDirectory / this`. No-op for paths that are already absolute (aside from converting to the `AbsolutePath` type).
 - `AbsolutePath::RelativeTo`, `LocalPath::RelativeTo` to get a relative part between two paths, if possible;
