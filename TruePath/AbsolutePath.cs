@@ -86,7 +86,7 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
     /// <paramref name="basePath"/> will be ignored.
     /// </remarks>
     public static AbsolutePath operator /(AbsolutePath basePath, LocalPath b) =>
-        new(Path.Combine(basePath.Value, b.Value));
+        new(Path.Combine(basePath.Value, b.Value), false);
 
     /// <remarks>
     /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the
