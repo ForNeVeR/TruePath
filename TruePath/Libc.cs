@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+//
+// SPDX-License-Identifier: MIT
+
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using Microsoft.Win32.SafeHandles;
