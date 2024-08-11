@@ -13,7 +13,7 @@ namespace TruePath;
 /// <summary>
 /// Utility class for handling disk operations and obtaining real paths.
 /// </summary>
-public static class DiskUtils
+internal static class DiskUtils
 {
     // from https://github.com/dotnet/corefx/blob/9c06da6a34fcefa6fb37776ac57b80730e37387c/src/Common/src/System/IO/PathInternal.Windows.cs#L52
     /// <summary>
