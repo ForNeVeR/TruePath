@@ -80,6 +80,7 @@ Aside from the strict types, the following features are supported for the paths:
 - `IPath::StartsWith` to check if the current path starts with a specified path;
 - `AbsolutePath::Canonicalize` to convert the path to absolute, convert to correct case on case-insensitive file systems, resolve symlinks.
 - `LocalPath::IsAbsolute` to check the path kind (since it supports both kinds);
+- `LocalPath::ResolveToCurrentDirectory`: effectively calculates `currentDirectory / this`. No-op for paths that are already absolute (aside from converting to the `AbsolutePath` type).
 - `AbsolutePath::RelativeTo`, `LocalPath::RelativeTo` to get a relative part between two paths, if possible;
 - extension methods on `IPath`:
   - `GetExtensionWithDot` and `GetExtensionWithoutDot` to get the file extension with or without the leading dot (note that `GetExtensionWithDot` will behave differently for paths ending with dots and paths without dot at all);
