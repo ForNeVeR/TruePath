@@ -16,6 +16,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
   Thanks to @Kataane.
 - More optimizations for `AbsolutePath`'s `/` operator: it will avoid the unnecessary check for absolute path.
+- [#85: Minor performance improvements for absolute path checking on Windows](https://github.com/ForNeVeR/TruePath/pull/85).
+
+  Thanks to @Kataane.
 
 ### Added
 - `AbsolutePath::Canonicalize` to convert the path to absolute, convert to correct case on case-insensitive file systems, resolve symlinks.
