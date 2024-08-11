@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 
 namespace TruePath.Tests;
 
-public class LocalPathTests(ITestOutputHelper Output)
+public class LocalPathTests(ITestOutputHelper output)
 {
     [Theory]
     [InlineData("user", "user/documents")]
@@ -78,8 +78,8 @@ public class LocalPathTests(ITestOutputHelper Output)
 
         try
         {
-            var newCurrentDirectory = new AbsolutePath(Path.GetTempPath());
-            Output.WriteLine("New current directory: " + newCurrentDirectory);
+            var newCurrentDirectory = new AbsolutePath(Path.GetTempPath()).Canonicalize();
+            output.WriteLine("New current directory: " + newCurrentDirectory);
             Environment.CurrentDirectory = newCurrentDirectory.Value;
             expected = newCurrentDirectory / localPath;
             Assert.Equal(expected, localPath.ResolveToCurrentDirectory());
@@ -87,7 +87,7 @@ public class LocalPathTests(ITestOutputHelper Output)
         finally
         {
             Environment.CurrentDirectory = currentDirectory.Value;
-            Output.WriteLine("Current directory reset back to: " + currentDirectory);
+            output.WriteLine("Current directory reset back to: " + currentDirectory);
         }
     }
 }
