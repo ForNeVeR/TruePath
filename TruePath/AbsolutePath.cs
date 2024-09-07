@@ -11,7 +11,7 @@ namespace TruePath;
 /// disk letter (on Windows).
 /// </summary>
 /// <remarks>For a path that's not guaranteed to be absolute, use the <see cref="LocalPath"/> type.</remarks>
-public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<AbsolutePath>
+public readonly struct AbsolutePath : IAbsolutePath, IPath<AbsolutePath>
 {
     internal readonly LocalPath Underlying;
 

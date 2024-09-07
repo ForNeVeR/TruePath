@@ -48,3 +48,33 @@ public interface IPath<TPath> where TPath : IPath<TPath>
     /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
     bool StartsWith(TPath other);
 }
+
+public interface IPathWithoutOperator<TPath>
+{
+    /// <remarks>
+    /// Checks for a non-strict prefix: if the paths are equal then they are still considered prefixes of each other.
+    /// </remarks>
+    /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
+    bool IsPrefixOf(TPath other);
+
+    /// <summary>
+    /// Determines whether the current path starts with the specified path.
+    /// </summary>
+    /// <param name="other">The path to compare to the current path.</param>
+    /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
+    bool StartsWith(TPath other);
+}
+
+public interface IAbsolutePath : IEquatable<AbsolutePath>, IPath, IPathWithoutOperator<AbsolutePath>
+{
+    public LocalPath RelativeTo(AbsolutePath basePath);
+    public AbsolutePath Canonicalize();
+    public FileEntryKind? ReadKind();
+}
+
+public interface ILocalPath : IEquatable<LocalPath>, IPath, IPathWithoutOperator<LocalPath>
+{
+    public bool IsAbsolute { get; }
+    public LocalPath RelativeTo(LocalPath basePath);
+    public AbsolutePath ResolveToCurrentDirectory();
+}

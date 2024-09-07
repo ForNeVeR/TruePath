@@ -14,7 +14,7 @@ namespace TruePath;
 ///     know what form of normalization does the path use.
 /// </para>
 /// </summary>
-public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, IPath<LocalPath>
+public readonly struct LocalPath(string value) : ILocalPath, IPath<LocalPath>
 {
     /// <inheritdoc cref="IPath.Value"/>
     public string Value { get; } = PathStrings.Normalize(value);
