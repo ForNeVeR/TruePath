@@ -7,7 +7,7 @@ namespace TruePath;
 /// <summary>
 /// Extension methods for <see cref="IPath"/> and <see cref="IPath{TPath}"/>.
 /// </summary>
-public static class PathExtensions
+public static partial class PathExtensions
 {
     /// <summary>
     /// <para>Gets the extension of the file name of the <paramref name="path"/> with the dot character.</para>
