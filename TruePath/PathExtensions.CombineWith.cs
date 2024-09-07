@@ -16,14 +16,14 @@ public static partial class PathExtensions
         return Path.IsPathFullyQualified(combined) ? new AbsolutePath(combined) : new LocalPath(combined);
     }
 
-    public static IPath CombineWith(this string path, string other)
+    public static IPath CombineWithAsPath(this string path, string other)
     {
         var combined = Path.Combine(path, other);
 
         return Path.IsPathFullyQualified(combined) ? new AbsolutePath(combined) : new LocalPath(combined);
     }
 
-    public static IPath CombineWith(this string path, IPath other)
+    public static IPath CombineWithAsPath(this string path, IPath other)
     {
         var combined = Path.Combine(path, other.Value);
 
