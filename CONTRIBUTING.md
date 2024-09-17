@@ -42,7 +42,7 @@ If the CI asks you to update the file licenses, follow one of these:
    $ reuse annotate --license MIT --copyright '%your name% <%your contact info, e.g. email%>' %file names to annotate%
    ```
 
-(Feel free to attribute the changes to "TruePath Authors <https://github.com/ForNeVeR/TruePath>" instead of your name in a multi-author file, or if you don't want your name to be mentioned in the project's source: this doesn't mean you'll lose the copyright.)
+(Feel free to attribute the changes to "TruePath contributors <https://github.com/ForNeVeR/TruePath>" instead of your name in a multi-author file, or if you don't want your name to be mentioned in the project's source: this doesn't mean you'll lose the copyright.)
 
 File Encoding Changes
 ---------------------

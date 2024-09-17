@@ -2,9 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Xunit.Abstractions;
+
 namespace TruePath.Tests;
 
-public partial class LocalPathTests
+public class LocalPathTests(ITestOutputHelper output)
 {
     [Theory]
     [InlineData("user", "user/documents")]
@@ -64,5 +66,28 @@ public partial class LocalPathTests
         var localPath2 = new LocalPath(absolutePath);
 
         Assert.Equal(localPath1, localPath2);
+    }
+
+    [Fact]
+    public void ResolveToCurrentDirectoryTests()
+    {
+        var localPath = new LocalPath("foo/bar");
+        var currentDirectory = AbsolutePath.CurrentWorkingDirectory;
+        var expected = currentDirectory / localPath;
+        Assert.Equal(expected, localPath.ResolveToCurrentDirectory());
+
+        try
+        {
+            var newCurrentDirectory = new AbsolutePath(Path.GetTempPath()).Canonicalize();
+            output.WriteLine("New current directory: " + newCurrentDirectory);
+            Environment.CurrentDirectory = newCurrentDirectory.Value;
+            expected = newCurrentDirectory / localPath;
+            Assert.Equal(expected, localPath.ResolveToCurrentDirectory());
+        }
+        finally
+        {
+            Environment.CurrentDirectory = currentDirectory.Value;
+            output.WriteLine("Current directory reset back to: " + currentDirectory);
+        }
     }
 }

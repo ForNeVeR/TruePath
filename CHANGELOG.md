@@ -10,9 +10,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.4.0] - 2024-08-12
 ### Changed
 - [#16: Support Windows disk drives in the normalization algorithm](https://github.com/ForNeVeR/TruePath/issues/16).
+
+  Thanks to @Kataane.
+- More optimizations for `AbsolutePath`'s `/` operator: it will avoid the unnecessary check for absolute path.
+- [#85: Minor performance improvements for absolute path checking on Windows](https://github.com/ForNeVeR/TruePath/pull/85).
 
   Thanks to @Kataane.
 
@@ -20,6 +24,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - `AbsolutePath::Canonicalize` to convert the path to absolute, convert to correct case on case-insensitive file systems, resolve symlinks.
 
   Thanks to @Kataane.
+- `LocalPath::ResolveToCurrentDirectory`: effectively calculates `currentDirectory / this`. No-op for paths that are already absolute (aside from converting to the `AbsolutePath` type).
+
+  Thanks to @Illusion4.
+- `AbsolutePath::ReadKind` to check the file system object kind (file, directory, or something else) and whether it exists at all.
+
+  Thanks to @Kataane.
+- [#76](https://github.com/ForNeVeR/TruePath/issues/76): a new `Temporary` class for creating a temp file or folder.
+
+  Thanks to @Illusion4.
 
 ## [1.3.0] - 2024-06-21
 ### Added
@@ -100,4 +113,5 @@ This is the first published version of the package. It doesn't contain any featu
 [1.2.0]: https://github.com/ForNeVeR/TruePath/compare/v1.1.0...v1.2.0
 [1.2.1]: https://github.com/ForNeVeR/TruePath/compare/v1.2.0...v1.2.1
 [1.3.0]: https://github.com/ForNeVeR/TruePath/compare/v1.2.1...v1.3.0
-[Unreleased]: https://github.com/ForNeVeR/TruePath/compare/v1.3.0...HEAD
+[1.4.0]: https://github.com/ForNeVeR/TruePath/compare/v1.3.0...v1.4.0
+[Unreleased]: https://github.com/ForNeVeR/TruePath/compare/v1.4.0...HEAD

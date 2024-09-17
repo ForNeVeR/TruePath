@@ -78,14 +78,23 @@ Aside from the strict types, the following features are supported for the paths:
 - `IPath<T>` supports operators to join it with `LocalPath` or a `string` (note that in both cases appending an absolute path to path of another kind will take over: the last absolute path in chain will win and destroy all the previous ones; this is the standard behavior of path-combining methods — use `AbsolutePath` in combination with `RelativePath` if you want to avoid this behavior);
 - `IPath::IsPrefixOf` to check path prefixes;
 - `IPath::StartsWith` to check if the current path starts with a specified path;
-- `AbsolutePath::Canonicalize` to convert the path to absolute, convert to correct case on case-insensitive file systems, resolve symlinks.
+- `AbsolutePath::ReadKind` helps to check if a path exists, and if it is, then what kind of path it is (file, directory, or something else);
+- `AbsolutePath::Canonicalize` to convert the path to the correct case on case-insensitive file systems, resolve symlinks.
 - `LocalPath::IsAbsolute` to check the path kind (since it supports both kinds);
+- `LocalPath::ResolveToCurrentDirectory`: effectively calculates `currentDirectory / this`. No-op for paths that are already absolute (aside from converting to the `AbsolutePath` type).
 - `AbsolutePath::RelativeTo`, `LocalPath::RelativeTo` to get a relative part between two paths, if possible;
 - extension methods on `IPath`:
   - `GetExtensionWithDot` and `GetExtensionWithoutDot` to get the file extension with or without the leading dot (note that `GetExtensionWithDot` will behave differently for paths ending with dots and paths without dot at all);
   - `GetFileNameWithoutExtension` to get the file name without the extension (and without the trailing dot, if any)
 
     (Note how `GetFileNameWithoutExtension()` works nicely together with `GetExtensionWithDot()` to reconstruct the resulting path from their concatenation, however weird the initial name was — no extension, trailing dot, no base name.)
+
+### `Temporary`
+
+`TruePath.Temporary` class contains a set of utility methods to work with the system temp directory (most widely known as `TEMP` or `TMP` environment variable):
+- `Temporary::SystemTempDirectory()` will return it as an absolute path;
+- `Temporary::CreateTempFile()` will create a randomly-named file in the system temp directory and return an absolute path to it;
+- `Temporary::CreateTempFolder()` will create a randomly-named folder in the system temp directory and return an absolute path to it.
 
 Documentation
 -------------
