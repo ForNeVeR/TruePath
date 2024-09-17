@@ -2,17 +2,20 @@ namespace TruePath.Tests;
 
 public static class Utils
 {
-    internal static IEnumerable<char> MakeNonCanonicalPath(this string path)
+    internal static string MakeNonCanonicalPath(this string path)
     {
-        foreach (var @char in path)
+        var result = new char[path.Length];
+        for (var i = 0; i < path.Length; i++)
         {
-            if (char.IsLetter(@char) && Random.Shared.NextSingle() >= 0.5)
-            {
-                yield return char.ToUpper(@char);
-                continue;
-            }
-
-            yield return @char;
+            result[i] = i % 2 == 0 ? char.ToUpper(path[i]) : char.ToLower(path[i]);
         }
+
+        var nonCanonicalPath = new string(result);
+        if (path.Equals(nonCanonicalPath, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("The non-canonical path is equal to the original path.");
+        }
+
+        return nonCanonicalPath;
     }
 }

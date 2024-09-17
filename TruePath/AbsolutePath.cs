@@ -118,13 +118,8 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
     /// <remarks>
     /// If the comparer is null, this method returns <see langword="false"/>.
     /// </remarks>
-    public bool Equals(AbsolutePath other, IComparer<string>? comparer)
+    public bool Equals(AbsolutePath other, IComparer<string> comparer)
     {
-        if (comparer is null)
-        {
-            return false;
-        }
-
         return comparer.Compare(Value, other.Value) == 0;
     }
 

@@ -19,7 +19,6 @@ public class PlatformDefaultPathComparer : IComparer<string>
     /// </summary>
     public PlatformDefaultPathComparer()
     {
-        // Определяем тип сравнения в зависимости от платформы
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
             comparisonType = StringComparer.OrdinalIgnoreCase;
