@@ -57,13 +57,8 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     /// <remarks>
     /// If the comparer is null, this method returns <see langword="false"/>.
     /// </remarks>
-    public bool Equals(LocalPath other, IComparer<string>? comparer)
+    public bool Equals(LocalPath other, IComparer<string> comparer)
     {
-        if (comparer is null)
-        {
-            return false;
-        }
-
         return comparer.Compare(Value, other.Value) == 0;
     }
 

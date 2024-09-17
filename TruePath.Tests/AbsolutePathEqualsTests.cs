@@ -59,23 +59,6 @@ public partial class AbsolutePathTests
     }
 
     [Fact]
-    public void EqualsNull_False()
-    {
-        // Arrange
-        var currentDirectory = Environment.CurrentDirectory;
-        var nonCanonicalPath = currentDirectory;
-
-        var path1 = new AbsolutePath(currentDirectory);
-        var path2 = new AbsolutePath(nonCanonicalPath);
-
-        // Act
-        var equals = path1.Equals(path2, null);
-
-        // Assert
-        Assert.False(equals);
-    }
-
-    [Fact]
     public void OnWindowsOrOsx_EqualsDefault_CaseInsensitive_True()
     {
         // Arrange
