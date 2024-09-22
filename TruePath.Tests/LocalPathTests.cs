@@ -8,44 +8,41 @@ namespace TruePath.Tests;
 
 public class LocalPathTests(ITestOutputHelper output)
 {
-    [Fact]
-    public void AnyExclusivelyRelativePath()
+    [Theory]
+    [InlineData("foo", ".")]
+    [InlineData("foo/bar", "foo")]
+    [InlineData("/", null)]
+    public void AbsolutePathParent(string relativePath, string? expectedRelativePath)
     {
-        // Arrange
-        var dots = new string(Enumerable.Repeat('.', Random.Shared.Next(1, 21)).ToArray());
-        var backslashes = new string(Enumerable.Repeat(Path.DirectorySeparatorChar, Random.Shared.Next(0, 20)).ToArray());
-        var result = string.Concat(dots.AsSpan(), backslashes.AsSpan()).ToArray();
-        Random.Shared.Shuffle(result.ToArray());
-        var path = new string(result);
-
-        var localPath = new LocalPath(path);
-
-        // Act
-        var parent = localPath.Parent;
-
-        // Assert
-        Assert.Null(parent);
+        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var parent = root / relativePath;
+        AbsolutePath? expectedPath = expectedRelativePath == null ? null : new(root / expectedRelativePath);
+        Assert.Equal(expectedPath, parent.Parent);
     }
 
     [Theory]
-    [InlineData(".")]
-    [InlineData("..")]
-    [InlineData("../..")]
-    [InlineData("../../")]
-    [InlineData("../...")]
-    [InlineData(".../..")]
-    [InlineData("./.")]
-    [InlineData("../../.")]
-    public void ExclusivelyRelativePath(string path)
+    [InlineData(".", "..")]
+    [InlineData("..", "../..")]
+    [InlineData("../..", "../../..")]
+    [InlineData("../../", "../../..")]
+    [InlineData("../...", "..")]
+    [InlineData(".../..", "..")]
+    [InlineData("./.", "..")]
+    [InlineData("../../.", "../../..")]
+    [InlineData("b", ".")]
+    [InlineData("../b", "..")]
+    [InlineData("b/..", "b/../..")]
+    public void RelativePathParent(string path, string? expected)
     {
         // Arrange
         var localPath = new LocalPath(path);
+        LocalPath? expectedPath = expected == null ? null : new(expected);
 
         // Act
         var parent = localPath.Parent;
 
         // Assert
-        Assert.Null(parent);
+        Assert.Equal(expectedPath, parent);
     }
 
     [Theory]
@@ -56,8 +53,6 @@ public class LocalPathTests(ITestOutputHelper output)
     public void IsPrefixOfShouldBeEquivalentToStartsWith(string pathA, string pathB)
     {
         // Arrange
-        var y = PathStrings.Normalize("../..");
-
         var a = new LocalPath(pathA);
         var b = new LocalPath(pathB);
 

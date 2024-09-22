@@ -16,6 +16,8 @@ namespace TruePath;
 /// </summary>
 public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, IPath<LocalPath>
 {
+    private static char Separator => Path.DirectorySeparatorChar;
+
     /// <inheritdoc cref="IPath.Value"/>
     public string Value { get; } = PathStrings.Normalize(value);
 
@@ -29,18 +31,14 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     public bool IsAbsolute => Path.IsPathRooted(Value);
 
     /// <inheritdoc cref="IPath.Parent"/>
-    public LocalPath? Parent {
+    public LocalPath? Parent
+    {
         get
         {
-            var value = PathStrings.ResolveRelativePaths(Value);
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return null;
-            }
-
+            if (Value == "" || Value == ".." || Value.EndsWith($"{Separator}..")) return this / "..";
             return Path.GetDirectoryName(Value) is { } parent ? new(parent) : null;
         }
-    } 
+    }
 
     /// <inheritdoc cref="IPath.Parent"/>
     IPath? IPath.Parent => Parent;
@@ -89,7 +87,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     public bool IsPrefixOf(LocalPath other)
     {
         if (!(Value.Length <= other.Value.Length && other.Value.StartsWith(Value))) return false;
-        return other.Value.Length == Value.Length || other.Value[Value.Length] == Path.DirectorySeparatorChar;
+        return other.Value.Length == Value.Length || other.Value[Value.Length] == Separator;
     }
 
     /// <summary>

@@ -95,6 +95,18 @@ public class AbsolutePathTests
     }
 
     [Theory]
+    [InlineData("foo", ".")]
+    [InlineData("foo/bar", "foo")]
+    [InlineData("/", null)]
+    public void ParentIsCalculatedCorrectly(string relativePath, string? expectedRelativePath)
+    {
+        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var parent = root / relativePath;
+        AbsolutePath? expectedPath = expectedRelativePath == null ? null : new(root / expectedRelativePath);
+        Assert.Equal(expectedPath, parent.Parent);
+    }
+
+    [Theory]
     [InlineData("/home/user", "/home/user/documents")]
     [InlineData("/home/usEr", "/home/User/documents")]
     [InlineData("/home/user/documents", "/home/user/documents")]
