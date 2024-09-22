@@ -75,7 +75,12 @@ public static class PathStrings
             else if (block.Length == 2 && block[0] == '.' && (block[1] == Path.DirectorySeparatorChar || block[1] == Path.AltDirectorySeparatorChar))
                 skip = true;
             // cut if '..' or '../'
-            else if (written != 0 && block.Length is 2 or 3 && block.StartsWith(".."))
+            else if (written != 0
+                && (
+                    block is ".."
+                    || block.SequenceEqual($"..{Path.DirectorySeparatorChar}")
+                    || block.SequenceEqual($"..{Path.AltDirectorySeparatorChar}")
+                ))
             {
                 var alreadyWrittenPart = normalized[..(written - 1)];
                 var jump = alreadyWrittenPart.LastIndexOf(Path.DirectorySeparatorChar);
