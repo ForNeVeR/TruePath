@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.5.0] - 2024-09-22
 ### Fixed
 - Incorrect path normalization: last ellipsis (`...`) in a path was treated as a `..` entry.
 
@@ -125,4 +125,5 @@ This is the first published version of the package. It doesn't contain any featu
 [1.2.1]: https://github.com/ForNeVeR/TruePath/compare/v1.2.0...v1.2.1
 [1.3.0]: https://github.com/ForNeVeR/TruePath/compare/v1.2.1...v1.3.0
 [1.4.0]: https://github.com/ForNeVeR/TruePath/compare/v1.3.0...v1.4.0
-[Unreleased]: https://github.com/ForNeVeR/TruePath/compare/v1.4.0...HEAD
+[1.5.0]: https://github.com/ForNeVeR/TruePath/compare/v1.4.0...v1.5.0
+[Unreleased]: https://github.com/ForNeVeR/TruePath/compare/v1.5.0...HEAD
