@@ -71,23 +71,28 @@ This is an interface that is implemented by both `LocalPath` and `AbsolutePath`.
 This is a marker type that doesn't offer any advanced functionality over the contained string. It is used to mark paths that include wildcards, for further integration with external libraries, such as [Microsoft.Extensions.FileSystemGlobbing][file-system-globbing.nuget].
 
 ### Path Features
-Aside from the strict types, the following features are supported for the paths:
-- `IPath::Value` returns the normalized path string;
-- `IPath::FileName` returns the last component of the path;
-- `IPath::Parent` returns the parent path item (`null` for the root path or top-level relative path);
-- `IPath<T>` supports operators to join it with `LocalPath` or a `string` (note that in both cases appending an absolute path to path of another kind will take over: the last absolute path in chain will win and destroy all the previous ones; this is the standard behavior of path-combining methods — use `AbsolutePath` in combination with `RelativePath` if you want to avoid this behavior);
-- `IPath::IsPrefixOf` to check path prefixes;
-- `IPath::StartsWith` to check if the current path starts with a specified path;
-- `AbsolutePath::ReadKind` helps to check if a path exists, and if it is, then what kind of path it is (file, directory, or something else);
+Aside from the strict types, the following features are supported for the paths.
+
+- `IPath::Value` returns the normalized path string.
+- `IPath::FileName` returns the last component of the path.
+- `IPath::Parent` returns the parent path item (`null` for the root absolute path).
+
+  Note that it will _always_ return a meaningful parent for a relative path: parent for `.` is `..`, parent for `..` is `../..`.
+
+  This means that generally `.Parent` behaves the same as appending a `..` component to the end of the path would. Also, this allows for an interesting property that `a / b.Parent.Value` is always the same as `(a / b).Parent` and `a / b / ".."` — in cases when this yield no exceptions, at least.
+- `IPath<T>` supports operators to join it with `LocalPath` or a `string` (note that in both cases appending an absolute path to path of another kind will take over: the last absolute path in chain will win and destroy all the previous ones; this is the standard behavior of path-combining methods — use `AbsolutePath` in combination with `RelativePath` if you want to avoid this behavior).
+- `IPath::IsPrefixOf` to check path prefixes.
+- `IPath::StartsWith` to check if the current path starts with a specified path.
+- `AbsolutePath::ReadKind` helps to check if a path exists, and if it is, then what kind of path it is (file, directory, or something else).
 - `AbsolutePath::Canonicalize` to convert the path to the correct case on case-insensitive file systems, resolve symlinks.
-- `LocalPath::IsAbsolute` to check the path kind (since it supports both kinds);
+- `LocalPath::IsAbsolute` to check the path kind (since it supports both kinds).
 - `LocalPath::ResolveToCurrentDirectory`: effectively calculates `currentDirectory / this`. No-op for paths that are already absolute (aside from converting to the `AbsolutePath` type).
-- `AbsolutePath::RelativeTo`, `LocalPath::RelativeTo` to get a relative part between two paths, if possible;
+- `AbsolutePath::RelativeTo`, `LocalPath::RelativeTo` to get a relative part between two paths, if possible.
 - extension methods on `IPath`:
   - `GetExtensionWithDot` and `GetExtensionWithoutDot` to get the file extension with or without the leading dot (note that `GetExtensionWithDot` will behave differently for paths ending with dots and paths without dot at all);
   - `GetFileNameWithoutExtension` to get the file name without the extension (and without the trailing dot, if any)
 
-    (Note how `GetFileNameWithoutExtension()` works nicely together with `GetExtensionWithDot()` to reconstruct the resulting path from their concatenation, however weird the initial name was — no extension, trailing dot, no base name.)
+    (note how `GetFileNameWithoutExtension()` works nicely together with `GetExtensionWithDot()` to reconstruct the resulting path from their concatenation, however weird the initial name was — no extension, trailing dot, no base name).
 
 ### `Temporary`
 

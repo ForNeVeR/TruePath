@@ -14,8 +14,9 @@ public interface IPath
     string FileName { get; }
 
     /// <summary>
-    /// The parent of this path. Will be <c>null</c> for a rooted absolute path, or relative path pointing to the
-    /// current directory.
+    /// The parent of this path. Will be <c>null</c> for a rooted absolute path. For a relative path, will always
+    /// resolve to its parent directory — by either removing directories from the end of the path, or appending
+    /// <code>..</code> to the end.
     /// </summary>
     IPath? Parent { get; }
 }
