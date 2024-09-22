@@ -32,6 +32,8 @@ public class LocalPathTests(ITestOutputHelper output)
     [InlineData("b", ".")]
     [InlineData("../b", "..")]
     [InlineData("b/..", "b/../..")]
+    [InlineData("...", ".../..")]
+    [InlineData(".../...", "...")]
     public void RelativePathParent(string path, string? expected)
     {
         // Arrange
