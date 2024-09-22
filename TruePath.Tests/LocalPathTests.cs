@@ -21,6 +21,18 @@ public class LocalPathTests(ITestOutputHelper output)
     }
 
     [Theory]
+    [InlineData(".", "")]
+    [InlineData("..", "..")]
+    [InlineData("../..", "../..")]
+    [InlineData(".../...", ".../...")]
+    [InlineData(".../..", "")]
+    public void ConstructionTest(string pathString, string expectedValue)
+    {
+        var path = new LocalPath(pathString);
+        Assert.Equal(expectedValue.Replace('/', Path.DirectorySeparatorChar), path.Value);
+    }
+
+    [Theory]
     [InlineData(".", "..")]
     [InlineData("..", "../..")]
     [InlineData("../..", "../../..")]

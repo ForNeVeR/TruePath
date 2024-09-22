@@ -9,6 +9,14 @@ namespace TruePath.Tests;
 public class AbsolutePathTests
 {
     [Fact]
+    public void ConstructionTest()
+    {
+        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var path = new AbsolutePath($"{root}/...");
+        Assert.Equal($"{root}...", path.Value);
+    }
+
+    [Fact]
     public void ReadKind_NonExistent()
     {
         // Arrange
