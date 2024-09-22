@@ -19,7 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
   Now, it works for relative paths by either removing the last part or adding `..` as necessary to lead to a parent directory.
 
-  Thanks to @Kataane.
+  Thanks to @Kataane for help on this one.
 
 ## [1.4.0] - 2024-08-12
 ### Changed
