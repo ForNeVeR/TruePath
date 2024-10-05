@@ -10,7 +10,7 @@ This is a library containing a set of types to work with file system paths in .N
 
 Motivation
 ----------
-Historically, .NET has been lacking a good set of types to work with file system paths. The `System.IO.Path` class has a variety of methods that operate on path strings, but it doesn't provide any types to represent paths themselves. It's impossible top tell whether a method accepts an absolute path, a relative path, a file name, or something file-related at all, only looking at its signature: all these types are represented by plain strings. Also, comparing different paths is not straightforward.
+Historically, .NET has been lacking a good set of types to work with file system paths. The `System.IO.Path` class has a variety of methods that operate on path strings, but it doesn't provide any types to represent paths themselves. It's impossible to tell whether a method accepts an absolute path, a relative path, a file name, or something file-related at all, only looking at its signature: all these types are represented by plain strings. Also, comparing different paths is not straightforward.
 
 This library aims to fill this gap by providing a set of types that represent paths in a strongly-typed way. Now, you can require a path in a method's parameters, and it is guaranteed that the passed path will be well-formed and will have certain properties.
 
@@ -28,7 +28,7 @@ For cases when you want the path kinds to be checked at compile time, you can us
 
 If you just need a more convenient API to work with paths, and it's not important to use strict path kinds, just rely on the functionality provided by `LocalPath`: it is opaque in a sense it wraps both absolute and relative paths, and you can use it in a more flexible way. It _may_ still cause surprising behavior, though: `new LocalPath("/usr") / "/bin"` is still an equivalent of `"/bin"` (which is not the case for `AbsolutePath` and `RelativePath`).
 
-The latter approach will cost a bit of performance, as the library will have to check the path kind at runtime.
+The strict approach will cost a bit of performance, as the library will have to validate the path kind at runtime.
 
 Usage
 -----
