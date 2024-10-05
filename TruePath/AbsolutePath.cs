@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using System.Runtime.InteropServices;
+using TruePath.Comparers;
 
 namespace TruePath;
 
@@ -103,7 +104,7 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
     /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
     public bool Equals(AbsolutePath other)
     {
-        var comparer = PlatformDefaultPathComparer.Comparer;
+        var comparer = PlatformDefaultPathComparer.Instance;
         return comparer.Compare(Underlying.Value, other.Underlying.Value) == 0;
     }
 
@@ -115,9 +116,6 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
     /// <returns>
     /// <see langword="true"/> if the specified <see cref="AbsolutePath"/> is equal to the current <see cref="AbsolutePath"/> using the specified string comparer; otherwise, <see langword="false"/>.
     /// </returns>
-    /// <remarks>
-    /// If the comparer is null, this method returns <see langword="false"/>.
-    /// </remarks>
     public bool Equals(AbsolutePath other, IComparer<string> comparer)
     {
         return comparer.Compare(Value, other.Value) == 0;

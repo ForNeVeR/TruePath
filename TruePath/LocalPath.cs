@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Runtime.InteropServices;
+using TruePath.Comparers;
 
 namespace TruePath;
 
@@ -53,7 +53,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
     public bool Equals(LocalPath other)
     {
-        var comparer = PlatformDefaultPathComparer.Comparer;
+        var comparer = PlatformDefaultPathComparer.Instance;
         return comparer.Compare(Value, other.Value) == 0;
     }
 
@@ -65,9 +65,6 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     /// <returns>
     /// <see langword="true"/> if the specified <see cref="LocalPath"/> is equal to the current <see cref="LocalPath"/> using the specified string comparer; otherwise, <see langword="false"/>.
     /// </returns>
-    /// <remarks>
-    /// If the comparer is null, this method returns <see langword="false"/>.
-    /// </remarks>
     public bool Equals(LocalPath other, IComparer<string> comparer)
     {
         return comparer.Compare(Value, other.Value) == 0;

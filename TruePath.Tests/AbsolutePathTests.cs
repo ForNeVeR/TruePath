@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using System.Diagnostics;
+using TruePath.Comparers;
 
 namespace TruePath.Tests;
 
@@ -239,7 +240,7 @@ public class AbsolutePathTests
         var path2 = new AbsolutePath(nonCanonicalPath);
 
         // Act
-        var equals = path1.Equals(path2, StrictStringPathComparer.Comparer);
+        var equals = path1.Equals(path2, StrictPathComparer.Instance);
 
         // Assert
         Assert.True(equals);
@@ -250,13 +251,13 @@ public class AbsolutePathTests
     {
         // Arrange
         var currentDirectory = Environment.CurrentDirectory;
-        var nonCanonicalPath = new string(currentDirectory.MakeNonCanonicalPath().ToArray());
+        var nonCanonicalPath = new string(currentDirectory.ToNonCanonicalCase().ToArray());
 
         var path1 = new AbsolutePath(currentDirectory);
         var path2 = new AbsolutePath(nonCanonicalPath);
 
         // Act
-        var equals = path1.Equals(path2, StrictStringPathComparer.Comparer);
+        var equals = path1.Equals(path2, StrictPathComparer.Instance);
 
         // Assert
         Assert.False(equals);
@@ -272,7 +273,7 @@ public class AbsolutePathTests
         }
 
         var currentDirectory = Environment.CurrentDirectory;
-        var nonCanonicalPath = new string(currentDirectory.MakeNonCanonicalPath().ToArray());
+        var nonCanonicalPath = new string(currentDirectory.ToNonCanonicalCase().ToArray());
 
         var path1 = new AbsolutePath(currentDirectory);
         var path2 = new AbsolutePath(nonCanonicalPath);
@@ -294,7 +295,7 @@ public class AbsolutePathTests
         }
 
         var currentDirectory = Environment.CurrentDirectory;
-        var nonCanonicalPath = new string(currentDirectory.MakeNonCanonicalPath().ToArray());
+        var nonCanonicalPath = new string(currentDirectory.ToNonCanonicalCase().ToArray());
 
         var path1 = new AbsolutePath(currentDirectory);
         var path2 = new AbsolutePath(nonCanonicalPath);

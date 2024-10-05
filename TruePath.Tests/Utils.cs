@@ -6,7 +6,7 @@ namespace TruePath.Tests;
 
 public static class Utils
 {
-    internal static string MakeNonCanonicalPath(this string path)
+    internal static string ToNonCanonicalCase(this string path)
     {
         var result = new char[path.Length];
         for (var i = 0; i < path.Length; i++)

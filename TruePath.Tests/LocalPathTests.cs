@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using TruePath.Comparers;
 using Xunit.Abstractions;
 
 namespace TruePath.Tests;
@@ -153,7 +154,7 @@ public partial class LocalPathTests(ITestOutputHelper output)
         var path2 = new LocalPath(nonCanonicalPath);
 
         // Act
-        var equals = path1.Equals(path2, StrictStringPathComparer.Comparer);
+        var equals = path1.Equals(path2, StrictPathComparer.Instance);
 
         // Assert
         Assert.True(equals);
@@ -164,13 +165,13 @@ public partial class LocalPathTests(ITestOutputHelper output)
     {
         // Arrange
         var currentDirectory = Environment.CurrentDirectory;
-        var nonCanonicalPath = new string(currentDirectory.MakeNonCanonicalPath().ToArray());
+        var nonCanonicalPath = new string(currentDirectory.ToNonCanonicalCase().ToArray());
 
         var path1 = new LocalPath(currentDirectory);
         var path2 = new LocalPath(nonCanonicalPath);
 
         // Act
-        var equals = path1.Equals(path2, StrictStringPathComparer.Comparer);
+        var equals = path1.Equals(path2, StrictPathComparer.Instance);
 
         // Assert
         Assert.False(equals);
@@ -186,7 +187,7 @@ public partial class LocalPathTests(ITestOutputHelper output)
         }
 
         var currentDirectory = Environment.CurrentDirectory;
-        var nonCanonicalPath = new string(currentDirectory.MakeNonCanonicalPath().ToArray());
+        var nonCanonicalPath = new string(currentDirectory.ToNonCanonicalCase().ToArray());
 
         var path1 = new LocalPath(currentDirectory);
         var path2 = new LocalPath(nonCanonicalPath);
@@ -208,7 +209,7 @@ public partial class LocalPathTests(ITestOutputHelper output)
         }
 
         var currentDirectory = Environment.CurrentDirectory;
-        var nonCanonicalPath = new string(currentDirectory.MakeNonCanonicalPath().ToArray());
+        var nonCanonicalPath = new string(currentDirectory.ToNonCanonicalCase().ToArray());
 
         var path1 = new LocalPath(currentDirectory);
         var path2 = new LocalPath(nonCanonicalPath);
