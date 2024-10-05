@@ -32,9 +32,7 @@ The strict approach will cost a bit of performance, as the library will have to 
 
 Usage
 -----
-The library offers several struct (i.e. low to zero memory overhead) types wrapping path strings. The types are designed to not involve any disk IO operations by default, and thus provide excellent performance during common operations. This comes with a drawback, though: **path comparison is only performed as string comparison so far**, which means that the library doesn't provide any means to compare paths in a case-insensitive way.
-
-This is a subject to change in future releases, where we will provide more control over this: better platform-wide defaults (such as case-insensitive comparison on Windows and macOS), and options to enable more IO-intensive comparison (to check sensitivity settings of particular file path components during comparison). See [issue #20][issue.20] on the current progress on this change.
+The library offers several struct (i.e. low to zero memory overhead) types wrapping path strings. The types are designed to not involve any disk IO operations by default, and thus provide excellent performance during common operations. This comes with a drawback, though: **path comparison is only performed as string comparison so far** — though it tries to take platform-specific case sensitivity defaults into account. See the section **Path Comparison** for details.
 
 The paths are stored in the **normalized form**.
 
@@ -70,7 +68,28 @@ This is an interface that is implemented by both `LocalPath` and `AbsolutePath`.
 ### `LocalPathPattern`
 This is a marker type that doesn't offer any advanced functionality over the contained string. It is used to mark paths that include wildcards, for further integration with external libraries, such as [Microsoft.Extensions.FileSystemGlobbing][file-system-globbing.nuget].
 
-### Path Features
+### Path Comparison
+Path comparison is a complex topic, because whether several strings point to one object or not might depend on various factors: first and the most obvious one is **case sensitivity**: in general, operating systems allow to set up case-sensitive or case-insensitive mode for any path on the file system. Practically though, in most cases the users aren't changing the defaults for this mode, and have paths as **case-sensitive** on **Linux**, while having them **case-insensitive** on **Windows and macOS**.
+
+Another related issue is canonical path status (for the lack of a better term). Various systems allows for several different strings to mark the same file on disk (either via links, junctions, or obscure features such as 8.3 mode on Windows).
+
+TruePath allows the user to control certain aspects of how their paths are presented and compared, and offers a set of defaults _that prefer max performance over correctness_ — they should work for the most practical cases, but may break in certain situations.
+
+When comparing the path objects via either `==` operator or the standard `Equals(object)` method, the library uses a `TruePath.Comparers.PlatformDefaultPathComparer`, meaning that
+- paths are compared as strings (no canonicalization performed),
+- paths are compared in either case-sensitive (Linux) or case-insensitive/ordinal mode (Windows, macOS).
+
+For cases when you want to always perform strict case-sensitive comparison (more performant yet not platform-aware), pass a `StrictStrictPathComparer` to the overload of `Equals` method:
+```csharp
+var path1 = new LocalPath("a/b/c");
+var path2 = new LocalPath("A/B/C");
+var result1 = path1.Equals(path2, StrictStrictPathComparer.Instance); // guaranteed to be false on all platforms
+var result2 = path1.Equals(path2); // might be true or false, depends on the current platform
+```
+
+The advantage of the current implementations is that they will never do any IO: they don't need to ask the OS about path features to compare them. This comes at cost of incorrect comparisons for paths that use unusual semantics (say, a folder that's marked as case-sensitive on a platform with case-insensitive default). We are planning to offer an option for a comparer that will take particular path case sensitivity into account; follow the [issue #20][issue.20] for details.
+
+### Other Features
 Aside from the strict types, the following features are supported for the paths.
 
 - `IPath::Value` returns the normalized path string.

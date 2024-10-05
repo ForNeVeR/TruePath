@@ -154,7 +154,7 @@ public partial class LocalPathTests(ITestOutputHelper output)
         var path2 = new LocalPath(nonCanonicalPath);
 
         // Act
-        var equals = path1.Equals(path2, StrictPathComparer.Instance);
+        var equals = path1.Equals(path2, StrictStringPathComparer.Instance);
 
         // Assert
         Assert.True(equals);
@@ -171,7 +171,7 @@ public partial class LocalPathTests(ITestOutputHelper output)
         var path2 = new LocalPath(nonCanonicalPath);
 
         // Act
-        var equals = path1.Equals(path2, StrictPathComparer.Instance);
+        var equals = path1.Equals(path2, StrictStringPathComparer.Instance);
 
         // Assert
         Assert.False(equals);

@@ -10,6 +10,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] (1.6.0)
+### Changed
+- Paths are now compared using a platform-specific comparer by default:
+    - case-sensitive on Linux,
+    - case-insensitive on Windows and macOS.
+
+  Thanks to @babaruh and @Kataane for working on this improvement.
+
+### Added
+- `Equals` method on `AbsolutePath` and `LocalPath` that accepts an alternate comparer (see `TruePath.Comparers.PlatformDefaultPathComparer` and `StrictStringPathComparer`). Thanks to @babaruh and @Kataane for working on this improvement.
+
 ## [1.5.0] - 2024-09-22
 ### Fixed
 - Incorrect path normalization: last ellipsis (`...`) in a path was treated as a `..` entry.

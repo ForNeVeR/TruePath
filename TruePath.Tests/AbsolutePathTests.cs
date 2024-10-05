@@ -240,7 +240,7 @@ public class AbsolutePathTests
         var path2 = new AbsolutePath(nonCanonicalPath);
 
         // Act
-        var equals = path1.Equals(path2, StrictPathComparer.Instance);
+        var equals = path1.Equals(path2, StrictStringPathComparer.Instance);
 
         // Assert
         Assert.True(equals);
@@ -257,7 +257,7 @@ public class AbsolutePathTests
         var path2 = new AbsolutePath(nonCanonicalPath);
 
         // Act
-        var equals = path1.Equals(path2, StrictPathComparer.Instance);
+        var equals = path1.Equals(path2, StrictStringPathComparer.Instance);
 
         // Assert
         Assert.False(equals);
