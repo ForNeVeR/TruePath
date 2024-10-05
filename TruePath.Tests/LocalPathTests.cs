@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 
 namespace TruePath.Tests;
 
-public partial class LocalPathTests(ITestOutputHelper output)
+public class LocalPathTests(ITestOutputHelper output)
 {
     [Theory]
     [InlineData("foo", ".")]
