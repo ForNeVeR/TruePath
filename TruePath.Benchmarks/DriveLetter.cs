@@ -6,7 +6,7 @@ using System.Buffers;
 
 namespace TruePath.Benchmarks;
 
-public class DriveLetter
+public static class DriveLetter
 {
     private static readonly SearchValues<char> DriveLetters = SearchValues.Create("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
 
@@ -19,7 +19,7 @@ public class DriveLetter
             return false;
         }
 
-        return source[1] == VolumeSeparatorChar && (uint)((source[0] | 0x20) - 'a') <= (uint)('z' - 'a');
+        return source[1] == VolumeSeparatorChar && (uint)((source[0] | 0x20) - 'a') <= 'z' - 'a';
     }
 
     internal static bool UseSearchValues(ReadOnlySpan<char> source)

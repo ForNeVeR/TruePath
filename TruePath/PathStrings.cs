@@ -10,7 +10,7 @@ namespace TruePath;
 /// <summary>Helper methods to manipulate paths as strings.</summary>
 public static class PathStrings
 {
-    internal const char VolumeSeparatorChar = ':';
+    private const char VolumeSeparatorChar = ':';
 
     /// <summary>
     /// <para>
@@ -185,6 +185,6 @@ public static class PathStrings
             return false;
         }
 
-        return source[1] == VolumeSeparatorChar && (uint)((source[0] | 0x20) - 'a') <= (uint)('z' - 'a');
+        return source[1] == VolumeSeparatorChar && (uint)((source[0] | 0x20) - 'a') <= 'z' - 'a';
     }
 }

@@ -2,11 +2,13 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 
 namespace TruePath;
 
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 internal static partial class Kernel32
 {
     /// <summary>
