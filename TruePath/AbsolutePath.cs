@@ -14,9 +14,26 @@ namespace TruePath;
 /// <remarks>For a path that's not guaranteed to be absolute, use the <see cref="LocalPath"/> type.</remarks>
 public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<AbsolutePath>
 {
+    /// <summary>
+    /// <para>Provides a default comparer for comparing file paths, aware of the current platform.</para>
+    /// <para>
+    ///     On <b>Windows</b> and <b>macOS</b>, this will perform <b>case-insensitive</b> string comparison, since the
+    ///     file systems are case-insensitive on these operating systems by default.
+    /// </para>
+    /// <para>On <b>Linux</b>, the comparison will be <b>case-sensitive</b>.</para>
+    /// </summary>
+    /// <remarks>
+    /// Note that this comparison <b>does not guarantee correctness</b>: in practice, on any platform to control
+    /// case-sensitiveness of either the whole file system or a part of it. This class does not take this into account,
+    /// having a benefit of no accessing the file system for any of the comparisons.
+    /// </remarks>
     public static readonly IEqualityComparer<AbsolutePath> PlatformDefaultComparer =
         new PlatformDefaultPathComparer<AbsolutePath>();
 
+    /// <summary>
+    /// A strict comparer for comparing file paths using ordinal, case-sensitive comparison of the underlying path
+    /// strings.
+    /// </summary>
     public static readonly IEqualityComparer<AbsolutePath> StrictStringComparer =
         new StrictStringPathComparer<AbsolutePath>();
 
