@@ -23,9 +23,6 @@ internal class PlatformDefaultPathComparer<TPath> : IEqualityComparer<TPath> whe
 {
     private readonly StringComparer _stringComparer;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PlatformDefaultPathComparer"/> class.
-    /// </summary>
     public PlatformDefaultPathComparer()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
