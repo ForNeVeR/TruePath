@@ -14,6 +14,12 @@ namespace TruePath;
 /// <remarks>For a path that's not guaranteed to be absolute, use the <see cref="LocalPath"/> type.</remarks>
 public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<AbsolutePath>
 {
+    public static readonly IEqualityComparer<AbsolutePath> PlatformDefaultComparer =
+        new PlatformDefaultPathComparer<AbsolutePath>();
+
+    public static readonly IEqualityComparer<AbsolutePath> StrictStringComparer =
+        new StrictStringPathComparer<AbsolutePath>();
+
     internal readonly LocalPath Underlying;
 
     /// <summary>
@@ -102,24 +108,23 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
 
     /// <summary>Compares the path with another.</summary>
     /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
-    public bool Equals(AbsolutePath other)
-    {
-        var comparer = PlatformDefaultPathComparer.Instance;
-        return comparer.Compare(Underlying.Value, other.Underlying.Value) == 0;
-    }
+    public bool Equals(AbsolutePath other) => Equals(other, PlatformDefaultComparer);
 
     /// <summary>
-    /// Determines whether the specified <see cref="AbsolutePath"/> is equal to the current <see cref="AbsolutePath"/> using the specified string comparer.
+    /// Determines whether the specified <see cref="AbsolutePath"/> is equal to the current <see cref="AbsolutePath"/>
+    /// using the specified comparer.
     /// </summary>
     /// <param name="other">The <see cref="AbsolutePath"/> to compare with the current <see cref="AbsolutePath"/>.</param>
-    /// <param name="comparer">The comparer to use for comparing the paths.</param>
+    /// <param name="comparer">
+    /// The comparer to use for comparing the paths. For example, pass <see cref="PlatformDefaultComparer"/> or
+    /// <see cref="StrictStringComparer"/>.
+    /// </param>
     /// <returns>
-    /// <see langword="true"/> if the specified <see cref="AbsolutePath"/> is equal to the current <see cref="AbsolutePath"/> using the specified string comparer; otherwise, <see langword="false"/>.
+    /// <see langword="true"/> if the specified <see cref="AbsolutePath"/> is equal to the current
+    /// <see cref="AbsolutePath"/> using the specified comparer; otherwise, <see langword="false"/>.
     /// </returns>
-    public bool Equals(AbsolutePath other, IComparer<string> comparer)
-    {
-        return comparer.Compare(Value, other.Value) == 0;
-    }
+    public bool Equals(AbsolutePath other, IEqualityComparer<AbsolutePath> comparer) =>
+        comparer.Equals(this, other);
 
     /// <inheritdoc cref="Equals(AbsolutePath)"/>
     public override bool Equals(object? obj)
@@ -128,10 +133,7 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
     }
 
     /// <inheritdoc cref="Object.GetHashCode"/>
-    public override int GetHashCode()
-    {
-        return Underlying.GetHashCode();
-    }
+    public override int GetHashCode() => PlatformDefaultComparer.GetHashCode(this);
 
     /// <inheritdoc cref="Equals(AbsolutePath)"/>
     public static bool operator ==(AbsolutePath left, AbsolutePath right)

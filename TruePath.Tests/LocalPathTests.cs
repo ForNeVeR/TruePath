@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using TruePath.Comparers;
 using Xunit.Abstractions;
 
 namespace TruePath.Tests;
@@ -144,6 +143,17 @@ public class LocalPathTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void PlatformDefaultPathComparerTest()
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
+
+        var path1 = new LocalPath(@"C:\Windows");
+        var path2 = new LocalPath(@"C:\WINDOWS");
+
+        Assert.True(path1.Equals(path2, LocalPath.PlatformDefaultComparer));
+    }
+
+    [Fact]
     public void EqualsUseStrictStringPathComparer_SamePaths_True()
     {
         // Arrange
@@ -154,7 +164,7 @@ public class LocalPathTests(ITestOutputHelper output)
         var path2 = new LocalPath(nonCanonicalPath);
 
         // Act
-        var equals = path1.Equals(path2, StrictStringPathComparer.Instance);
+        var equals = path1.Equals(path2, LocalPath.StrictStringComparer);
 
         // Assert
         Assert.True(equals);
@@ -171,7 +181,7 @@ public class LocalPathTests(ITestOutputHelper output)
         var path2 = new LocalPath(nonCanonicalPath);
 
         // Act
-        var equals = path1.Equals(path2, StrictStringPathComparer.Instance);
+        var equals = path1.Equals(path2, LocalPath.StrictStringComparer);
 
         // Assert
         Assert.False(equals);

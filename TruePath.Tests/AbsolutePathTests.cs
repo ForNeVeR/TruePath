@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 using System.Diagnostics;
-using TruePath.Comparers;
 
 namespace TruePath.Tests;
 
@@ -230,6 +229,17 @@ public class AbsolutePathTests
     }
 
     [Fact]
+    public void PlatformDefaultPathComparerTest()
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
+
+        var path1 = new AbsolutePath(@"C:\Windows");
+        var path2 = new AbsolutePath(@"C:\WINDOWS");
+
+        Assert.True(path1.Equals(path2, AbsolutePath.PlatformDefaultComparer));
+    }
+
+    [Fact]
     public void EqualsUseStrictStringPathComparer_SamePaths_True()
     {
         // Arrange
@@ -240,7 +250,7 @@ public class AbsolutePathTests
         var path2 = new AbsolutePath(nonCanonicalPath);
 
         // Act
-        var equals = path1.Equals(path2, StrictStringPathComparer.Instance);
+        var equals = path1.Equals(path2, AbsolutePath.StrictStringComparer);
 
         // Assert
         Assert.True(equals);
@@ -257,7 +267,7 @@ public class AbsolutePathTests
         var path2 = new AbsolutePath(nonCanonicalPath);
 
         // Act
-        var equals = path1.Equals(path2, StrictStringPathComparer.Instance);
+        var equals = path1.Equals(path2, AbsolutePath.StrictStringComparer);
 
         // Assert
         Assert.False(equals);

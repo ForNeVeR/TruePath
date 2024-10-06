@@ -16,6 +16,12 @@ namespace TruePath;
 /// </summary>
 public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, IPath<LocalPath>
 {
+    public static readonly IEqualityComparer<LocalPath> PlatformDefaultComparer =
+        new PlatformDefaultPathComparer<LocalPath>();
+
+    public static readonly IEqualityComparer<LocalPath> StrictStringComparer =
+        new StrictStringPathComparer<LocalPath>();
+
     private static char Separator => Path.DirectorySeparatorChar;
 
     /// <inheritdoc cref="IPath.Value"/>
@@ -51,11 +57,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
 
     /// <summary>Compares the path with another.</summary>
     /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
-    public bool Equals(LocalPath other)
-    {
-        var comparer = PlatformDefaultPathComparer.Instance;
-        return comparer.Compare(Value, other.Value) == 0;
-    }
+    public bool Equals(LocalPath other) => Equals(other, PlatformDefaultComparer);
 
     /// <summary>
     /// Determines whether the specified <see cref="LocalPath"/> is equal to the current <see cref="LocalPath"/> using the specified string comparer.
@@ -65,10 +67,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     /// <returns>
     /// <see langword="true"/> if the specified <see cref="LocalPath"/> is equal to the current <see cref="LocalPath"/> using the specified string comparer; otherwise, <see langword="false"/>.
     /// </returns>
-    public bool Equals(LocalPath other, IComparer<string> comparer)
-    {
-        return comparer.Compare(Value, other.Value) == 0;
-    }
+    public bool Equals(LocalPath other, IEqualityComparer<LocalPath> comparer) => comparer.Equals(this, other);
 
     /// <inheritdoc cref="Equals(LocalPath)"/>
     public override bool Equals(object? obj)
@@ -77,10 +76,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     }
 
     /// <inheritdoc cref="Object.GetHashCode"/>
-    public override int GetHashCode()
-    {
-        return Value.GetHashCode();
-    }
+    public override int GetHashCode() => PlatformDefaultComparer.GetHashCode(this);
 
     /// <inheritdoc cref="Equals(LocalPath)"/>
     public static bool operator ==(LocalPath left, LocalPath right)

@@ -4,17 +4,11 @@
 
 namespace TruePath.Comparers;
 
-/// <summary>A strict comparer for comparing file paths using ordinal, case-sensitive comparison.</summary>
-public class StrictStringPathComparer : IComparer<string>
+/// <summary>
+/// A strict comparer for comparing file paths using ordinal, case-sensitive comparison of the underlying path strings.
+/// </summary>
+internal class StrictStringPathComparer<TPath> : IEqualityComparer<TPath> where TPath : IPath
 {
-    /// <summary>
-    /// Gets the singleton instance of the <see cref="StrictStringPathComparer"/> class.
-    /// </summary>
-    public static readonly StrictStringPathComparer Instance = new();
-
-    /// <inheritdoc cref="IComparer{T}.Compare"/>
-    public int Compare(string? x, string? y)
-    {
-        return StringComparer.Ordinal.Compare(x, y);
-    }
+    public bool Equals(TPath? x, TPath? y) => StringComparer.Ordinal.Equals(x?.Value, y?.Value);
+    public int GetHashCode(TPath obj) => StringComparer.Ordinal.GetHashCode(obj.Value);
 }

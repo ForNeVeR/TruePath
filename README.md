@@ -75,19 +75,21 @@ Another related issue is canonical path status (for the lack of a better term). 
 
 TruePath allows the user to control certain aspects of how their paths are presented and compared, and offers a set of defaults _that prefer max performance over correctness_ — they should work for the most practical cases, but may break in certain situations.
 
-When comparing the path objects via either `==` operator or the standard `Equals(object)` method, the library uses a `TruePath.Comparers.PlatformDefaultPathComparer`, meaning that
+When comparing the path objects via either `==` operator or the standard `Equals(object)` method, the library uses the `AbsolutePath.PlatformDefaultComparer` or the `LocalPath.PlatformDefaultComparer`, meaning that
 - paths are compared as strings (no canonicalization performed),
 - paths are compared in either case-sensitive (Linux) or case-insensitive/ordinal mode (Windows, macOS).
 
-For cases when you want to always perform strict case-sensitive comparison (more performant yet not platform-aware), pass a `StrictStrictPathComparer` to the overload of `Equals` method:
+For cases when you want to always perform strict case-sensitive comparison (more performant yet not platform-aware), pass the `AbsolutePath.StrictStringComparer` or the `LocalPath.StrictStringComparer` to the overload of the `Equals` method:
 ```csharp
 var path1 = new LocalPath("a/b/c");
 var path2 = new LocalPath("A/B/C");
-var result1 = path1.Equals(path2, StrictStrictPathComparer.Instance); // guaranteed to be false on all platforms
+var result1 = path1.Equals(path2, LocalPath.StrictStringComparer); // guaranteed to be false on all platforms
 var result2 = path1.Equals(path2); // might be true or false, depends on the current platform
 ```
 
 The advantage of the current implementations is that they will never do any IO: they don't need to ask the OS about path features to compare them. This comes at cost of incorrect comparisons for paths that use unusual semantics (say, a folder that's marked as case-sensitive on a platform with case-insensitive default). We are planning to offer an option for a comparer that will take particular path case sensitivity into account; follow the [issue #20][issue.20] for details.
+
+To convert the path to the canonical form, use `AbsolutePath::Canonicalize`.
 
 ### Other Features
 Aside from the strict types, the following features are supported for the paths.

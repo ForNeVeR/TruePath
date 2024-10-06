@@ -9,7 +9,7 @@ namespace TruePath.Comparers;
 /// <summary>
 /// <para>Provides a default comparer for comparing file paths, aware of the current platform.</para>
 /// <para>
-///     On <b>Windows</b> and <b>macOS</b>, this will perform <b>case-insensitive</b> comparison, since the file
+///     On <b>Windows</b> and <b>macOS</b>, this will perform <b>case-insensitive</b> string comparison, since the file
 ///     systems are case-insensitive on these operating systems by default.
 /// </para>
 /// <para>On <b>Linux</b>, the comparison will be <b>case-sensitive</b>.</para>
@@ -19,33 +19,32 @@ namespace TruePath.Comparers;
 /// case-sensitiveness of either the whole file system or a part of it. This class does not take this into account,
 /// having a benefit of no accessing the file system for any of the comparisons.
 /// </remarks>
-public class PlatformDefaultPathComparer : IComparer<string>
+internal class PlatformDefaultPathComparer<TPath> : IEqualityComparer<TPath> where TPath : IPath
 {
-    /// <summary>
-    /// Gets the singleton instance of the <see cref="PlatformDefaultPathComparer"/> class.
-    /// </summary>
-    public static readonly PlatformDefaultPathComparer Instance = new();
-
-    private readonly StringComparer _comparisonType;
+    private readonly StringComparer _stringComparer;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PlatformDefaultPathComparer"/> class.
     /// </summary>
-    private PlatformDefaultPathComparer()
+    public PlatformDefaultPathComparer()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            _comparisonType = StringComparer.OrdinalIgnoreCase;
+            _stringComparer = StringComparer.OrdinalIgnoreCase;
         }
         else
         {
-            _comparisonType = StringComparer.Ordinal;
+            _stringComparer = StringComparer.Ordinal;
         }
     }
 
-    /// <inheritdoc cref="IComparer{T}.Compare"/>
-    public int Compare(string? x, string? y)
+    public bool Equals(TPath? x, TPath? y)
     {
-        return _comparisonType.Compare(x, y);
+        return _stringComparer.Equals(x?.Value, y?.Value);
+    }
+
+    public int GetHashCode(TPath obj)
+    {
+        return _stringComparer.GetHashCode(obj.Value);
     }
 }
