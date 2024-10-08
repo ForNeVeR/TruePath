@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: MIT
 
 /.idea/
+/docs/_site/
+/docs/api/
 
 bin/
 obj/

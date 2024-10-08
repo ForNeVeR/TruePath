@@ -50,6 +50,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TruePath.Tests", "TruePath.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TruePath.Benchmarks", "TruePath.Benchmarks\TruePath.Benchmarks.csproj", "{4FB7CAE4-241F-4DA8-ABC7-699BEAFBC637}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{33FCBEF9-2172-4755-8792-AEAF646DE77D}"
+	ProjectSection(SolutionItems) = preProject
+		.config\dotnet-tools.json = .config\dotnet-tools.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{98C65796-8ACB-4CAF-A06B-6A179F338E9C}"
+	ProjectSection(SolutionItems) = preProject
+		docs\toc.yml = docs\toc.yml
+		docs\docfx.json = docs\docfx.json
+		docs\index.md = docs\index.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
