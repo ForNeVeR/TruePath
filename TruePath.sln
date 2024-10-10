@@ -54,6 +54,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{33FCBEF9-2172-4755-8792-AEAF646DE77D}"
 	ProjectSection(SolutionItems) = preProject
 		.config\dotnet-tools.json = .config\dotnet-tools.json
+		.config\dotnet-tools.json.license = .config\dotnet-tools.json.license
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{98C65796-8ACB-4CAF-A06B-6A179F338E9C}"
@@ -61,6 +62,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{98C65796-8
 		docs\toc.yml = docs\toc.yml
 		docs\docfx.json = docs\docfx.json
 		docs\index.md = docs\index.md
+		docs\docfx.json.license = docs\docfx.json.license
 	EndProjectSection
 EndProject
 Global
