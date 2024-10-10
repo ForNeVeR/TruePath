@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - infra/docs # TODO: Replace
+  workflow_dispatch:
 
 permissions:
   actions: read
