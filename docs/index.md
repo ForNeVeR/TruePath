@@ -1,6 +1,9 @@
 ---
-_layout: landing
+_disableBreadcrumb: true
 ---
+
+TruePath: the Path Manipulation Library for .NET
+================================================
 
 Motivation
 ----------
@@ -36,7 +39,9 @@ The paths are stored in the **normalized form**.
 
 Note that the normalization operation will not perform any file IO, and is purely string manipulation.
 
-### `LocalPath`
+In this section, we'll overview some of the main library features. For details, see [the API reference][api.index].
+
+### [`LocalPath`][api.local-path]
 This is the type that may either be a relative or an absolute. Small showcase:
 ```csharp
 var myRoot = new LocalPath("foo/bar");
@@ -46,18 +51,15 @@ var bazSubdirectory = myRoot / "baz";
 var alsoBazSubdirectory = myRoot / new LocalPath("baz");
 ```
 
-### `AbsolutePath`
+### [`AbsolutePath`][api.absolute-path]
 This functions basically the same as the `LocalPath`, but it is _always_ an absolute path, which is checked in the constructor.
 
 To convert from `LocalPath` to `AbsolutePath` and vice versa, you can use the constructors of `AbsolutePath` and `LocalPath` respectively. Any `AbsolutePath` constructor (from either a string or a `LocalPath`) has same check for absolute path, and any `LocalPath` constructor (from either a string or an `AbsolutePath`) doesn't have any checks.
 
-#### Static Members
-- `AbsolutePath.CurrentWorkingDirectory`: returns `Environment.CurrentDirectory` as an `AbsolutePath` instance.
-
-### `IPath`
+### [`IPath`][api.i-path]
 This is an interface that is implemented by both `LocalPath` and `AbsolutePath`. It allows to process any paths in a polymorphic way.
 
-### `LocalPathPattern`
+### [`LocalPathPattern`][api.local-path-pattern]
 This is a marker type that doesn't offer any advanced functionality over the contained string. It is used to mark paths that include wildcards, for further integration with external libraries, such as [Microsoft.Extensions.FileSystemGlobbing][file-system-globbing.nuget].
 
 ### Path Comparison
@@ -83,37 +85,19 @@ The advantage of the current implementations is that they will never do any IO: 
 
 To convert the path to the canonical form, use `AbsolutePath::Canonicalize`.
 
-### Other Features
-Aside from the strict types, the following features are supported for the paths.
-
-- `IPath::Value` returns the normalized path string.
-- `IPath::FileName` returns the last component of the path.
-- `IPath::Parent` returns the parent path item (`null` for the root absolute path).
-
-  Note that it will _always_ return a meaningful parent for a relative path: parent for `.` is `..`, parent for `..` is `../..`.
-
-  This means that generally `.Parent` behaves the same as appending a `..` component to the end of the path would. Also, this allows for an interesting property that `a / b.Parent.Value` is always the same as `(a / b).Parent` and `a / b / ".."` — in cases when this yield no exceptions, at least.
-- `IPath<T>` supports operators to join it with `LocalPath` or a `string` (note that in both cases appending an absolute path to path of another kind will take over: the last absolute path in chain will win and destroy all the previous ones; this is the standard behavior of path-combining methods — use `AbsolutePath` in combination with `RelativePath` if you want to avoid this behavior).
-- `IPath::IsPrefixOf` to check path prefixes.
-- `IPath::StartsWith` to check if the current path starts with a specified path.
-- `AbsolutePath::ReadKind` helps to check if a path exists, and if it is, then what kind of path it is (file, directory, or something else).
-- `AbsolutePath::Canonicalize` to convert the path to the correct case on case-insensitive file systems, resolve symlinks.
-- `LocalPath::IsAbsolute` to check the path kind (since it supports both kinds).
-- `LocalPath::ResolveToCurrentDirectory`: effectively calculates `currentDirectory / this`. No-op for paths that are already absolute (aside from converting to the `AbsolutePath` type).
-- `AbsolutePath::RelativeTo`, `LocalPath::RelativeTo` to get a relative part between two paths, if possible.
-- extension methods on `IPath`:
-    - `GetExtensionWithDot` and `GetExtensionWithoutDot` to get the file extension with or without the leading dot (note that `GetExtensionWithDot` will behave differently for paths ending with dots and paths without dot at all);
-    - `GetFileNameWithoutExtension` to get the file name without the extension (and without the trailing dot, if any)
-
-      (note how `GetFileNameWithoutExtension()` works nicely together with `GetExtensionWithDot()` to reconstruct the resulting path from their concatenation, however weird the initial name was — no extension, trailing dot, no base name).
-
-### `Temporary`
+### [`Temporary`][api.temporary]
 
 `TruePath.Temporary` class contains a set of utility methods to work with the system temp directory (most widely known as `TEMP` or `TMP` environment variable):
 - `Temporary::SystemTempDirectory()` will return it as an absolute path;
 - `Temporary::CreateTempFile()` will create a randomly-named file in the system temp directory and return an absolute path to it;
 - `Temporary::CreateTempFolder()` will create a randomly-named folder in the system temp directory and return an absolute path to it.
 
+[api.absolute-path]: api/TruePath.AbsolutePath.html
+[api.i-path]: api/TruePath.IPath.html
+[api.local-path-pattern]: api/TruePath.LocalPathPattern.html
+[api.local-path]: api/TruePath.LocalPath.html
+[api.temporary]: api/TruePath.Temporary.html
+[api.reference]: api/TruePath.html
 [file-system-globbing.nuget]: https://www.nuget.org/packages/Microsoft.Extensions.FileSystemGlobbing
 [issue.20]: https://github.com/ForNeVeR/TruePath/issues/20
 [java.path]: https://docs.oracle.com/en%2Fjava%2Fjavase%2F21%2Fdocs%2Fapi%2F%2F/java.base/java/nio/file/Path.html

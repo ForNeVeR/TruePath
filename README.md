@@ -39,7 +39,7 @@ The license indication in the project's sources is compliant with the [REUSE spe
 [docs.contributing]: CONTRIBUTING.md
 [docs.license]: LICENSE.txt
 [docs.maintaining]: MAINTAINING.md
-[docs]: https://fornever.github.io/truepath
+[docs]: https://fornever.github.io/TruePath
 [issues]: https://github.com/ForNeVeR/TruePath/issues
 [java.path]: https://docs.oracle.com/en%2Fjava%2Fjavase%2F21%2Fdocs%2Fapi%2F%2F/java.base/java/nio/file/Path.html
 [kotlin.path]: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io.path/java.nio.file.-path/

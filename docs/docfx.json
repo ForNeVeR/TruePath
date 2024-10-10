@@ -1,45 +1,45 @@
 {
-  "metadata": [
-    {
-      "src": [
+    "metadata": [
         {
-          "src": "..",
-          "files": [
-            "TruePath/TruePath.csproj"
-          ]
+            "src": [
+                {
+                    "src": "..",
+                    "files": [
+                        "TruePath/TruePath.csproj"
+                    ]
+                }
+            ],
+            "dest": "api"
         }
-      ],
-      "dest": "api"
-    }
-  ],
-  "build": {
-    "content": [
-      {
-        "files": [
-          "**/*.{md,yml}"
+    ],
+    "build": {
+        "content": [
+            {
+                "files": [
+                    "**/*.{md,yml}"
+                ],
+                "exclude": [
+                    "_site/**"
+                ]
+            }
         ],
-        "exclude": [
-          "_site/**"
-        ]
-      }
-    ],
-    "resource": [
-      {
-        "files": [
-          "images/**"
-        ]
-      }
-    ],
-    "output": "_site",
-    "template": [
-      "default",
-      "modern"
-    ],
-    "globalMetadata": {
-      "_appName": "TruePath",
-      "_appTitle": "TruePath",
-      "_enableSearch": true,
-      "pdf": false
+        "resource": [
+            {
+                "files": [
+                    "images/**"
+                ]
+            }
+        ],
+        "output": "_site",
+        "template": [
+            "default",
+            "modern"
+        ],
+        "globalMetadata": {
+            "_appName": "TruePath",
+            "_appTitle": "TruePath",
+            "_enableSearch": true,
+            "pdf": false
+        }
     }
-  }
 }
