@@ -32,7 +32,7 @@ License
 -------
 The project is distributed under the terms of [the MIT license][docs.license].
 
-The license indication in the project's sources is compliant with the [REUSE specification v3.2][reuse.spec].
+The license indication in the project's sources is compliant with the [REUSE specification v3.3][reuse.spec].
 
 [andivionian-status-classifier]: https://andivionian.fornever.me/v1/#status-ventis-
 [discussions]: https://github.com/ForNeVeR/TruePath/discussions
@@ -45,5 +45,5 @@ The license indication in the project's sources is compliant with the [REUSE spe
 [kotlin.path]: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io.path/java.nio.file.-path/
 [nuget.badge]: https://img.shields.io/nuget/v/TruePath
 [nuget.page]: https://www.nuget.org/packages/TruePath
-[reuse.spec]: https://reuse.software/spec-3.2/
+[reuse.spec]: https://reuse.software/spec-3.3/
 [status-ventis]: https://img.shields.io/badge/status-ventis-yellow.svg
