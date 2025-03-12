@@ -1,5 +1,5 @@
 <!--
-SPDX-FileCopyrightText: 2024 Friedrich von Never <friedrich@fornever.me>
+SPDX-FileCopyrightText: 2024-2025 Friedrich von Never <friedrich@fornever.me>
 
 SPDX-License-Identifier: MIT
 -->
@@ -25,6 +25,7 @@ If you miss some feature or have questions, do not hesitate to [open an issue][i
 Documentation
 -------------
 - [Project Documentation Site][docs]
+- [Changelog][docs.changelog]
 - [Contributor Guide][docs.contributing]
 - [Maintainer Guide][docs.maintaining]
 
@@ -36,6 +37,7 @@ The license indication in the project's sources is compliant with the [REUSE spe
 
 [andivionian-status-classifier]: https://andivionian.fornever.me/v1/#status-ventis-
 [discussions]: https://github.com/ForNeVeR/TruePath/discussions
+[docs.changelog]: CHANGELOG.md
 [docs.contributing]: CONTRIBUTING.md
 [docs.license]: LICENSE.txt
 [docs.maintaining]: MAINTAINING.md
