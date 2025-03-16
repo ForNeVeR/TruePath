@@ -12,9 +12,9 @@ open type Generaptor.Library.Actions
 open type Generaptor.Library.Patterns
 
 let mainBranch = "main"
-let ubuntu = "ubuntu-22.04"
+let ubuntu = "ubuntu-24.04"
 let images = [
-    "macos-12"
+    "macos-14"
     ubuntu
     "windows-2022"
 ]
@@ -40,7 +40,7 @@ let workflows = [
             runsOn ubuntu
             checkout
 
-            step(name = "REUSE license check", uses = "fsfe/reuse-action@v3")
+            step(name = "REUSE license check", uses = "fsfe/reuse-action@v5")
         ]
 
         job "encoding" [
@@ -75,7 +75,13 @@ let workflows = [
             dotNetPack(version = versionField)
 
             let releaseNotes = "./release-notes.md"
-            prepareChangelog(releaseNotes)
+            step(
+                name = "Read changelog",
+                uses = "ForNeVeR/ChangelogAutomation.action@v2",
+                options = Map.ofList [
+                    "output", releaseNotes
+                ]
+            )
 
             let projectName = "TruePath"
             let packageId = "TruePath"

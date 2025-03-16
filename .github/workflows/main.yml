@@ -15,8 +15,8 @@ jobs:
     strategy:
       matrix:
         image:
-        - macos-12
-        - ubuntu-22.04
+        - macos-14
+        - ubuntu-24.04
         - windows-2022
       fail-fast: false
     runs-on: ${{ matrix.image }}
@@ -41,20 +41,20 @@ jobs:
       run: dotnet test
       timeout-minutes: 10
   licenses:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
     - name: REUSE license check
       uses: fsfe/reuse-action@v5
   encoding:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
     - name: Verify encoding
       shell: pwsh
       run: scripts/Test-Encoding.ps1
   nowarn-empty:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
     - name: Verify with NoWarn as empty
