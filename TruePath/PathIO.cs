@@ -273,16 +273,11 @@ public static class PathIO
     /// <param name="path">The name of the file to be deleted. Wildcard characters are not supported.</param>
     public static void Delete(this AbsolutePath path) => File.Delete(path.Value);
     /// <summary>
-    /// Deletes an empty directory from a specified path.
-    /// </summary>
-    /// <param name="path">The name of the empty directory to remove. This directory must be writable and empty.</param>
-    public static void DeleteDirectory(AbsolutePath path) => Directory.Delete(path.Value);
-    /// <summary>
     /// Deletes the specified directory and, if indicated, any subdirectories and files in the directory.
     /// </summary>
     /// <param name="path">The name of the empty directory to remove. This directory must be writable and empty.</param>
     /// <param name="recursive"><b>true</b> to remove directories, subdirectories, and files in <paramref name="path"/>; otherwise, <b>false</b>.</param>
-    public static void DeleteDirectory(AbsolutePath path, bool recursive) => Directory.Delete(path.Value, recursive);
+    public static void DeleteDirectory(AbsolutePath path, bool recursive = false) => Directory.Delete(path.Value, recursive);
     /// <summary>
     /// Determines whether the specified file exists.
     /// </summary>
