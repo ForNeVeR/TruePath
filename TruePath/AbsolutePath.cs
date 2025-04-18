@@ -89,13 +89,13 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
         return Value.Length <= other.Value.Length && other.Value.StartsWith(Value);
     }
 
-    /// <summary>
-    /// Gets the current working directory as an AbsolutePath instance.
-    /// </summary>
-    /// <value>
-    /// The current working directory.
-    /// </value>
-    public static AbsolutePath CurrentWorkingDirectory => new(Environment.CurrentDirectory);
+    /// <summary>Gets or sets the current working directory as an AbsolutePath instance.</summary>
+    /// <value>The current working directory.</value>
+    public static AbsolutePath CurrentWorkingDirectory
+    {
+        get => new(Environment.CurrentDirectory);
+        set => Directory.SetCurrentDirectory(value.Value);
+    }
 
     /// <summary>
     /// Calculates the relative path from a base path to this path.

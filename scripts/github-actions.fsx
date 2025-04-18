@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+// SPDX-FileCopyrightText: 2024-2025 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 //
 // SPDX-License-Identifier: MIT
 
@@ -83,14 +83,14 @@ let workflows = [
                 ]
             )
 
-            let projectName = "TruePath"
-            let packageId = "TruePath"
-            let artifacts includeSNuPkg = [
+            let artifacts projectName includeSNuPkg = [
+                let packageId = projectName
                 $"./{projectName}/bin/{configuration}/{packageId}.{versionField}.nupkg"
                 if includeSNuPkg then $"./{projectName}/bin/{configuration}/{packageId}.{versionField}.snupkg"
             ]
             let allArtifacts = [
-                yield! artifacts true
+                yield! artifacts "TruePath" true
+                yield! artifacts "TruePath.SystemIo" true
             ]
             uploadArtifacts [
                 releaseNotes
@@ -102,8 +102,11 @@ let workflows = [
                     releaseNotesPath = releaseNotes,
                     files = allArtifacts
                 )
-                yield! pushToNuGetOrg "NUGET_TOKEN" (
-                    artifacts false
+                yield! pushToNuGetOrg "NUGET_TOKEN_TRUE_PATH" (
+                    artifacts "TruePath" false
+                )
+                yield! pushToNuGetOrg "NUGET_TOKEN_TRUE_PATH_SYSTEM_IO" (
+                    artifacts "TruePath.SystemIo" false
                 )
             ]
         ]

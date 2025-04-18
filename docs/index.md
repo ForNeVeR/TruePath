@@ -3,7 +3,7 @@ _disableBreadcrumb: true
 ---
 
 <!--
-SPDX-FileCopyrightText: 2024 Friedrich von Never <friedrich@fornever.me>
+SPDX-FileCopyrightText: 2024-2025 Friedrich von Never <friedrich@fornever.me>
 
 SPDX-License-Identifier: MIT
 -->
@@ -30,6 +30,12 @@ For cases when you want the path kinds to be checked at compile time, you can us
 If you just need a more convenient API to work with paths, and it's not important to use strict path kinds, just rely on the functionality provided by `LocalPath`: it is opaque in a sense it wraps both absolute and relative paths, and you can use it in a more flexible way. It _may_ still cause surprising behavior, though: `new LocalPath("/usr") / "/bin"` is still an equivalent of `"/bin"` (which is not the case for `AbsolutePath` and `RelativePath`).
 
 The strict approach will cost a bit of performance, as the library will have to validate the path kind at runtime.
+
+Packages
+--------
+TruePath provides two packages:
+- [TruePath][nuget.true-path] for path abstractions,
+- [TruePath.SystemIo][nuget.true-path.system-io] for the `System.IO` integration.
 
 Usage
 -----
@@ -68,6 +74,9 @@ This is an interface that is implemented by both `LocalPath` and `AbsolutePath`.
 ### [`LocalPathPattern`][api.local-path-pattern]
 This is a marker type that doesn't offer any advanced functionality over the contained string. It is used to mark paths that include wildcards, for further integration with external libraries, such as [Microsoft.Extensions.FileSystemGlobbing][file-system-globbing.nuget].
 
+### [`PathIO`][api.path-io]
+`PathIo` class provides extension methods to interoperate with `System.File.IO` with TruePath. Operations to read and write files, create directories, query file attributes, etc. are available here.
+
 ### Path Comparison
 Path comparison is a complex topic, because whether several strings point to one object or not might depend on various factors: first and the most obvious one is **case sensitivity**: in general, operating systems allow to set up case-sensitive or case-insensitive mode for any path on the file system. Practically though, in most cases the users aren't changing the defaults for this mode, and have paths as **case-sensitive** on **Linux**, while having them **case-insensitive** on **Windows and macOS**.
 
@@ -98,13 +107,16 @@ To convert the path to the canonical form, use `AbsolutePath::Canonicalize`.
 - `Temporary::CreateTempFile()` will create a randomly-named file in the system temp directory and return an absolute path to it;
 - `Temporary::CreateTempFolder()` will create a randomly-named folder in the system temp directory and return an absolute path to it.
 
-[api.absolute-path]: api/TruePath.AbsolutePath.html
-[api.i-path]: api/TruePath.IPath.html
-[api.local-path-pattern]: api/TruePath.LocalPathPattern.html
-[api.local-path]: api/TruePath.LocalPath.html
-[api.temporary]: api/TruePath.Temporary.html
-[api.reference]: api/TruePath.html
+[api.absolute-path]: api/TruePath.AbsolutePath.yml
+[api.i-path]: api/TruePath.IPath.yml
+[api.local-path-pattern]: api/TruePath.LocalPathPattern.yml
+[api.local-path]: api/TruePath.LocalPath.yml
+[api.path-io]: api/TruePath.SystemIo.PathIo.yml
+[api.reference]: api/TruePath.yml
+[api.temporary]: api/TruePath.Temporary.yml
 [file-system-globbing.nuget]: https://www.nuget.org/packages/Microsoft.Extensions.FileSystemGlobbing
 [issue.20]: https://github.com/ForNeVeR/TruePath/issues/20
 [java.path]: https://docs.oracle.com/en%2Fjava%2Fjavase%2F21%2Fdocs%2Fapi%2F%2F/java.base/java/nio/file/Path.html
 [kotlin.path]: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io.path/java.nio.file.-path/
+[nuget.true-path]: https://www.nuget.org/packages/TruePath
+[nuget.true-path.system-io]: https://www.nuget.org/packages/TruePath.SystemIo
