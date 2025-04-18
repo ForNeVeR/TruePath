@@ -159,6 +159,22 @@ public class AbsolutePathTests
     }
 
     [Fact]
+    public void CurrentWorkingDirectoryGetsChanged()
+    {
+        var prevPath = AbsolutePath.CurrentWorkingDirectory;
+        var path = new AbsolutePath(Environment.ProcessPath!).Parent!.Value;
+        try
+        {
+            AbsolutePath.CurrentWorkingDirectory = path;
+            Assert.Equal(path, new AbsolutePath(Environment.CurrentDirectory));
+        }
+        finally
+        {
+            AbsolutePath.CurrentWorkingDirectory = prevPath;
+        }
+    }
+
+    [Fact]
     public void PathIsNormalizedOnCreation()
     {
         if (!OperatingSystem.IsWindows()) return;
