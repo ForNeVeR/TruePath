@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   `TruePath.SystemIo.PathIo` contains most of the static methods from .NET's `File` and `Directory` types as extension methods over the `AbstractPath`.
 
   Thanks to @kant2002!
+- A setter for `AbsolutePath.CurrentWorkingDirectory`.
 
 ## [1.6.0] - 2024-10-06
 ### Changed
