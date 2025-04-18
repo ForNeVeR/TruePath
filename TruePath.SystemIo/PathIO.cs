@@ -1,16 +1,17 @@
-// SPDX-FileCopyrightText: 2024 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+// SPDX-FileCopyrightText: 2025 .NET Foundation and Contributors
+// SPDX-FileCopyrightText: 2025 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 //
 // SPDX-License-Identifier: MIT
 
 using System.Runtime.Versioning;
 using System.Text;
 
-namespace TruePath;
+namespace TruePath.SystemIo;
 
 /// <summary>
 /// Extension methods for the <see cref="AbsolutePath"/> type that provide common I/O operations.
 /// </summary>
-public static class PathIO
+public static class PathIo
 {
     /// <summary>
     /// Appends the specified lines to the file, creating the file if it does not already exist.
@@ -273,11 +274,15 @@ public static class PathIO
     /// <param name="path">The name of the file to be deleted. Wildcard characters are not supported.</param>
     public static void Delete(this AbsolutePath path) => File.Delete(path.Value);
     /// <summary>
-    /// Deletes the specified directory and, if indicated, any subdirectories and files in the directory.
+    /// Deletes the specified empty directory.
     /// </summary>
-    /// <param name="path">The name of the empty directory to remove. This directory must be writable and empty.</param>
-    /// <param name="recursive"><b>true</b> to remove directories, subdirectories, and files in <paramref name="path"/>; otherwise, <b>false</b>.</param>
-    public static void DeleteDirectory(AbsolutePath path, bool recursive = false) => Directory.Delete(path.Value, recursive);
+    /// <param name="path">The name of the directory to remove. This directory must be writable and empty.</param>
+    public static void DeleteEmptyDirectory(AbsolutePath path) => Directory.Delete(path.Value, recursive: false);
+    /// <summary>
+    /// Deletes the specified directory and any subdirectories and files in the directory.
+    /// </summary>
+    /// <param name="path">The name of the directory to remove. This directory must be writable.</param>
+    public static void DeleteDirectoryRecursively(AbsolutePath path) => Directory.Delete(path.Value, recursive: true);
     /// <summary>
     /// Determines whether the specified file exists.
     /// </summary>

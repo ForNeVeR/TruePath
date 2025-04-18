@@ -5,7 +5,8 @@
                 {
                     "src": "..",
                     "files": [
-                        "TruePath/TruePath.csproj"
+                        "TruePath/TruePath.csproj",
+                        "TruePath.SystemIo/TruePath.SystemIo.csproj"
                     ]
                 }
             ],

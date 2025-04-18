@@ -35,6 +35,8 @@ jobs:
           ./release-notes.md
           ./TruePath/bin/Release/TruePath.${{ steps.version.outputs.version }}.nupkg
           ./TruePath/bin/Release/TruePath.${{ steps.version.outputs.version }}.snupkg
+          ./TruePath.SystemIo/bin/Release/TruePath.SystemIo.${{ steps.version.outputs.version }}.nupkg
+          ./TruePath.SystemIo/bin/Release/TruePath.SystemIo.${{ steps.version.outputs.version }}.snupkg
     - if: startsWith(github.ref, 'refs/tags/v')
       name: Create a release
       uses: softprops/action-gh-release@v2
@@ -43,7 +45,12 @@ jobs:
         files: |-
           ./TruePath/bin/Release/TruePath.${{ steps.version.outputs.version }}.nupkg
           ./TruePath/bin/Release/TruePath.${{ steps.version.outputs.version }}.snupkg
+          ./TruePath.SystemIo/bin/Release/TruePath.SystemIo.${{ steps.version.outputs.version }}.nupkg
+          ./TruePath.SystemIo/bin/Release/TruePath.SystemIo.${{ steps.version.outputs.version }}.snupkg
         name: TruePath v${{ steps.version.outputs.version }}
     - if: startsWith(github.ref, 'refs/tags/v')
       name: Push artifact to NuGet
-      run: dotnet nuget push ./TruePath/bin/Release/TruePath.${{ steps.version.outputs.version }}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }}
+      run: dotnet nuget push ./TruePath/bin/Release/TruePath.${{ steps.version.outputs.version }}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN_TRUE_PATH }}
+    - if: startsWith(github.ref, 'refs/tags/v')
+      name: Push artifact to NuGet
+      run: dotnet nuget push ./TruePath.SystemIo/bin/Release/TruePath.SystemIo.${{ steps.version.outputs.version }}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN_TRUE_PATH_SYSTEM_IO }}

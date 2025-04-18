@@ -1,0 +1,22 @@
+﻿<!--
+SPDX-FileCopyrightText: 2025 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+
+SPDX-License-Identifier: MIT
+-->
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+        <PackageDescription>Adapters to use System.IO.File and System.IO.Directory APIs together with TruePath.</PackageDescription>
+        <RootNamespace>TruePath.SystemIO</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="TruePath.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\TruePath\TruePath.csproj" />
+    </ItemGroup>
+</Project>

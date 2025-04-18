@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2024 Friedrich von Never <friedrich@fornever.me>
 SPDX-License-Identifier: MIT
 -->
 
-TruePath [![Status Ventis][status-ventis]][andivionian-status-classifier] [![NuGet package][nuget.badge]][nuget.page]
+TruePath [![Status Ventis][status-ventis]][andivionian-status-classifier]
 ========
 This is a library containing a set of types to work with file system paths in .NET.
 
@@ -21,6 +21,17 @@ The library is inspired by the path libraries used in other ecosystems: in parti
 Read more on [the documentation site][docs].
 
 If you miss some feature or have questions, do not hesitate to [open an issue][issues] or [go to the discussions section][discussions].
+
+Packages
+--------
+| Name                  | Badge                                                                                           |
+|-----------------------|-------------------------------------------------------------------------------------------------|
+| **TruePath**          | [![TruePath on nuget.org][nuget.badge.true-path]][nuget.true-path]                              |
+| **TruePath.SystemIo** | [![TruePath.SystemIo on nuget.org][nuget.badge.true-path.system-io]][nuget.true-path.system-io] |
+
+TruePath provides two NuGet packages:
+- [**TruePath**][nuget.true-path] for the main path abstractions,
+- [**TruePath.SystemIo**][nuget.true-path.system-io] for the `System.IO` integration.
 
 Documentation
 -------------
@@ -43,7 +54,9 @@ The license indication in the project's sources is compliant with the [REUSE spe
 [issues]: https://github.com/ForNeVeR/TruePath/issues
 [java.path]: https://docs.oracle.com/en%2Fjava%2Fjavase%2F21%2Fdocs%2Fapi%2F%2F/java.base/java/nio/file/Path.html
 [kotlin.path]: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io.path/java.nio.file.-path/
-[nuget.badge]: https://img.shields.io/nuget/v/TruePath
-[nuget.page]: https://www.nuget.org/packages/TruePath
+[nuget.badge.true-path.system-io]: https://img.shields.io/nuget/v/TruePath.SystemIo
+[nuget.badge.true-path]: https://img.shields.io/nuget/v/TruePath
+[nuget.true-path.system-io]: https://www.nuget.org/packages/TruePath.SystemIo
+[nuget.true-path]: https://www.nuget.org/packages/TruePath
 [reuse.spec]: https://reuse.software/spec-3.3/
 [status-ventis]: https://img.shields.io/badge/status-ventis-yellow.svg
