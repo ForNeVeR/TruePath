@@ -10,7 +10,7 @@ public interface IPath
     /// <summary>The normalized path string.</summary>
     string Value { get; }
 
-    /// <summary>The name of the last component of this path.</summary>
+    /// <summary>The name of this path's last component.</summary>
     string FileName { get; }
 
     /// <summary>
@@ -25,7 +25,6 @@ public interface IPath
 /// <typeparam name="TPath">The type of this path.</typeparam>
 public interface IPath<TPath> where TPath : IPath<TPath>
 {
-    // ReSharper disable once GrammarMistakeInComment // RIDER-111735
     /// <summary>Appends another path to this one.</summary>
     /// <remarks>
     /// Note that in case path <paramref name="appended"/> is <b>absolute</b>, it will completely take over and the
@@ -37,7 +36,7 @@ public interface IPath<TPath> where TPath : IPath<TPath>
     static abstract TPath operator /(TPath basePath, string appended);
 
     /// <remarks>
-    /// Checks for a non-strict prefix: if the paths are equal then they are still considered prefixes of each other.
+    /// Checks for a non-strict prefix: if the paths are equal, then they are still considered prefixes of each other.
     /// </remarks>
     /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
     bool IsPrefixOf(TPath other);

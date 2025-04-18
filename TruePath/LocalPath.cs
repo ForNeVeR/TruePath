@@ -11,7 +11,7 @@ namespace TruePath;
 /// <para>It may be either absolute or relative.</para>
 /// <para>
 ///     Always stored in a normalized form. Read the documentation on <see cref="TruePath.PathStrings.Normalize"/> to
-///     know what form of normalization does the path use.
+///     know what form of normalization the path uses.
 /// </para>
 /// </summary>
 public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, IPath<LocalPath>
@@ -45,9 +45,9 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     public string Value { get; } = PathStrings.Normalize(value);
 
     /// <summary>
-    /// <para>Checks whether th path is absolute.</para>
+    /// <para>Checks whether the path is absolute.</para>
     /// <para>
-    ///     Currently, any rooted paths are considered absolute, but this is a subject to change: on Windows, there
+    ///     Currently, any rooted paths are considered absolute, but this is subject to change: on Windows, there
     ///     will be an additional requirement for a path to be either a DOS device path or start from a disk letter.
     /// </para>
     /// </summary>
@@ -124,7 +124,6 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     /// <returns>The relative path from the base path to this path.</returns>
     public LocalPath RelativeTo(LocalPath basePath) => new(Path.GetRelativePath(basePath.Value, Value));
 
-    // ReSharper disable once GrammarMistakeInComment // RIDER-111735
     /// <summary>Appends another path to this one.</summary>
     /// <remarks>
     /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the
@@ -133,7 +132,6 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     public static LocalPath operator /(LocalPath basePath, LocalPath b) =>
         new(Path.Combine(basePath.Value, b.Value));
 
-    // ReSharper disable once GrammarMistakeInComment // RIDER-111735
     /// <summary>Appends another path to this one.</summary>
     /// <remarks>
     /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the
@@ -157,7 +155,6 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     /// </remarks>
     public AbsolutePath ResolveToCurrentDirectory() => AbsolutePath.CurrentWorkingDirectory / this;
 
-    // ReSharper disable once GrammarMistakeInComment // RIDER-111735
     /// <summary>Converts an <see cref="AbsolutePath"/> to a <see cref="LocalPath"/>.</summary>
     public LocalPath(AbsolutePath path) : this(path.Value)
     {
