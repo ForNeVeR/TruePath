@@ -16,7 +16,7 @@ Publish a New Version
 5. Set `<Version>` in the `Directory.Build.props` file.
 6. Merge the aforementioned changes via a pull request.
 7. Check if the NuGet keys are still valid (see the **Rotate NuGet Publishing Keys** section if they aren't).
-8. Push a tag in form of `v<VERSION>`, e.g. `v0.0.0`. GitHub Actions will do the rest (push a NuGet package).
+8. Push a tag in form of `v<VERSION>`, e.g. `v0.0.0`. GitHub Actions will do the rest (push a NuGet packages).
 
 Rotate NuGet Publishing Keys
 ----------------------------
