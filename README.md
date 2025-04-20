@@ -24,10 +24,10 @@ If you miss some feature or have questions, do not hesitate to [open an issue][i
 
 Packages
 --------
-| Name                  | Badge                                                                                           |
-|-----------------------|-------------------------------------------------------------------------------------------------|
-| **TruePath**          | [![TruePath on nuget.org][nuget.badge.true-path]][nuget.true-path]                              |
-| **TruePath.SystemIo** | [![TruePath.SystemIo on nuget.org][nuget.badge.true-path.system-io]][nuget.true-path.system-io] |
+| Name                  | NuGet Package                                                                                   | Documentation                             |
+|-----------------------|-------------------------------------------------------------------------------------------------|-------------------------------------------|
+| **TruePath**          | [![TruePath on nuget.org][nuget.badge.true-path]][nuget.true-path]                              | [API Reference][docs.true-path]           |
+| **TruePath.SystemIo** | [![TruePath.SystemIo on nuget.org][nuget.badge.true-path.system-io]][nuget.true-path.system-io] | [API Reference][docs.true-path.system-io] |
 
 TruePath provides two NuGet packages:
 - [**TruePath**][nuget.true-path] for the main path abstractions,
@@ -52,6 +52,8 @@ The license indication in the project's sources is compliant with the [REUSE spe
 [docs.contributing]: CONTRIBUTING.md
 [docs.license]: LICENSE.txt
 [docs.maintaining]: MAINTAINING.md
+[docs.true-path.system-io]: https://fornever.github.io/TruePath/api/TruePath.SystemIo.html
+[docs.true-path]: https://fornever.github.io/TruePath/api/TruePath.html
 [docs]: https://fornever.github.io/TruePath
 [issues]: https://github.com/ForNeVeR/TruePath/issues
 [java.path]: https://docs.oracle.com/en%2Fjava%2Fjavase%2F21%2Fdocs%2Fapi%2F%2F/java.base/java/nio/file/Path.html
