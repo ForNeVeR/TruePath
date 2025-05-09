@@ -230,4 +230,48 @@ public class LocalPathTests(ITestOutputHelper output)
         // Assert
         Assert.True(equals);
     }
+
+    [Theory]
+    [InlineData("/path/to/file.txt", "/path/to/file.txt", 0, 0)]
+    [InlineData("/path/to/file.txt", "/PATH/TO/FILE.TXT", 1, 0)]
+    [InlineData("/PATH/TO/FILE.TXT", "/path/to/file.txt", -1, 0)]
+    [InlineData("path/to/apple", "path/to/banana", -1, -1)]
+    [InlineData("path/to/folder", "path/to/folder/subfolder", -1, -1)]
+    [InlineData("path/to/folder/subfolder", "path/to/folder", 1, 1)]
+    [InlineData(@"C:\path\to\folder", @"C:\path\to\folder\subfolder", -1, -1)]
+    [InlineData(@"C:\path\to\folder\subfolder", @"C:\path\to\folder", 1, 1)]
+    [InlineData(@"C:\path", @"D:\path", -1, -1)]
+    [InlineData(@"D:\path", @"C:\path", 1, 1)]
+    [InlineData(@"C:\path\to\apple", @"C:\path\to\banana", -1, -1)]
+    [InlineData(@"C:\path\to\file.txt", @"C:\PATH\TO\FILE.TXT", 1, 0)]
+    [InlineData(@"C:\PATH\TO\FILE.TXT", @"C:\path\to\file.txt", -1, 0)]
+    [InlineData(@"C:\path\to\file.txt", @"C:\path\to\file.txt", 0, 0)]
+    public void PlatformDefaultLocalPathOrderingTest(
+        string firstPathString,
+        string secondPathString,
+        int expectedLinux,
+        int expectedWindowsMac)
+    {
+        // Arrange
+        var firstPath = new LocalPath(firstPathString);
+        var secondPath = new LocalPath(secondPathString);
+        var comparer = LocalPath.PlatformDefaultComparer;
+
+        int expected;
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            expected = expectedWindowsMac;
+        }
+        else
+        {
+            expected = expectedLinux;
+        }
+
+        // Act
+        var comparisonResult = comparer.Compare(firstPath, secondPath);
+
+        // Assert
+        Assert.Equal(expected, Math.Sign(comparisonResult));
+    }
 }

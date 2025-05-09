@@ -14,7 +14,7 @@ namespace TruePath;
 ///     know what form of normalization the path uses.
 /// </para>
 /// </summary>
-public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, IPath<LocalPath>
+public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IComparable<LocalPath>, IPath, IPath<LocalPath>
 {
     /// <summary>
     /// <para>Provides a default comparer for comparing file paths, aware of the current platform.</para>
@@ -29,14 +29,14 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     /// case-sensitiveness of either the whole file system or a part of it. This class does not take this into account,
     /// having a benefit of no accessing the file system for any of the comparisons.
     /// </remarks>
-    public static readonly IEqualityComparer<LocalPath> PlatformDefaultComparer =
+    public static readonly PathComparer<LocalPath> PlatformDefaultComparer =
         new PlatformDefaultPathComparer<LocalPath>();
 
     /// <summary>
     /// A strict comparer for comparing file paths using ordinal, case-sensitive comparison of the underlying path
     /// strings.
     /// </summary>
-    public static readonly IEqualityComparer<LocalPath> StrictStringComparer =
+    public static readonly PathComparer<LocalPath> StrictStringComparer =
         new StrictStringPathComparer<LocalPath>();
 
     private static char Separator => Path.DirectorySeparatorChar;
@@ -159,4 +159,31 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     public LocalPath(AbsolutePath path) : this(path.Value)
     {
     }
+
+    /// <summary>
+    /// Compares the current <see cref="LocalPath"/> instance with another <see cref="LocalPath"/> instance,
+    /// using the default platform-aware comparison rules provided by <see cref="PlatformDefaultPathComparer{TPath}"/>.
+    /// </summary>
+    /// <param name="other">The <see cref="LocalPath"/> instance to compare with the current instance.</param>
+    /// <returns>
+    /// <para>A signed integer that indicates the relative order of the compared objects.</para>
+    /// <list type="table">
+    ///     <listheader>
+    ///         <term>Value</term>
+    ///         <description>Meaning</description>
+    ///     </listheader>
+    ///     <item>
+    ///         <term>Less than zero</term>
+    ///         <description>The current instance precedes <paramref name="other"/> in the sort order.</description>
+    ///     </item>
+    ///     <item>
+    ///         <term>Zero</term>
+    ///         <description>The current instance occurs in the same position in the sort order as <paramref name="other"/>.</description>
+    ///     </item>
+    ///     <item>
+    ///         <term>Greater than zero</term>
+    ///         <description>The current instance follows <paramref name="other"/> in the sort order.</description>
+    ///     </item>
+    /// </list>
+    public int CompareTo(LocalPath other) => PlatformDefaultComparer.Compare(this, other);
 }

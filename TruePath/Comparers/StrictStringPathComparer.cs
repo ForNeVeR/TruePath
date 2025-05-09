@@ -7,8 +7,11 @@ namespace TruePath.Comparers;
 /// <summary>
 /// A strict comparer for comparing file paths using ordinal, case-sensitive comparison of the underlying path strings.
 /// </summary>
-internal class StrictStringPathComparer<TPath> : IEqualityComparer<TPath> where TPath : IPath
+internal class StrictStringPathComparer<TPath> : PathComparer<TPath> where TPath : IPath
 {
-    public bool Equals(TPath? x, TPath? y) => StringComparer.Ordinal.Equals(x?.Value, y?.Value);
-    public int GetHashCode(TPath obj) => StringComparer.Ordinal.GetHashCode(obj.Value);
+    public override bool Equals(TPath? x, TPath? y) => StringComparer.Ordinal.Equals(x?.Value, y?.Value);
+
+    public override int GetHashCode(TPath obj) => StringComparer.Ordinal.GetHashCode(obj.Value);
+
+    public override int Compare(TPath? x, TPath? y) => StringComparer.Ordinal.Compare(x?.Value, y?.Value);
 }
