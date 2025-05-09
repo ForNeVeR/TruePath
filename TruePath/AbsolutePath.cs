@@ -12,7 +12,7 @@ namespace TruePath;
 /// disk letter (on Windows).
 /// </summary>
 /// <remarks>For a path that's not guaranteed to be absolute, use the <see cref="LocalPath"/> type.</remarks>
-public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<AbsolutePath>
+public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<AbsolutePath>, IPath, IPath<AbsolutePath>
 {
     /// <summary>
     /// <para>Provides a default comparer for comparing file paths, aware of the current platform.</para>
@@ -27,14 +27,14 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
     /// case-sensitiveness of either the whole file system or a part of it. This class does not take this into account,
     /// having a benefit of no accessing the file system for any of the comparisons.
     /// </remarks>
-    public static readonly IEqualityComparer<AbsolutePath> PlatformDefaultComparer =
+    public static readonly PathComparer<AbsolutePath> PlatformDefaultComparer =
         new PlatformDefaultPathComparer<AbsolutePath>();
 
     /// <summary>
     /// A strict comparer for comparing file paths using ordinal, case-sensitive comparison of the underlying path
     /// strings.
     /// </summary>
-    public static readonly IEqualityComparer<AbsolutePath> StrictStringComparer =
+    public static readonly PathComparer<AbsolutePath> StrictStringComparer =
         new StrictStringPathComparer<AbsolutePath>();
 
     internal readonly LocalPath Underlying;
@@ -209,6 +209,34 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
 
         return FileEntryKind.Directory;
     }
+
+    /// <summary>
+    /// Compares the current <see cref="AbsolutePath"/> instance with another <see cref="AbsolutePath"/> instance,
+    /// using the default platform-aware comparison rules provided by <see cref="PlatformDefaultPathComparer{TPath}"/>.
+    /// </summary>
+    /// <param name="other">The <see cref="AbsolutePath"/> instance to compare with the current instance.</param>
+    /// <returns>
+    /// <para>A signed integer that indicates the relative order of the compared objects.</para>
+    /// <list type="table">
+    ///     <listheader>
+    ///         <term>Value</term>
+    ///         <description>Meaning</description>
+    ///     </listheader>
+    ///     <item>
+    ///         <term>Less than zero</term>
+    ///         <description>The current instance precedes <paramref name="other"/> in the sort order.</description>
+    ///     </item>
+    ///     <item>
+    ///         <term>Zero</term>
+    ///         <description>The current instance occurs in the same position in the sort order as <paramref name="other"/>.</description>
+    ///     </item>
+    ///     <item>
+    ///         <term>Greater than zero</term>
+    ///         <description>The current instance follows <paramref name="other"/> in the sort order.</description>
+    ///     </item>
+    /// </list>
+    /// </returns>
+    public int CompareTo(AbsolutePath other) => PlatformDefaultComparer.Compare(this, other);
 }
 
 /// <summary>
