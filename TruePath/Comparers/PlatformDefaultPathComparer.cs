@@ -19,7 +19,7 @@ namespace TruePath.Comparers;
 /// case-sensitiveness of either the whole file system or a part of it. This class does not take this into account,
 /// having a benefit of no accessing the file system for any of the comparisons.
 /// </remarks>
-internal class PlatformDefaultPathComparer<TPath> : PathComparer<TPath> where TPath : IPath
+internal class PlatformDefaultPathComparer<TPath> : IPathComparer<TPath> where TPath : IPath
 {
     private readonly StringComparer _stringComparer;
 
@@ -35,17 +35,17 @@ internal class PlatformDefaultPathComparer<TPath> : PathComparer<TPath> where TP
         }
     }
 
-    public override bool Equals(TPath? x, TPath? y)
+    public bool Equals(TPath? x, TPath? y)
     {
         return _stringComparer.Equals(x?.Value, y?.Value);
     }
 
-    public override int GetHashCode(TPath obj)
+    public int GetHashCode(TPath obj)
     {
         return _stringComparer.GetHashCode(obj.Value);
     }
 
-    public override int Compare(TPath? x, TPath? y)
+    public int Compare(TPath? x, TPath? y)
     {
         return _stringComparer.Compare(x?.Value, y?.Value);
     }
