@@ -49,4 +49,71 @@ public static class PathExtensions
     /// </returns>
     public static string GetFilenameWithoutExtension(this IPath path) =>
         Path.GetFileNameWithoutExtension(path.FileName);
+
+    /// <summary>
+    /// Returns a new path of the same type <typeparamref name="TPath"/> with the extension of its file name component changed,
+    /// or with a new extension-like component if the original file name was empty.
+    /// </summary>
+    /// <typeparam name="TPath">The type of the path, which must implement <see cref="IPath{TPath}"/>.</typeparam>
+    /// <param name="path">The original path.</param>
+    /// <param name="extension">The new extension to apply.</param>
+    /// <returns>
+    /// A new path of type <typeparamref name="TPath"/> with the modified file name component.
+    /// The original <paramref name="path"/> object is not modified.
+    /// </returns>
+    public static TPath WithExtension<TPath>(this TPath path, string? extension)
+        where TPath : IPath<TPath>
+    {
+        string newFileName;
+
+        if (path.FileName.Length != 0)
+        {
+            newFileName = Path.ChangeExtension(path.FileName, extension);
+        }
+        else if (extension is { Length: > 0 } && extension[0] == '.')
+        {
+            newFileName = extension;
+        }
+        else
+        {
+            newFileName = "." + extension;
+        }
+
+        if (path.Parent is null)
+        {
+            return path / newFileName;
+        }
+
+        return (TPath)path.Parent / newFileName;
+    }
+
+    /// <summary>
+    /// Returns a new path of the type <see cref="LocalPath"/> with the extension of its file name component changed,
+    /// or with a new extension-like component if the original file name was empty.
+    /// </summary>
+    /// <param name="path">The original path.</param>
+    /// <param name="extension">The new extension to apply.</param>
+    /// <returns>
+    /// A new path of type <see cref="LocalPath"/> with the modified file name component.
+    /// </returns>
+    /// <remarks>
+    /// The original <paramref name="path"/> object is not modified.
+    /// </remarks>
+    public static LocalPath WithExtension2(this LocalPath path, string? extension) =>
+        new(Path.ChangeExtension(path.Value, extension));
+
+    /// <summary>
+    /// Returns a new path of the type <see cref="AbsolutePath"/> with the extension of its file name component changed,
+    /// or with a new extension-like component if the original file name was empty.
+    /// </summary>
+    /// <param name="path">The original path.</param>
+    /// <param name="extension">The new extension to apply.</param>
+    /// <returns>
+    /// A new path of type <see cref="AbsolutePath"/> with the modified file name component.
+    /// </returns>
+    /// <remarks>
+    /// The original <paramref name="path"/> object is not modified.
+    /// </remarks>
+    public static AbsolutePath WithExtension2(this AbsolutePath path, string? extension) =>
+        new(Path.ChangeExtension(path.Value, extension));
 }
