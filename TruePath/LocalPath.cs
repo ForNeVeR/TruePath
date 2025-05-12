@@ -185,5 +185,6 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     ///         <description>The current instance follows <paramref name="other"/> in the sort order.</description>
     ///     </item>
     /// </list>
+    /// </returns>
     public int CompareTo(LocalPath other) => PlatformDefaultComparer.Compare(this, other);
 }
