@@ -29,14 +29,14 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     /// case-sensitiveness of either the whole file system or a part of it. This class does not take this into account,
     /// having a benefit of no accessing the file system for any of the comparisons.
     /// </remarks>
-    public static readonly PathComparer<LocalPath> PlatformDefaultComparer =
+    public static readonly IPathComparer<LocalPath> PlatformDefaultComparer =
         new PlatformDefaultPathComparer<LocalPath>();
 
     /// <summary>
     /// A strict comparer for comparing file paths using ordinal, case-sensitive comparison of the underlying path
     /// strings.
     /// </summary>
-    public static readonly PathComparer<LocalPath> StrictStringComparer =
+    public static readonly IPathComparer<LocalPath> StrictStringComparer =
         new StrictStringPathComparer<LocalPath>();
 
     private static char Separator => Path.DirectorySeparatorChar;

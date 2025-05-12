@@ -27,14 +27,14 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// case-sensitiveness of either the whole file system or a part of it. This class does not take this into account,
     /// having a benefit of no accessing the file system for any of the comparisons.
     /// </remarks>
-    public static readonly PathComparer<AbsolutePath> PlatformDefaultComparer =
+    public static readonly IPathComparer<AbsolutePath> PlatformDefaultComparer =
         new PlatformDefaultPathComparer<AbsolutePath>();
 
     /// <summary>
     /// A strict comparer for comparing file paths using ordinal, case-sensitive comparison of the underlying path
     /// strings.
     /// </summary>
-    public static readonly PathComparer<AbsolutePath> StrictStringComparer =
+    public static readonly IPathComparer<AbsolutePath> StrictStringComparer =
         new StrictStringPathComparer<AbsolutePath>();
 
     internal readonly LocalPath Underlying;
