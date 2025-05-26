@@ -110,6 +110,13 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IPath, I
     /// <inheritdoc cref="IPath{TPath}.StartsWith(TPath)"/>
     public bool StartsWith(LocalPath other) => Value.StartsWith(other.Value);
 
+    /// <summary>
+    /// Creates a new <see cref="LocalPath"/> instance from the specified string value.
+    /// </summary>
+    /// <param name="value">The string representation of the path to create.</param>
+    /// <returns>A new normalized <see cref="LocalPath"/> instance representing the specified path.</returns>
+    public static LocalPath Create(string value) => new(value);
+
     /// <inheritdoc cref="IPath{TPath}.IsPrefixOf(TPath)"/>
     public bool IsPrefixOf(LocalPath other)
     {

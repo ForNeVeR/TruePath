@@ -83,6 +83,9 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IPath, IPath<Abs
     /// <inheritdoc cref="IPath{TPath}.StartsWith(TPath)"/>
     public bool StartsWith(AbsolutePath other) => Value.StartsWith(other.Value);
 
+    /// <inheritdoc cref="AbsolutePath(string)"/>
+    public static AbsolutePath Create(string value) => new(value);
+
     /// <inheritdoc cref="IPath{TPath}.IsPrefixOf(TPath)"/>
     public bool IsPrefixOf(AbsolutePath other)
     {

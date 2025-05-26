@@ -81,8 +81,8 @@ public class PathExtensionsTests
     [InlineData(@"\file", "bar", @"\file.bar")]
     [InlineData(@"\file", ".bar", @"\file.bar")]
     [InlineData(@"\file.", ".bar", @"\file.bar")]
-    [InlineData(@"\file.foo", "bar", @"\file.bar")]
-    public void WithExtensionTests_Windows(string inputPath, string @newExtension, string expected)
+    [InlineData("file.foo", "bar", "file.bar")]
+    public void WithExtensionTests_Windows(string inputPath, string newExtension, string expected)
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
@@ -104,7 +104,7 @@ public class PathExtensionsTests
     [InlineData("/file", "bar", "/file.bar")]
     [InlineData("/file", ".bar", "/file.bar")]
     [InlineData("/file.", ".bar", "/file.bar")]
-    [InlineData("/file.foo", "bar", "/file.bar")]
+    [InlineData("file.foo", "bar", "file.bar")]
     public void WithExtensionTests_Unix(string inputPath, string @newExtension, string expected)
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && !RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
@@ -117,103 +117,6 @@ public class PathExtensionsTests
 
         // Act
         var newPath = path.WithExtension(newExtension);
-
-        // Assert
-        Assert.Equal(expected, newPath.Value);
-    }
-
-    [Theory]
-    [InlineData(@"C:\", "bar", @"C:\.bar")]
-    [InlineData(@"C:\filename.foo", "bar", @"C:\filename.bar")]
-    [InlineData(@"\", "bar", @"\.bar")]
-    [InlineData(@"\file", "bar", @"\file.bar")]
-    [InlineData(@"\file", ".bar", @"\file.bar")]
-    [InlineData(@"\file.", ".bar", @"\file.bar")]
-    [InlineData(@"\file.foo", "bar", @"\file.bar")]
-    public void WithExtensionTests_AbsolutePath_Windows(string inputPath, string newExtension, string expected)
-    {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            return;
-        }
-
-        // Arrange
-        var path = new AbsolutePath(inputPath);
-
-        // Act
-        var newPath = path.WithExtension2(newExtension);
-
-        // Assert
-        Assert.Equal(expected, newPath.Value);
-    }
-
-    [Theory]
-    [InlineData("/", "bar", "/.bar")]
-    [InlineData("/file", "bar", "/file.bar")]
-    [InlineData("/file", ".bar", "/file.bar")]
-    [InlineData("/file.", ".bar", "/file.bar")]
-    [InlineData("/file.foo", "bar", "/file.bar")]
-    public void WithExtensionTests_AbsolutePath_Unix(string inputPath, string newExtension, string expected)
-    {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && !RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            return;
-        }
-
-        // Arrange
-        var path = new AbsolutePath(inputPath);
-
-        // Act
-        var newPath = path.WithExtension2(newExtension);
-
-        // Assert
-        Assert.Equal(expected, newPath.Value);
-    }
-
-
-    [Theory]
-    [InlineData(@"C:\", "bar", @"C:\.bar")]
-    [InlineData(@"C:\filename.foo", "bar", @"C:\filename.bar")]
-    [InlineData(@"\", "bar", @"\.bar")]
-    [InlineData(@"\file", "bar", @"\file.bar")]
-    [InlineData(@"\file", ".bar", @"\file.bar")]
-    [InlineData(@"\file.", ".bar", @"\file.bar")]
-    [InlineData(@"\file.foo", "bar", @"\file.bar")]
-    public void WithExtensionTests_LocalPath_Windows(string inputPath, string newExtension, string expected)
-    {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            return;
-        }
-
-        // Arrange
-        var path = new LocalPath(inputPath);
-
-        // Act
-        var newPath = path.WithExtension2(newExtension);
-
-        // Assert
-        Assert.Equal(expected, newPath.Value);
-    }
-
-    [Theory]
-    [InlineData("/", "bar", "/.bar")]
-    [InlineData("/file", "bar", "/file.bar")]
-    [InlineData("/file", ".bar", "/file.bar")]
-    [InlineData("/file.", ".bar", "/file.bar")]
-    [InlineData("/file.foo", "bar", "/file.bar")]
-    public void WithExtensionTests_LocalPath_Unix(string inputPath, string newExtension, string expected)
-    {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && !RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            return;
-        }
-
-        // Arrange
-        var path = new LocalPath(inputPath);
-
-        // Act
-        var newPath = path.WithExtension2(newExtension);
 
         // Assert
         Assert.Equal(expected, newPath.Value);
