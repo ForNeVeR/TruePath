@@ -82,6 +82,7 @@ public class PathExtensionsTests
     [InlineData(@"\file", ".bar", @"\file.bar")]
     [InlineData(@"\file.", ".bar", @"\file.bar")]
     [InlineData("file.foo", "bar", "file.bar")]
+    [InlineData(".gitignore", "hgignore", ".hgignore")]
     public void WithExtensionTests_Windows(string inputPath, string newExtension, string expected)
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -105,7 +106,8 @@ public class PathExtensionsTests
     [InlineData("/file", ".bar", "/file.bar")]
     [InlineData("/file.", ".bar", "/file.bar")]
     [InlineData("file.foo", "bar", "file.bar")]
-    public void WithExtensionTests_Unix(string inputPath, string @newExtension, string expected)
+    [InlineData(".gitignore", "hgignore", ".hgignore")]
+    public void WithExtensionTests_Unix(string inputPath, string newExtension, string expected)
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && !RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
