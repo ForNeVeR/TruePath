@@ -23,7 +23,7 @@ public interface IPath
 
 /// <summary>Represents a path in a file system. Allows generic operators to be applied.</summary>
 /// <typeparam name="TPath">The type of this path.</typeparam>
-public interface IPath<TPath> : IPath where TPath : IPath<TPath>
+public interface IPath<TPath> where TPath : IPath<TPath>
 {
     /// <summary>Appends another path to this one.</summary>
     /// <remarks>
@@ -47,4 +47,11 @@ public interface IPath<TPath> : IPath where TPath : IPath<TPath>
     /// <param name="other">The path to compare to the current path.</param>
     /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
     bool StartsWith(TPath other);
+
+    /// <summary>
+    /// Creates a new path instance of type <typeparamref name="TPath"/> from the specified string value.
+    /// </summary>
+    /// <param name="value">The string representation of the path to create.</param>
+    /// <returns>A new instance of <typeparamref name="TPath"/> representing the specified path.</returns>
+    static abstract TPath Create(string value);
 }
