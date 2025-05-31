@@ -501,7 +501,7 @@ public static class PathIo
     public static Task<string> ReadAllTextAsync(this AbsolutePath path, CancellationToken cancellationToken = default) => File.ReadAllTextAsync(path.Value, cancellationToken);
 
     /// <summary>
-    /// Asynchronously opens a text file, reads all the text in the file, and then closes the file.
+    /// Asynchronously opens a text file, reads all text in the file with the specified encoding, and then closes the file.
     /// </summary>
     /// <param name="path">The file to open for reading.</param>
     /// <param name="encoding">The encoding that is applied to the contents of the file.</param>
