@@ -654,6 +654,7 @@ public static class PathIo
     /// <param name="contents">The string to write to the file.</param>
     /// <param name="encoding">The character encoding to use.</param>
     public static void WriteAllText(this AbsolutePath path, string? contents, Encoding encoding) => File.WriteAllText(path.Value, contents, encoding);
+
     /// <summary>
     /// Asynchronously creates a new file, writes the specified string to the file, and then closes the file. If the target file already exists, it is truncated and overwritten.
     /// </summary>
@@ -662,6 +663,7 @@ public static class PathIo
     /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
     /// <returns>A task that represents the asynchronous write operation.</returns>
     public static Task WriteAllTextAsync(this AbsolutePath path, string? contents, CancellationToken cancellationToken = default) => File.WriteAllTextAsync(path.Value, contents, cancellationToken);
+
     /// <summary>
     /// Asynchronously creates a new file, writes the specified string to the file using the specified encoding, and then closes the file. If the target file already exists, it is truncated and overwritten.
     /// </summary>
@@ -671,4 +673,70 @@ public static class PathIo
     /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
     /// <returns>A task that represents the asynchronous write operation.</returns>
     public static Task WriteAllTextAsync(this AbsolutePath path, string? contents, Encoding encoding, CancellationToken cancellationToken = default) => File.WriteAllTextAsync(path.Value, contents, encoding, cancellationToken);
+
+    /// <summary>
+    /// Returns the names of files (including their paths) that match the specified search pattern in the specified directory.
+    /// </summary>
+    /// <param name="path">The directory to search.</param>
+    /// <returns>An array of the full names (including paths) for the files in the specified directory that match the specified search pattern.</returns>
+    public static string[] GetFiles(this AbsolutePath path) => Directory.GetFiles(path.Value);
+
+    /// <summary>
+    /// Returns the names of files (including their paths) that match the specified search pattern in the specified directory.
+    /// </summary>
+    /// <param name="path">The directory to search.</param>
+    /// <param name="searchPattern">The search string to match against the names of files in <paramref name="path"/>.</param>
+    /// <returns>An array of the full names (including paths) for the files in the specified directory that match the specified search pattern.</returns>
+    public static string[] GetFiles(this AbsolutePath path, string searchPattern) => Directory.GetFiles(path.Value, searchPattern);
+
+    /// <summary>
+    /// Returns the names of files (including their paths) that match the specified search pattern and enumeration options in the specified directory.
+    /// </summary>
+    /// <param name="path">The directory to search.</param>
+    /// <param name="searchPattern">The search string to match against the names of files in <paramref name="path"/>.</param>
+    /// <param name="enumerationOptions">An object that contains the search options to use.</param>
+    /// <returns>An array of the full names (including paths) for the files in the specified directory that match the specified search pattern and enumeration options.</returns>
+    public static string[] GetFiles(this AbsolutePath path, string searchPattern, EnumerationOptions enumerationOptions) => Directory.GetFiles(path.Value, searchPattern, enumerationOptions);
+
+    /// <summary>
+    /// Returns the names of files (including their paths) that match the specified search pattern in the specified directory, using a value to determine whether to search subdirectories.
+    /// </summary>
+    /// <param name="path">The directory to search.</param>
+    /// <param name="searchPattern">The search string to match against the names of files in <paramref name="path"/>.</param>
+    /// <param name="searchOption">One of the enumeration values that specifies whether the search operation should include only the current directory or should include all subdirectories.</param>
+    /// <returns>An array of the full names (including paths) for the files in the specified directory that match the specified search pattern and option.</returns>
+    public static string[] GetFiles(this AbsolutePath path, string searchPattern, SearchOption searchOption) => Directory.GetFiles(path.Value, searchPattern, searchOption);
+
+    /// <summary>
+    /// Returns the names of subdirectories (including their paths) in the specified directory.
+    /// </summary>
+    /// <param name="path">The directory to search.</param>
+    /// <returns>An array of the full names (including paths) for the subdirectories in the specified directory.</returns>
+    public static string[] GetDirectories(this AbsolutePath path) => Directory.GetDirectories(path.Value);
+
+    /// <summary>
+    /// Returns the names of subdirectories (including their paths) that match the specified search pattern in the specified directory.
+    /// </summary>
+    /// <param name="path">The directory to search.</param>
+    /// <param name="searchPattern">The search string to match against the names of subdirectories in <paramref name="path"/>.</param>
+    /// <returns>An array of the full names (including paths) for the subdirectories in the specified directory that match the specified search pattern.</returns>
+    public static string[] GetDirectories(this AbsolutePath path, string searchPattern) => Directory.GetDirectories(path.Value, searchPattern);
+
+    /// <summary>
+    /// Returns the names of subdirectories (including their paths) that match the specified search pattern and enumeration options in the specified directory.
+    /// </summary>
+    /// <param name="path">The directory to search.</param>
+    /// <param name="searchPattern">The search string to match against the names of subdirectories in <paramref name="path"/>.</param>
+    /// <param name="enumerationOptions">An object that contains the search options to use.</param>
+    /// <returns>An array of the full names (including paths) for the subdirectories in the specified directory that match the specified search pattern and enumeration options.</returns>
+    public static string[] GetDirectories(this AbsolutePath path, string searchPattern, EnumerationOptions enumerationOptions) => Directory.GetDirectories(path.Value, searchPattern, enumerationOptions);
+
+    /// <summary>
+    /// Returns the names of subdirectories (including their paths) that match the specified search pattern in the specified directory, using a value to determine whether to search subdirectories.
+    /// </summary>
+    /// <param name="path">The directory to search.</param>
+    /// <param name="searchPattern">The search string to match against the names of subdirectories in <paramref name="path"/>.</param>
+    /// <param name="searchOption">One of the enumeration values that specifies whether the search operation should include only the current directory or should include all subdirectories.</param>
+    /// <returns>An array of the full names (including paths) for the subdirectories in the specified directory that match the specified search pattern and option.</returns>
+    public static string[] GetDirectories(this AbsolutePath path, string searchPattern, SearchOption searchOption) => Directory.GetDirectories(path.Value, searchPattern, searchOption);
 }
