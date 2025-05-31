@@ -102,8 +102,8 @@ public static class PathStrings
                 }
                 else if (jump != -1)
                 {
-                    written = jump;
-                    buffer = normalized.Slice(written + 1);
+                    written = last ? jump : jump + 1;
+                    buffer = normalized.Slice(written);
                     skip = true;
                 }
                 else

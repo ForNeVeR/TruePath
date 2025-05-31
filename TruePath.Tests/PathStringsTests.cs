@@ -59,6 +59,7 @@ public class PathStringsTests
     [InlineData(".../..", "")]
     [InlineData(".../...", ".../...")]
     [InlineData(".../../...", "...")]
+    [InlineData("foo/bar/../file.ext", "foo/file.ext")]
     public void DotFoldersAreTraversedCorrectly(string input, string expected)
     {
         Assert.Equal(NormalizeSeparators(expected), PathStrings.Normalize(input));
