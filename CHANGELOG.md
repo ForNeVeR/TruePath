@@ -10,6 +10,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2025-05-31
+### Added
+- [#87](https://github.com/ForNeVeR/TruePath/issues/87): all the path types are now `IComparable<Self>`. Thanks to @alvkn!
+- `IPath<TPath>` generic interface now supports a `Create` method to create a path from its string representation. Thanks to @alvkn!
+- [#120](https://github.com/ForNeVeR/TruePath/issues/120): a new method on paths, `ChangeExtension`. Thanks to @alvkn!
+
+### Fixed
+- [#134](https://github.com/ForNeVeR/TruePath/issues/134): path normalization fails when input has both dot folders and file extension. Thanks to @maxkatz6 and @kant2002 for a detailed report and a fix!
+
 ## [1.7.0] - 2025-04-18
 ### Added
 - A new package, **TruePath.SystemIo**, with adapter for `System.IO` types.
@@ -148,4 +157,5 @@ This is the first published version of the package. It doesn't contain any featu
 [1.5.0]: https://github.com/ForNeVeR/TruePath/compare/v1.4.0...v1.5.0
 [1.6.0]: https://github.com/ForNeVeR/TruePath/compare/v1.5.0...v1.6.0
 [1.7.0]: https://github.com/ForNeVeR/TruePath/compare/v1.6.0...v1.7.0
-[Unreleased]: https://github.com/ForNeVeR/TruePath/compare/v1.7.0...HEAD
+[1.8.0]: https://github.com/ForNeVeR/TruePath/compare/v1.7.0...v1.8.0
+[Unreleased]: https://github.com/ForNeVeR/TruePath/compare/v1.8.0...HEAD
