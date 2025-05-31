@@ -267,7 +267,7 @@ public static class PathIo
     /// Creates all directories and subdirectories in the specified path unless they already exist.
     /// </summary>
     /// <param name="path">The directory to create.</param>
-    public static void CreateDirectory(AbsolutePath path) => Directory.CreateDirectory(path.Value);
+    public static void CreateDirectory(this AbsolutePath path) => Directory.CreateDirectory(path.Value);
     /// <summary>
     /// Deletes the specified file or directory.
     /// </summary>
@@ -277,12 +277,12 @@ public static class PathIo
     /// Deletes the specified empty directory.
     /// </summary>
     /// <param name="path">The name of the directory to remove. This directory must be writable and empty.</param>
-    public static void DeleteEmptyDirectory(AbsolutePath path) => Directory.Delete(path.Value, recursive: false);
+    public static void DeleteEmptyDirectory(this AbsolutePath path) => Directory.Delete(path.Value, recursive: false);
     /// <summary>
     /// Deletes the specified directory and any subdirectories and files in the directory.
     /// </summary>
     /// <param name="path">The name of the directory to remove. This directory must be writable.</param>
-    public static void DeleteDirectoryRecursively(AbsolutePath path) => Directory.Delete(path.Value, recursive: true);
+    public static void DeleteDirectoryRecursively(this AbsolutePath path) => Directory.Delete(path.Value, recursive: true);
     /// <summary>
     /// Determines whether the specified file exists.
     /// </summary>
@@ -670,5 +670,5 @@ public static class PathIo
     /// <param name="encoding">The character encoding to use.</param>
     /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
     /// <returns>A task that represents the asynchronous write operation.</returns>
-    public static Task WriteAllTextAsync(AbsolutePath path, string? contents, Encoding encoding, CancellationToken cancellationToken = default) => File.WriteAllTextAsync(path.Value, contents, encoding, cancellationToken);
+    public static Task WriteAllTextAsync(this AbsolutePath path, string? contents, Encoding encoding, CancellationToken cancellationToken = default) => File.WriteAllTextAsync(path.Value, contents, encoding, cancellationToken);
 }
