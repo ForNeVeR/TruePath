@@ -478,6 +478,38 @@ public static class PathIo
     public static IAsyncEnumerable<string> ReadLinesAsync(this AbsolutePath path, Encoding encoding, CancellationToken cancellationToken = default) => File.ReadLinesAsync(path.Value, encoding, cancellationToken);
 
     /// <summary>
+    /// Opens a text file, reads all the text in the file, and then closes the file.
+    /// </summary>
+    /// <param name="path">The file to open for reading.</param>
+    /// <returns>A string containing all the text in the file.</returns>
+    public static string ReadAllText(this AbsolutePath path) => File.ReadAllText(path.Value);
+
+    /// <summary>
+    /// Opens a text file, reads all the text in the file, and then closes the file.
+    /// </summary>
+    /// <param name="path">The file to open for reading.</param>
+    /// <param name="encoding">The encoding that is applied to the contents of the file.</param>
+    /// <returns>A string containing all the text in the file.</returns>
+    public static string ReadAllText(this AbsolutePath path, Encoding encoding) => File.ReadAllText(path.Value, encoding);
+
+    /// <summary>
+    /// Asynchronously opens a text file, reads all the text in the file, and then closes the file.
+    /// </summary>
+    /// <param name="path">The file to open for reading.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
+    /// <returns>A task that represents the asynchronous read operation, which wraps the string containing all text in the file.</returns>
+    public static Task<string> ReadAllTextAsync(this AbsolutePath path, CancellationToken cancellationToken = default) => File.ReadAllTextAsync(path.Value, cancellationToken);
+
+    /// <summary>
+    /// Asynchronously opens a text file, reads all the text in the file, and then closes the file.
+    /// </summary>
+    /// <param name="path">The file to open for reading.</param>
+    /// <param name="encoding">The encoding that is applied to the contents of the file.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
+    /// <returns>A task that represents the asynchronous read operation, which wraps the string containing all text in the file.</returns>
+    public static Task<string> ReadAllTextAsync(this AbsolutePath path, Encoding encoding, CancellationToken cancellationToken = default) => File.ReadAllTextAsync(path.Value, encoding, cancellationToken);
+
+    /// <summary>
     /// Sets the specified <see cref="FileAttributes"/> of the file on the specified path.
     /// </summary>
     /// <param name="path">The path to the file.</param>
