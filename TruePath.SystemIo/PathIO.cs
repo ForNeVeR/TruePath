@@ -446,6 +446,23 @@ public static class PathIo
     public static string[] ReadAllLines(this AbsolutePath path, Encoding encoding) => File.ReadAllLines(path.Value, encoding);
 
     /// <summary>
+    /// Asynchronously opens a text file, reads all lines of the file, and then closes the file.
+    /// </summary>
+    /// <param name="path">The file to open for reading.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
+    /// <returns>A task that represents the asynchronous read operation, which wraps the string array containing all lines of the file.</returns>
+    public static Task<string[]> ReadAllLinesAsync(this AbsolutePath path, CancellationToken cancellationToken = default) => File.ReadAllLinesAsync(path.Value, cancellationToken);
+
+    /// <summary>
+    /// Asynchronously opens a text file, reads all lines of the file with the specified encoding, and then closes the file.
+    /// </summary>
+    /// <param name="path">The file to open for reading.</param>
+    /// <param name="encoding">The encoding applied to the contents of the file.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
+    /// <returns>A task that represents the asynchronous read operation, which wraps the string array containing all lines of the file.</returns>
+    public static Task<string[]> ReadAllLinesAsync(this AbsolutePath path, Encoding encoding, CancellationToken cancellationToken = default) => File.ReadAllLinesAsync(path.Value, encoding, cancellationToken);
+
+    /// <summary>
     /// Reads the lines of a file.
     /// </summary>
     /// <param name="path">The file to read.</param>
