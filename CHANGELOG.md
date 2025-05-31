@@ -10,6 +10,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2025-06-01
+### Changed
+- `PathIo.CreateDirectory`, `DeleteEmptyDirectory`, `DeleteDirectoryRecursively` are now extension methods. Thanks to @seclerp!
+
+### Added
+- Extension methods:
+  - `PathIo.ReadAllLinesAsync`,
+  - `PathIo.ReadAllText`,
+  - `PathIo.ReadAllTextAsync`,
+  - `PathIo.WriteAllTextAsync`,
+  - `PathIo.GetFiles`,
+  - `PathIo.GetDirectories` (the latter two for file system traversal). Thanks to @seclerp!
+
 ## [1.8.0] - 2025-05-31
 ### Added
 - [#87](https://github.com/ForNeVeR/TruePath/issues/87): all the path types are now `IComparable<Self>`. Thanks to @alvkn!
