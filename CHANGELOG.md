@@ -171,4 +171,5 @@ This is the first published version of the package. It doesn't contain any featu
 [1.6.0]: https://github.com/ForNeVeR/TruePath/compare/v1.5.0...v1.6.0
 [1.7.0]: https://github.com/ForNeVeR/TruePath/compare/v1.6.0...v1.7.0
 [1.8.0]: https://github.com/ForNeVeR/TruePath/compare/v1.7.0...v1.8.0
-[Unreleased]: https://github.com/ForNeVeR/TruePath/compare/v1.8.0...HEAD
+[1.9.0]: https://github.com/ForNeVeR/TruePath/compare/v1.8.0...v1.9.0
+[Unreleased]: https://github.com/ForNeVeR/TruePath/compare/v1.9.0...HEAD
