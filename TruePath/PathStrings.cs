@@ -149,7 +149,7 @@ public static class PathStrings
         }
 
         // remove / at the end of path
-        if (written > 2 && normalized[written - 1] == Path.DirectorySeparatorChar)
+        if (written > 1 && normalized[written - 1] == Path.DirectorySeparatorChar)
             written--;
 
         // alloc new path
