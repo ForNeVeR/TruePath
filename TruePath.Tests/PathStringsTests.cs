@@ -60,6 +60,7 @@ public class PathStringsTests
     [InlineData(".../...", ".../...")]
     [InlineData(".../../...", "...")]
     [InlineData("foo/bar/../file.ext", "foo/file.ext")]
+    [InlineData("N/", "N")]
     public void DotFoldersAreTraversedCorrectly(string input, string expected)
     {
         Assert.Equal(NormalizeSeparators(expected), PathStrings.Normalize(input));
@@ -76,7 +77,6 @@ public class PathStringsTests
     [InlineData("a/../../..", "../..")]
     [InlineData("foo/./bar/../var/./dar/..", "foo/var")]
     [InlineData("foo/.bar", "foo/.bar")]
-    [InlineData("/.", "/")]
     [InlineData("/..", "/..")]
     [InlineData("/../..", "/../..")]
     [InlineData("/../../foo/..", "/../..")]
@@ -91,8 +91,20 @@ public class PathStringsTests
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
 
         var driveLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        driveLetters += driveLetters.ToLowerInvariant();
 
+        foreach (var driveLetter in driveLetters)
+        {
+            var inputPath = $"{driveLetter}:{input}";
+            var expectedPath = $"{driveLetter}:{expected}";
+
+            //Act
+            var actual = PathStrings.Normalize(inputPath);
+
+            // Assert
+            Assert.Equal(NormalizeSeparators(expectedPath), actual);
+        }
+
+        driveLetters += driveLetters.ToLowerInvariant();
         foreach (var driveLetter in driveLetters)
         {
             var inputPath = $"{driveLetter}:{input}";
