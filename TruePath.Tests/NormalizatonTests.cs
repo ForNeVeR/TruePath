@@ -34,7 +34,7 @@ public class NormalizatonTests
     }
 
     [Property(Arbitrary = new[] { typeof(AnyOsPath) })]
-    public void NormalizedPathDoesContainAltDirSeparator(List<string> pathParts)
+    public void NormalizedPathDoesNotContainAltDirSeparator(List<string> pathParts)
     {
         var sourcePath = string.Join("", pathParts);
 
