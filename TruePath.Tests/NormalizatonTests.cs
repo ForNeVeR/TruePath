@@ -34,6 +34,30 @@ public class NormalizatonTests
     }
 
     [Property(Arbitrary = new[] { typeof(AnyOsPath) })]
+    public void NormalizedPathDoesContainAltDirSeparator(List<string> pathParts)
+    {
+        var sourcePath = string.Join("", pathParts);
+
+        // Act
+        var normalizedPath = PathStrings.Normalize(sourcePath);
+
+        _TestOutputHelper.WriteLine($"{sourcePath} => {normalizedPath}");
+        Assert.True(!normalizedPath.Contains(Path.AltDirectorySeparatorChar));
+    }
+
+    [Property(Arbitrary = new[] { typeof(AnyOsPath) })]
+    public void NormalizedPathDoesNotContainTwoDirSeparator(List<string> pathParts)
+    {
+        var sourcePath = string.Join("", pathParts);
+
+        // Act
+        var normalizedPath = PathStrings.Normalize(sourcePath);
+
+        _TestOutputHelper.WriteLine($"{sourcePath} => {normalizedPath}");
+        Assert.True(!normalizedPath.Contains(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar));
+    }
+
+    [Property(Arbitrary = new[] { typeof(AnyOsPath) })]
     public void DepthPreserverd(List<string> pathParts)
     {
         var sourcePath = string.Join("", pathParts);
@@ -45,10 +69,6 @@ public class NormalizatonTests
         var collapsedBlock = CollapseSameBlocks(pathParts);
         var expectedDepth = CountDepth(collapsedBlock);
         var actualDepth = CountDepth([.. normalizedPath.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries)]);
-        if (actualDepth != expectedDepth)
-        {
-            _TestOutputHelper.WriteLine($"{string.Join("|", collapsedBlock)}");
-        }
         Assert.Equal(expectedDepth, actualDepth);
 
         static int CountDepth(List<string> pathParts)
