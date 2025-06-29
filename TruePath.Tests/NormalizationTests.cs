@@ -30,6 +30,9 @@ public class NormalizationTests(ITestOutputHelper testOutputHelper)
     [Property(Arbitrary = [typeof(AnyOsPath)])]
     public void NormalizedPathDoesNotContainAltDirSeparator(List<string> pathParts)
     {
+        if (Path.DirectorySeparatorChar == Path.AltDirectorySeparatorChar) // test doesn't make sense on these systems
+            return;
+
         var sourcePath = string.Join("", pathParts);
 
         // Act
