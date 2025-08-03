@@ -28,13 +28,13 @@ public interface IPath<TPath> where TPath : IPath<TPath>
 #if NET8_0_OR_GREATER
     /// <summary>Appends another path to this one.</summary>
     /// <remarks>
-    /// Note that in case path <paramref name="appended" /> is <b>absolute</b>, it will completely take over and the
-    /// <paramref name="basePath" /> will be ignored.
+    /// Note that in case path <paramref name="appended"/> is <b>absolute</b>, it will completely take over and the
+    /// <paramref name="basePath"/> will be ignored.
     /// </remarks>
-    public static abstract TPath operator /(TPath basePath, LocalPath appended);
+    static abstract TPath operator /(TPath basePath, LocalPath appended);
 
-    /// <inheritdoc cref="!:op_Division(TPath,LocalPath)" />
-    public static abstract TPath operator /(TPath basePath, string appended);
+    /// <inheritdoc cref="op_Division(TPath,LocalPath)"/>
+    static abstract TPath operator /(TPath basePath, string appended);
 #endif
 
     /// <remarks>
