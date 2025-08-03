@@ -9,7 +9,7 @@ using Microsoft.Win32.SafeHandles;
 namespace TruePath;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-internal static partial class Kernel32
+internal static class Kernel32
 {
     /// <summary>
     /// Retrieves the final path for the specified file handle.
@@ -19,11 +19,11 @@ internal static partial class Kernel32
     /// <param name="bufferLength">The size of the buffer, in characters.</param>
     /// <param name="dwFlags">The flags to specify the path format.</param>
     /// <returns>The length of the string copied to the buffer.</returns>
-    [LibraryImport("kernel32.dll",
+    [DllImport("kernel32.dll",
         EntryPoint = "GetFinalPathNameByHandleW",
         SetLastError = true,
-        StringMarshalling = StringMarshalling.Utf16)]
-    internal static unsafe partial uint GetFinalPathNameByHandle(
+        CharSet = CharSet.Unicode)]
+    internal static extern unsafe uint GetFinalPathNameByHandle(
         IntPtr hFile,
         char* buffer,
         uint bufferLength,
@@ -202,11 +202,11 @@ internal static partial class Kernel32
     /// <param name="flagsAndAttributes">The file or device attributes and flags.</param>
     /// <param name="templateFile">A valid handle to a template file, or <c>IntPtr.Zero</c>.</param>
     /// <returns>A <see cref="SafeFileHandle"/> for the opened file or device.</returns>
-    [LibraryImport("kernel32.dll",
+    [DllImport("kernel32.dll",
         EntryPoint = "CreateFileW",
         SetLastError = true,
-        StringMarshalling = StringMarshalling.Utf16)]
-    internal static partial SafeFileHandle CreateFile(
+        CharSet = CharSet.Unicode)]
+    internal static extern SafeFileHandle CreateFile(
         [MarshalAs(UnmanagedType.LPTStr)] string filename,
         FileAccess access,
         FileShare share,
@@ -248,9 +248,9 @@ internal static partial class Kernel32
     /// <remarks>
     /// For more information, see <see href="https://learn.microsoft.com/windows-hardware/drivers/ifs/fsctl-get-reparse-point"/>.
     /// </remarks>
-    [LibraryImport("kernel32.dll", EntryPoint = "DeviceIoControl", SetLastError = true)]
+    [DllImport("kernel32.dll", EntryPoint = "DeviceIoControl", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static unsafe partial bool DeviceIoControl(
+    internal static extern unsafe bool DeviceIoControl(
         SafeHandle hDevice,
         uint dwIoControlCode,
         void* lpInBuffer,
