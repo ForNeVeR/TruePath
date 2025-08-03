@@ -9,7 +9,7 @@ namespace System.IO;
 /// <summary>
 /// Class that contains custom implementations methods of <see cref="Directory"/> class presented in .NET 8 but missing in .NET Standard 2.0.
 /// </summary>
-public static class DirectoryEx
+internal static class DirectoryEx
 {
     public static DirectoryInfo CreateTempSubdirectory(string? prefix = null)
     {
