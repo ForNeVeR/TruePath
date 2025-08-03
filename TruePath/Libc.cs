@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 using Microsoft.Win32.SafeHandles;
 
 namespace TruePath;
@@ -11,7 +10,7 @@ namespace TruePath;
 /// <summary>
 /// Provides interop methods for the libc library.
 /// </summary>
-internal static partial class Libc
+internal static class Libc
 {
     /// <summary>
     /// Resolves the absolute path of the specified <paramref name="path"/> and stores it in the provided <paramref name="buffer"/>.
@@ -22,10 +21,9 @@ internal static partial class Libc
     /// <remarks>
     /// This method is an interop call to the 'realpath' function in the libc library. The <paramref name="buffer"/> should be allocated with enough space to hold the resolved path.
     /// </remarks>
-    [LibraryImport("libc",
+    [DllImport("libc",
         EntryPoint = "realpath",
         SetLastError = true,
-        StringMarshalling = StringMarshalling.Custom,
-        StringMarshallingCustomType = typeof(AnsiStringMarshaller))]
-    internal static partial SafeFileHandle RealPath(string path, IntPtr buffer);
+        CharSet = CharSet.Ansi)]
+    internal static extern SafeFileHandle RealPath(string path, IntPtr buffer);
 }
