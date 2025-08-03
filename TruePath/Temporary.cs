@@ -37,7 +37,11 @@ public static class Temporary
     /// <returns>An AbsolutePath representing newly created temporary folder</returns>
     public static AbsolutePath CreateTempFolder(string? prefix = null)
     {
+#if NET8_0_OR_GREATER
         var tempDirectoryInfo = Directory.CreateTempSubdirectory(prefix);
+#else
+        var tempDirectoryInfo = DirectoryEx.CreateTempSubdirectory(prefix);
+#endif
         return AbsolutePath.CurrentWorkingDirectory / tempDirectoryInfo.FullName;
     }
 }
