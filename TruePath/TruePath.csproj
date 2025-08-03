@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
         <IsPackable>true</IsPackable>
         <PackageDescription>File path abstraction library for .NET.</PackageDescription>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -14,5 +15,9 @@ SPDX-License-Identifier: MIT
 
     <ItemGroup>
         <InternalsVisibleTo Include="TruePath.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Bcl.Memory" Version="9.0.7" />
     </ItemGroup>
 </Project>
