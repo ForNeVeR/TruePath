@@ -39,7 +39,9 @@ public static class PathStrings
     ///     Note that this operation will never perform any file IO, and is purely string manipulation.
     /// </para>
     /// </summary>
+#if NET8_0_OR_GREATER
     [SkipLocalsInit] // is necessary to prevent the CLR from filling stackalloc with zeros.
+#endif
     public static string Normalize(string path)
     {
         bool containsDriveLetter = SourceContainsDriveLetter(path.AsSpan());
