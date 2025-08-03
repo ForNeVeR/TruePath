@@ -83,7 +83,11 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// <inheritdoc cref="IPath{TPath}.StartsWith(TPath)"/>
     public bool StartsWith(AbsolutePath other) => Value.StartsWith(other.Value);
 
-    /// <inheritdoc cref="AbsolutePath(string)"/>
+    /// <summary>
+    /// Creates a new path instance of type <see cref="AbsolutePath" /> from the specified string value.
+    /// </summary>
+    /// <param name="value">The string representation of the path to create.</param>
+    /// <returns>A new instance of <see cref="AbsolutePath" /> representing the specified path.</returns>
     public static AbsolutePath Create(string value) => new(value);
 
     /// <inheritdoc cref="IPath{TPath}.IsPrefixOf(TPath)"/>
@@ -113,6 +117,7 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// <summary>Corrects the file name case on case-insensitive file systems, resolves symlinks.</summary>
     public AbsolutePath Canonicalize() => new(DiskUtils.GetRealPath(Value));
 
+    /// <summary>Appends another path to this one.</summary>
     /// <remarks>
     /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the
     /// <paramref name="basePath"/> will be ignored.
@@ -120,6 +125,7 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     public static AbsolutePath operator /(AbsolutePath basePath, LocalPath b) =>
         new(Path.Combine(basePath.Value, b.Value), false);
 
+    /// <summary>Appends another path to this one.</summary>
     /// <remarks>
     /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the
     /// <paramref name="basePath"/> will be ignored.
