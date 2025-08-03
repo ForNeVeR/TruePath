@@ -48,10 +48,12 @@ public interface IPath<TPath> where TPath : IPath<TPath>
     /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
     bool StartsWith(TPath other);
 
+#if NET8_0_OR_GREATER
     /// <summary>
-    /// Creates a new path instance of type <typeparamref name="TPath"/> from the specified string value.
+    /// Creates a new path instance of type <typeparamref name="TPath" /> from the specified string value.
     /// </summary>
     /// <param name="value">The string representation of the path to create.</param>
-    /// <returns>A new instance of <typeparamref name="TPath"/> representing the specified path.</returns>
-    static abstract TPath Create(string value);
+    /// <returns>A new instance of <typeparamref name="TPath" /> representing the specified path.</returns>
+    public static abstract TPath Create(string value);
+#endif
 }
