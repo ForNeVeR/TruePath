@@ -80,8 +80,8 @@ public static class PathStrings
             else if (written != 0
                 && (
                     block is ".."
-                    || block.SequenceEqual($"..{Path.DirectorySeparatorChar}")
-                    || block.SequenceEqual($"..{Path.AltDirectorySeparatorChar}")
+                    || block.SequenceEqual($"..{Path.DirectorySeparatorChar}".AsSpan())
+                    || block.SequenceEqual($"..{Path.AltDirectorySeparatorChar}".AsSpan())
                 ))
             {
                 var alreadyWrittenPart = normalized[..(written - 1)];
@@ -105,7 +105,7 @@ public static class PathStrings
                 else if (jump != -1)
                 {
                     written = last ? jump : jump + 1;
-                    buffer = normalized.Slice(written);
+                    buffer = normalized[written..];
                     skip = true;
                 }
                 else
@@ -142,7 +142,7 @@ public static class PathStrings
 
         if (written == 0 && containsDriveLetter)
         {
-            return new string(path.AsSpan(0, 2));
+            return path[..2];
         }
 
         if (written == 0)
@@ -159,12 +159,12 @@ public static class PathStrings
 
         if (containsDriveLetter)
         {
-            var normalizedRef = new ReadOnlySpan<char>(normalized.ToArray(), 0, written);
-            result = string.Concat(path.AsSpan(0, 2), normalizedRef.Slice(0, written));
+            var normalizedArr = normalized[..written].ToArray();
+            result = new string(path.AsSpan(0, 2).ToArray()) + new string(normalizedArr);
         }
         else
         {
-            result = new string(normalized.Slice(0, written));
+            result = new string(normalized[..written].ToArray());
         }
 
         normalized.Slice(0, written);
