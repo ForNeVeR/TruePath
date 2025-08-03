@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+//
+// SPDX-License-Identifier: MIT
+
 #if !NET8_0_OR_GREATER
 // ReSharper disable once CheckNamespace
 namespace System.IO;
