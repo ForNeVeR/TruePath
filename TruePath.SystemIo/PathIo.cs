@@ -61,6 +61,7 @@ public static class PathIo
     /// </remarks>
     public static void AppendAllLines(this AbsolutePath path, IEnumerable<string> contents, Encoding encoding) => File.AppendAllLines(path.Value, contents, encoding);
 
+#if NET8_0_OR_GREATER
     /// <summary>
     /// Asynchronously appends the specified lines to the file, creating the file if it does not already exist.
     /// </summary>
@@ -112,6 +113,7 @@ public static class PathIo
     /// if it doesn't exist, but it doesn't create new directories. Therefore, the value of the path parameter must contain existing directories.
     /// </remarks>
     public static Task AppendAllLinesAsync(this AbsolutePath path, IEnumerable<string> contents, Encoding encoding, CancellationToken cancellationToken = default) => File.AppendAllLinesAsync(path.Value, contents, encoding, cancellationToken);
+#endif
 
     /// <summary>
     /// Appends the specified string to the file, creating the file if it does not already exist.
@@ -161,6 +163,7 @@ public static class PathIo
     /// </remarks>
     public static void AppendAllText(this AbsolutePath path, string? contents, Encoding encoding) => File.AppendAllText(path.Value, contents, encoding);
 
+#if NET8_0_OR_GREATER
     /// <summary>
     /// Asynchronously appends the specified string to the file, creating the file if it does not already exist.
     /// </summary>
@@ -212,6 +215,7 @@ public static class PathIo
     /// if it doesn't exist, but it doesn't create new directories. Therefore, the value of the path parameter must contain existing directories.
     /// </remarks>
     public static Task AppendAllTextAsync(this AbsolutePath path, string? contents, Encoding encoding, CancellationToken cancellationToken = default) => File.AppendAllTextAsync(path.Value, contents, encoding, cancellationToken);
+#endif
 
     /// <summary>
     /// Creates a <see cref="StreamWriter" /> that appends UTF-8 encoded text to an existing file, or to a new file if the specified file does not exist.
@@ -345,6 +349,7 @@ public static class PathIo
     /// <returns>A <see cref="DateTime"/> structure set to the date and time that the specified file or directory was last written to. This value is expressed in UTC time.</returns>
     public static DateTime GetLastWriteTimeUtc(this AbsolutePath path) => File.GetLastWriteTimeUtc(path.Value);
 
+#if NET8_0_OR_GREATER
     /// <summary>
     /// Gets the <see cref="UnixFileMode"/> of the file on the path.
     /// </summary>
@@ -352,6 +357,7 @@ public static class PathIo
     /// <returns>The <see cref="UnixFileMode"/> of the file on the path.</returns>
     [UnsupportedOSPlatform("windows")]
     public static UnixFileMode GetUnixFileMode(this AbsolutePath path) => File.GetUnixFileMode(path.Value);
+#endif
 
     /// <summary>
     /// Moves a specified file to a new location, providing the option to specify a new file name.
@@ -360,6 +366,7 @@ public static class PathIo
     /// <param name="destFile">The new path and name for the file.</param>
     public static void Move(this AbsolutePath sourceFile, AbsolutePath destFile) => File.Move(sourceFile.Value, destFile.Value);
 
+#if NET8_0_OR_GREATER
     /// <summary>
     /// Moves a specified file to a new location, providing the options to specify a new file name and to replace the destination file if it already exists.
     /// </summary>
@@ -367,6 +374,7 @@ public static class PathIo
     /// <param name="destFile">The new path and name for the file.</param>
     /// <param name="overwrite"><b>true</b> to replace the destination file if it already exists; <b>false</b> otherwise.</param>
     public static void Move(this AbsolutePath sourceFile, AbsolutePath destFile, bool overwrite) => File.Move(sourceFile.Value, destFile.Value, overwrite);
+#endif
 
     /// <summary>
     /// Opens a <see cref="FileStream"/> on the specified path with read/write access with no sharing.
@@ -422,6 +430,7 @@ public static class PathIo
     /// <returns>A byte array containing the contents of the file.</returns>
     public static byte[] ReadAllBytes(this AbsolutePath path) => File.ReadAllBytes(path.Value);
 
+#if NET8_0_OR_GREATER
     /// <summary>
     /// Asynchronously opens a binary file, reads the contents of the file into a byte array, and then closes the file.
     /// </summary>
@@ -429,6 +438,7 @@ public static class PathIo
     /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
     /// <returns>A task that represents the asynchronous read operation, which wraps the byte array containing the contents of the file.</returns>
     public static Task<byte[]> ReadAllBytesAsync(this AbsolutePath path, CancellationToken cancellationToken = default) => File.ReadAllBytesAsync(path.Value, cancellationToken);
+#endif
 
     /// <summary>
     /// Opens a text file, reads all lines of the file, and then closes the file.
@@ -445,6 +455,7 @@ public static class PathIo
     /// <returns>A string array containing all lines of the file.</returns>
     public static string[] ReadAllLines(this AbsolutePath path, Encoding encoding) => File.ReadAllLines(path.Value, encoding);
 
+#if NET8_0_OR_GREATER
     /// <summary>
     /// Asynchronously opens a text file, reads all lines of the file, and then closes the file.
     /// </summary>
@@ -461,6 +472,7 @@ public static class PathIo
     /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
     /// <returns>A task that represents the asynchronous read operation, which wraps the string array containing all lines of the file.</returns>
     public static Task<string[]> ReadAllLinesAsync(this AbsolutePath path, Encoding encoding, CancellationToken cancellationToken = default) => File.ReadAllLinesAsync(path.Value, encoding, cancellationToken);
+#endif
 
     /// <summary>
     /// Reads the lines of a file.
@@ -477,6 +489,7 @@ public static class PathIo
     /// <returns>All the lines of the file, or the lines that are the result of a query.</returns>
     public static IEnumerable<string> ReadLines(this AbsolutePath path, Encoding encoding) => File.ReadLines(path.Value, encoding);
 
+#if NET8_0_OR_GREATER
     /// <summary>
     /// Asynchronously reads the lines of a file.
     /// </summary>
@@ -493,6 +506,7 @@ public static class PathIo
     /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
     /// <returns>The async enumerable that represents all the lines of the file, or the lines that are the result of a query.</returns>
     public static IAsyncEnumerable<string> ReadLinesAsync(this AbsolutePath path, Encoding encoding, CancellationToken cancellationToken = default) => File.ReadLinesAsync(path.Value, encoding, cancellationToken);
+#endif
 
     /// <summary>
     /// Opens a text file, reads all the text in the file, and then closes the file.
@@ -509,6 +523,7 @@ public static class PathIo
     /// <returns>A string containing all the text in the file.</returns>
     public static string ReadAllText(this AbsolutePath path, Encoding encoding) => File.ReadAllText(path.Value, encoding);
 
+#if NET8_0_OR_GREATER
     /// <summary>
     /// Asynchronously opens a text file, reads all the text in the file, and then closes the file.
     /// </summary>
@@ -525,6 +540,7 @@ public static class PathIo
     /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
     /// <returns>A task that represents the asynchronous read operation, which wraps the string containing all text in the file.</returns>
     public static Task<string> ReadAllTextAsync(this AbsolutePath path, Encoding encoding, CancellationToken cancellationToken = default) => File.ReadAllTextAsync(path.Value, encoding, cancellationToken);
+#endif
 
     /// <summary>
     /// Sets the specified <see cref="FileAttributes"/> of the file on the specified path.
@@ -582,6 +598,7 @@ public static class PathIo
     /// <param name="bytes">The bytes to write to the file.</param>
     public static void WriteAllBytes(this AbsolutePath path, byte[] bytes) => File.WriteAllBytes(path.Value, bytes);
 
+#if NET8_0_OR_GREATER
     /// <summary>
     /// Asynchronously creates a new file, writes the specified byte array to the file, and then closes the file. If the target file already exists, it is truncated and overwritten.
     /// </summary>
@@ -590,6 +607,7 @@ public static class PathIo
     /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
     /// <returns>A task that represents the asynchronous write operation.</returns>
     public static Task WriteAllBytesAsync(this AbsolutePath path, byte[] bytes, CancellationToken cancellationToken = default) => File.WriteAllBytesAsync(path.Value, bytes, cancellationToken);
+#endif
 
     /// <summary>
     /// Creates a new file, writes a collection of strings to the file, and then closes the file.
@@ -621,6 +639,7 @@ public static class PathIo
     /// <param name="encoding">An <see cref="Encoding"/> object that represents the character encoding applied to the string array.</param>
     public static void WriteAllLines(this AbsolutePath path, string[] contents, Encoding encoding) => File.WriteAllLines(path.Value, contents, encoding);
 
+#if NET8_0_OR_GREATER
     /// <summary>
     /// Asynchronously creates a new file, writes the specified lines to the file, and then closes the file.
     /// </summary>
@@ -639,6 +658,7 @@ public static class PathIo
     /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
     /// <returns>A task that represents the asynchronous write operation.</returns>
     public static Task WriteAllLinesAsync(this AbsolutePath path, IEnumerable<string> contents, Encoding encoding, CancellationToken cancellationToken = default) => File.WriteAllLinesAsync(path.Value, contents, encoding, cancellationToken);
+#endif
 
     /// <summary>
     /// Creates a new file, writes the specified string to the file, and then closes the file. If the target file already exists, it is truncated and overwritten.
@@ -655,6 +675,7 @@ public static class PathIo
     /// <param name="encoding">The character encoding to use.</param>
     public static void WriteAllText(this AbsolutePath path, string? contents, Encoding encoding) => File.WriteAllText(path.Value, contents, encoding);
 
+#if NET8_0_OR_GREATER
     /// <summary>
     /// Asynchronously creates a new file, writes the specified string to the file, and then closes the file. If the target file already exists, it is truncated and overwritten.
     /// </summary>
@@ -673,6 +694,7 @@ public static class PathIo
     /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
     /// <returns>A task that represents the asynchronous write operation.</returns>
     public static Task WriteAllTextAsync(this AbsolutePath path, string? contents, Encoding encoding, CancellationToken cancellationToken = default) => File.WriteAllTextAsync(path.Value, contents, encoding, cancellationToken);
+#endif
 
     /// <summary>
     /// Returns the names of files (including their paths) that match the specified search pattern in the specified directory.
@@ -689,6 +711,7 @@ public static class PathIo
     /// <returns>An array of the full names (including paths) for the files in the specified directory that match the specified search pattern.</returns>
     public static string[] GetFiles(this AbsolutePath path, string searchPattern) => Directory.GetFiles(path.Value, searchPattern);
 
+#if NET8_0_OR_GREATER
     /// <summary>
     /// Returns the names of files (including their paths) that match the specified search pattern and enumeration options in the specified directory.
     /// </summary>
@@ -697,6 +720,7 @@ public static class PathIo
     /// <param name="enumerationOptions">An object that contains the search options to use.</param>
     /// <returns>An array of the full names (including paths) for the files in the specified directory that match the specified search pattern and enumeration options.</returns>
     public static string[] GetFiles(this AbsolutePath path, string searchPattern, EnumerationOptions enumerationOptions) => Directory.GetFiles(path.Value, searchPattern, enumerationOptions);
+#endif
 
     /// <summary>
     /// Returns the names of files (including their paths) that match the specified search pattern in the specified directory, using a value to determine whether to search subdirectories.
@@ -722,6 +746,7 @@ public static class PathIo
     /// <returns>An array of the full names (including paths) for the subdirectories in the specified directory that match the specified search pattern.</returns>
     public static string[] GetDirectories(this AbsolutePath path, string searchPattern) => Directory.GetDirectories(path.Value, searchPattern);
 
+#if NET8_0_OR_GREATER
     /// <summary>
     /// Returns the names of subdirectories (including their paths) that match the specified search pattern and enumeration options in the specified directory.
     /// </summary>
@@ -730,6 +755,7 @@ public static class PathIo
     /// <param name="enumerationOptions">An object that contains the search options to use.</param>
     /// <returns>An array of the full names (including paths) for the subdirectories in the specified directory that match the specified search pattern and enumeration options.</returns>
     public static string[] GetDirectories(this AbsolutePath path, string searchPattern, EnumerationOptions enumerationOptions) => Directory.GetDirectories(path.Value, searchPattern, enumerationOptions);
+#endif
 
     /// <summary>
     /// Returns the names of subdirectories (including their paths) that match the specified search pattern in the specified directory, using a value to determine whether to search subdirectories.
