@@ -166,19 +166,19 @@ internal static class DiskUtils
                 return null;
         }
 
-        if (string.IsNullOrWhiteSpace(realPath))
+        if (string.IsNullOrWhiteSpace(realPath) || realPath is null)
         {
             return null;
         }
 
         //The string that is returned by this function uses the \?\ syntax
-        if (realPath.Length >= 8 && realPath.AsSpan().StartsWith(@"\\?\UNC\", StringComparison.OrdinalIgnoreCase))
+        if (realPath.Length >= 8 && realPath.AsSpan().StartsWith(@"\\?\UNC\".AsSpan(), StringComparison.OrdinalIgnoreCase))
         {
             // network path, replace `\\?\UNC\` with `\\`
-            realPath = string.Concat("\\", realPath.AsSpan(7));
+            realPath = string.Concat("\\", realPath[7..]);
         }
 
-        if (realPath.Length >= 4 && realPath.AsSpan().StartsWith(@"\\?\", StringComparison.OrdinalIgnoreCase))
+        if (realPath.Length >= 4 && realPath.AsSpan().StartsWith(@"\\?\".AsSpan(), StringComparison.OrdinalIgnoreCase))
         {
             // local path, remove `\\?\`
             realPath = realPath.AsSpan(4).ToString();
