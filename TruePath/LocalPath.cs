@@ -129,8 +129,11 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     /// </summary>
     /// <param name="basePath">The base path from which to calculate the relative path.</param>
     /// <returns>The relative path from the base path to this path.</returns>
+#if NET8_0_OR_GREATER
     public LocalPath RelativeTo(LocalPath basePath) => new(Path.GetRelativePath(basePath.Value, Value));
-
+#else
+    public LocalPath RelativeTo(LocalPath basePath) => new(PathEx.GetRelativePath(basePath.Value, Value));
+#endif
     /// <summary>Appends another path to this one.</summary>
     /// <remarks>
     /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the

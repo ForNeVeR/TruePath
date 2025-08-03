@@ -105,8 +105,11 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// </summary>
     /// <param name="basePath">The base path from which to calculate the relative path.</param>
     /// <returns>The relative path from the base path to this path.</returns>
+#if NET8_0_OR_GREATER
     public LocalPath RelativeTo(AbsolutePath basePath) => new(Path.GetRelativePath(basePath.Value, Value));
-
+#else
+    public LocalPath RelativeTo(AbsolutePath basePath) => new(PathEx.GetRelativePath(basePath.Value, Value));
+#endif
     /// <summary>Corrects the file name case on case-insensitive file systems, resolves symlinks.</summary>
     public AbsolutePath Canonicalize() => new(DiskUtils.GetRealPath(Value));
 
