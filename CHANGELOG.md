@@ -10,6 +10,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2025-08-04
+### Added
+- Support for .NET Standard 2.0. Thanks to @seclerp!
+
+### Fixed
+- Fix a path parsing issue based on fuzz testing ([#139](https://github.com/ForNeVeR/TruePath/pull/139)). Thanks to @kant2002!
+
 ## [1.9.0] - 2025-06-01
 ### Changed
 - `PathIo.CreateDirectory`, `DeleteEmptyDirectory`, `DeleteDirectoryRecursively` are now extension methods. Thanks to @seclerp!
@@ -172,4 +179,5 @@ This is the first published version of the package. It doesn't contain any featu
 [1.7.0]: https://github.com/ForNeVeR/TruePath/compare/v1.6.0...v1.7.0
 [1.8.0]: https://github.com/ForNeVeR/TruePath/compare/v1.7.0...v1.8.0
 [1.9.0]: https://github.com/ForNeVeR/TruePath/compare/v1.8.0...v1.9.0
-[Unreleased]: https://github.com/ForNeVeR/TruePath/compare/v1.9.0...HEAD
+[1.10.0]: https://github.com/ForNeVeR/TruePath/compare/v1.9.0...v1.10.0
+[Unreleased]: https://github.com/ForNeVeR/TruePath/compare/v1.10.0...HEAD

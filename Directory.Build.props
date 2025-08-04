@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 <Project>
     <PropertyGroup Label="Packaging">
-        <Version>1.9.0</Version>
+        <Version>1.10.0</Version>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Copyright>2024-2025 TruePath contributors &lt;https://github.com/ForNeVeR/TruePath&gt;</Copyright>
         <PackageReadmeFile>README.md</PackageReadmeFile>
