@@ -109,6 +109,7 @@ To convert the path to the canonical form, use `AbsolutePath::Canonicalize`.
 
 [api.absolute-path]: api/TruePath.AbsolutePath.yml
 [api.i-path]: api/TruePath.IPath.yml
+[api.index]: api/TruePath.yml
 [api.local-path-pattern]: api/TruePath.LocalPathPattern.yml
 [api.local-path]: api/TruePath.LocalPath.yml
 [api.path-io]: api/TruePath.SystemIo.PathIo.yml
@@ -118,5 +119,5 @@ To convert the path to the canonical form, use `AbsolutePath::Canonicalize`.
 [issue.20]: https://github.com/ForNeVeR/TruePath/issues/20
 [java.path]: https://docs.oracle.com/en%2Fjava%2Fjavase%2F21%2Fdocs%2Fapi%2F%2F/java.base/java/nio/file/Path.html
 [kotlin.path]: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io.path/java.nio.file.-path/
-[nuget.true-path]: https://www.nuget.org/packages/TruePath
 [nuget.true-path.system-io]: https://www.nuget.org/packages/TruePath.SystemIo
+[nuget.true-path]: https://www.nuget.org/packages/TruePath
