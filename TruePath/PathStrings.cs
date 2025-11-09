@@ -189,4 +189,18 @@ public static class PathStrings
 
         return source[1] == VolumeSeparatorChar && (uint)((source[0] | 0x20) - 'a') <= 'z' - 'a';
     }
+
+    public readonly struct AbsolutePath
+    {
+        public string Value { get; }
+
+        public bool Exists() =>
+            File.Exists(Value) || Directory.Exists(Value);
+
+        public bool ExistsFile() =>
+            File.Exists(Value);
+
+        public bool ExistsDirectory() =>
+            Directory.Exists(Value);
+    }
 }
