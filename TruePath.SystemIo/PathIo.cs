@@ -288,11 +288,17 @@ public static class PathIo
     /// <param name="path">The name of the directory to remove. This directory must be writable.</param>
     public static void DeleteDirectoryRecursively(this AbsolutePath path) => Directory.Delete(path.Value, recursive: true);
     /// <summary>
+    /// Determines whether the specified file or directory exists.
+    /// </summary>
+    /// <param name="path">The file or directory to check.</param>
+    /// <returns><b>true</b> if the caller has the required permissions and <paramref name="path"/> contains the name of an existing file or directory; otherwise, <b>false</b>. This method also returns <b>false</b> if <paramref name="path"/> is null, an invalid path, or a zero-length string. If the caller does not have sufficient permissions to read the specified path, no exception is thrown and the method returns <b>false</b> regardless of the existence of <paramref name="path"/>.</returns>
+    public static bool Exists(this AbsolutePath path) => File.Exists(path.Value) || Directory.Exists(path.Value);
+    /// <summary>
     /// Determines whether the specified file exists.
     /// </summary>
     /// <param name="path">The file to check.</param>
     /// <returns><b>true</b> if the caller has the required permissions and <paramref name="path"/> contains the name of an existing file; otherwise, <b>false</b>. This method also returns <b>false</b> if <paramref name="path"/> is null, an invalid path, or a zero-length string. If the caller does not have sufficient permissions to read the specified file, no exception is thrown and the method returns <b>false</b> regardless of the existence of <paramref name="path"/>.</returns>
-    public static bool Exists(this AbsolutePath path) => File.Exists(path.Value);
+    public static bool ExistsFile(this AbsolutePath path) => File.Exists(path.Value);
     /// <summary>
     /// Determines whether the given path refers to an existing directory on disk.
     /// </summary>
