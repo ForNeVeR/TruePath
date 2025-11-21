@@ -25,7 +25,7 @@ jobs:
       DOTNET_NOLOGO: 1
       NUGET_PACKAGES: ${{ github.workspace }}/.github/nuget-packages
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up .NET SDK
       uses: actions/setup-dotnet@v5
       with:
@@ -43,19 +43,19 @@ jobs:
   licenses:
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: REUSE license check
       uses: fsfe/reuse-action@v6
   encoding:
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Verify encoding
       shell: pwsh
       run: scripts/Test-Encoding.ps1
   nowarn-empty:
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Verify with NoWarn as empty
       run: dotnet build /p:NoWarn='' --no-incremental
