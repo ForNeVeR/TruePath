@@ -51,7 +51,7 @@ let workflows = [
             runsOn ubuntu
             checkout
 
-            step(name = "REUSE license check", uses = "fsfe/reuse-action@v5")
+            step(name = "REUSE license check", usesSpec = Auto "fsfe/reuse-action")
         ]
 
         job "encoding" [
@@ -88,7 +88,7 @@ let workflows = [
             let releaseNotes = "./release-notes.md"
             step(
                 name = "Read changelog",
-                uses = "ForNeVeR/ChangelogAutomation.action@v2",
+                usesSpec = Auto "ForNeVeR/ChangelogAutomation.action",
                 options = Map.ofList [
                     "output", releaseNotes
                 ]
