@@ -3,5 +3,30 @@
     "extends": [
         "config:recommended"
     ],
-    "automerge": true
+    "automerge": true,
+    "customManagers": [
+        {
+            "description": "Update the F# script dependencies.",
+            "customType": "regex",
+            "managerFilePatterns": [
+                "scripts/github-actions.fsx"
+            ],
+            "matchStrings": [
+                "#r \"nuget: (?<depName>.+), (?<currentValue>\\S+)\""
+            ],
+            "datasourceTemplate": "nuget"
+        },
+        {
+            "description": "Update the GitHub Actions runners.",
+            "customType": "regex",
+            "managerFilePatterns": [
+                ".github/workflows/*.yml",
+                "scripts/github-actions.fsx"
+            ],
+            "matchStrings": [
+                "(?<depName>macos|ubuntu|windows)-(?<currentValue>[-\\w.\\d]+)"
+            ],
+            "datasourceTemplate": "github-runners"
+        }
+    ]
 }
