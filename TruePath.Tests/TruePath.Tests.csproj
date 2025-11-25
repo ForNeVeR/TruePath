@@ -25,6 +25,7 @@ SPDX-License-Identifier: MIT
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\TruePath.SystemIo\TruePath.SystemIo.csproj" />
       <ProjectReference Include="..\TruePath\TruePath.csproj" />
     </ItemGroup>
 
