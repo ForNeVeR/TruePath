@@ -11,6 +11,13 @@ on:
   - cron: 0 0 * * 6
   workflow_dispatch: 
 jobs:
+  verify-workflows:
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v5
+    - name: Set up .NET SDK
+      uses: actions/setup-dotnet@v5
+    - run: dotnet fsi ./scripts/github-actions.fsx verify
   check:
     strategy:
       matrix:
@@ -27,7 +34,7 @@ jobs:
     steps:
     - uses: actions/checkout@v5
     - name: Set up .NET SDK
-      uses: actions/setup-dotnet@v5
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
     - name: NuGet cache
@@ -45,7 +52,7 @@ jobs:
     steps:
     - uses: actions/checkout@v5
     - name: REUSE license check
-      uses: fsfe/reuse-action@v6
+      uses: fsfe/reuse-action@v5
   encoding:
     runs-on: ubuntu-24.04
     steps:

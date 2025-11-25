@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-#r "nuget: Generaptor.Library, 1.2.0"
+#r "nuget: Generaptor.Library, 1.9.0"
 
 open System
 open Generaptor
@@ -30,6 +30,17 @@ let workflows = [
     workflow "main" [
         name "Main"
         yield! mainTriggers
+
+        job "verify-workflows" [
+            runsOn "ubuntu-24.04"
+
+            checkout
+            step(
+                name = "Set up .NET SDK",
+                usesSpec = Auto "actions/setup-dotnet"
+            )
+            step(run = "dotnet fsi ./scripts/github-actions.fsx verify")
+        ]
 
         job "check" [
             checkout
@@ -65,7 +76,7 @@ let workflows = [
         job "nuget" [
             runsOn ubuntu
             checkout
-            writeContentPermissions
+            jobPermission(PermissionKind.Contents, AccessKind.Write)
 
             let configuration = "Release"
 
