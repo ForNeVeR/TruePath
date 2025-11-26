@@ -14,7 +14,7 @@ open type Generaptor.Library.Patterns
 let mainBranch = "main"
 let ubuntu = "ubuntu-24.04"
 let images = [
-    "macos-14"
+    "macos-15"
     ubuntu
     "windows-2022"
 ]

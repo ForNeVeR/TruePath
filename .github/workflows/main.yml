@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         image:
-        - macos-14
+        - macos-15
         - ubuntu-24.04
         - windows-2022
       fail-fast: false
