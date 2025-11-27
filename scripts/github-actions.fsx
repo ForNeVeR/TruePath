@@ -16,7 +16,7 @@ let ubuntu = "ubuntu-24.04"
 let images = [
     "macos-15"
     ubuntu
-    "windows-2022"
+    "windows-2025"
 ]
 
 let workflows = [
