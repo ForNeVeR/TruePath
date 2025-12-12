@@ -38,7 +38,7 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: NuGet cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         key: ${{ runner.os }}.nuget.${{ hashFiles('**/*.csproj') }}
         path: ${{ env.NUGET_PACKAGES }}
