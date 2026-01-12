@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - main
+    - renovate/**
   pull_request:
     branches:
     - main
@@ -34,11 +35,11 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: Set up .NET SDK
-      uses: actions/setup-dotnet@v5
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
     - name: NuGet cache
-      uses: actions/cache@v5
+      uses: actions/cache@v4
       with:
         key: ${{ runner.os }}.nuget.${{ hashFiles('**/*.csproj') }}
         path: ${{ env.NUGET_PACKAGES }}
