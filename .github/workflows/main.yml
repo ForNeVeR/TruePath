@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024-2026 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+#
+# SPDX-License-Identifier: MIT
+
 # This file is auto-generated.
 name: Main
 on:

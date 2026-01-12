@@ -1,23 +1,21 @@
-# SPDX-FileCopyrightText: 2024 Friedrich von Never <friedrich@fornever.me>
+# SPDX-FileCopyrightText: 2024-2026 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 #
 # SPDX-License-Identifier: MIT
 
+# This file is auto-generated.
 name: Docs
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
-
+    - main
+  workflow_dispatch: 
+concurrency:
+  group: pages
+  cancel-in-progress: false
 permissions:
   actions: read
-  pages: write
   id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
+  pages: write
 jobs:
   publish-docs:
     environment:
@@ -25,20 +23,18 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: Dotnet Setup
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: 8.x
-
-      - run: dotnet tool restore
-      - run: dotnet docfx docs/docfx.json
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: 'docs/_site'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+    - name: Checkout
+      uses: actions/checkout@v6
+    - name: Set up .NET SDK
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 8.x
+    - run: dotnet tool restore
+    - run: dotnet docfx docs/docfx.json
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v4
+      with:
+        path: docs/_site
+    - id: deployment
+      name: Deploy to GitHub Pages
+      uses: actions/deploy-pages@v4

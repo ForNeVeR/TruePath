@@ -1,6 +1,9 @@
-// SPDX-FileCopyrightText: 2024-2026 TruePath contributors <https://github.com/ForNeVeR/TruePath>
-//
-// SPDX-License-Identifier: MIT
+let licenseHeader = """
+# SPDX-FileCopyrightText: 2024-2026 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+#
+# SPDX-License-Identifier: MIT
+
+# This file is auto-generated.""".Trim()
 
 #r "nuget: Generaptor.Library, 1.9.0"
 
@@ -26,6 +29,11 @@ let workflows = [
         onPullRequestTo mainBranch
         onSchedule(day = DayOfWeek.Saturday)
         onWorkflowDispatch
+    ]
+
+    let workflow name actions = workflow name [
+        header licenseHeader
+        yield! actions
     ]
 
     workflow "main" [
@@ -121,6 +129,52 @@ let workflows = [
                     artifacts "TruePath.SystemIo" false
                 )
             ]
+        ]
+    ]
+
+    workflow "docs" [
+        name "Docs"
+        onPushTo "main"
+        onWorkflowDispatch
+        workflowPermission(PermissionKind.Actions, AccessKind.Read)
+        workflowPermission(PermissionKind.Pages, AccessKind.Write)
+        workflowPermission(PermissionKind.IdToken, AccessKind.Write)
+        workflowConcurrency(
+            group = "pages",
+            cancelInProgress = false
+        )
+        job "publish-docs" [
+            environment(name = "github-pages", url = "${{ steps.deployment.outputs.page_url }}")
+            runsOn "ubuntu-24.04"
+            step(
+                name = "Checkout",
+                usesSpec = Auto "actions/checkout"
+            )
+            step(
+                name = "Set up .NET SDK",
+                usesSpec = Auto "actions/setup-dotnet",
+                options = Map.ofList [
+                    "dotnet-version", "8.x"
+                ]
+            )
+            step(
+                run = "dotnet tool restore"
+            )
+            step(
+                run = "dotnet docfx docs/docfx.json"
+            )
+            step(
+                name = "Upload artifact",
+                usesSpec = Auto "actions/upload-pages-artifact",
+                options = Map.ofList [
+                    "path", "docs/_site"
+                ]
+            )
+            step(
+                name = "Deploy to GitHub Pages",
+                id = "deployment",
+                usesSpec = Auto "actions/deploy-pages"
+            )
         ]
     ]
 ]
