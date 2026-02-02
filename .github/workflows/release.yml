@@ -23,7 +23,8 @@ jobs:
       contents: write
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v6
+    - name: Check out the sources
+      uses: actions/checkout@v6
     - id: version
       name: Get version
       shell: pwsh
@@ -54,8 +55,8 @@ jobs:
           ./TruePath.SystemIo/bin/Release/TruePath.SystemIo.${{ steps.version.outputs.version }}.snupkg
         name: TruePath v${{ steps.version.outputs.version }}
     - if: startsWith(github.ref, 'refs/tags/v')
-      name: Push artifact to NuGet
+      name: Push TruePath to NuGet
       run: dotnet nuget push ./TruePath/bin/Release/TruePath.${{ steps.version.outputs.version }}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN_TRUE_PATH }}
     - if: startsWith(github.ref, 'refs/tags/v')
-      name: Push artifact to NuGet
+      name: Push TruePath.SystemIo to NuGet
       run: dotnet nuget push ./TruePath.SystemIo/bin/Release/TruePath.SystemIo.${{ steps.version.outputs.version }}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN_TRUE_PATH_SYSTEM_IO }}

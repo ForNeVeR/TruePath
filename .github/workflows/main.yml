@@ -18,17 +18,29 @@ on:
 jobs:
   verify-workflows:
     runs-on: ubuntu-24.04
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: 1
+      NUGET_PACKAGES: ${{ github.workspace }}/.github/nuget-packages
     steps:
-    - uses: actions/checkout@v6
+    - name: Check out the sources
+      uses: actions/checkout@v6
     - name: Set up .NET SDK
       uses: actions/setup-dotnet@v5
+    - name: Cache NuGet packages
+      uses: actions/cache@v5
+      with:
+        key: ${{ runner.os }}.nuget.${{ hashFiles('**/*.*proj', '**/*.props') }}
+        path: ${{ env.NUGET_PACKAGES }}
     - run: dotnet fsi ./scripts/github-actions.fsx verify
   check:
     strategy:
       matrix:
         image:
-        - macos-15
+        - macos-14
         - ubuntu-24.04
+        - ubuntu-24.04-arm
+        - windows-11-arm
         - windows-2025
       fail-fast: false
     runs-on: ${{ matrix.image }}
@@ -37,15 +49,14 @@ jobs:
       DOTNET_NOLOGO: 1
       NUGET_PACKAGES: ${{ github.workspace }}/.github/nuget-packages
     steps:
-    - uses: actions/checkout@v6
+    - name: Check out the sources
+      uses: actions/checkout@v6
     - name: Set up .NET SDK
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - name: NuGet cache
+      uses: actions/setup-dotnet@v5
+    - name: Cache NuGet packages
       uses: actions/cache@v5
       with:
-        key: ${{ runner.os }}.nuget.${{ hashFiles('**/*.csproj') }}
+        key: ${{ runner.os }}.nuget.${{ hashFiles('**/*.*proj', '**/*.props') }}
         path: ${{ env.NUGET_PACKAGES }}
     - name: Build
       run: dotnet build
@@ -55,19 +66,35 @@ jobs:
   licenses:
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v6
+    - name: Check out the sources
+      uses: actions/checkout@v6
     - name: REUSE license check
       uses: fsfe/reuse-action@v6
   encoding:
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v6
+    - name: Check out the sources
+      uses: actions/checkout@v6
     - name: Verify encoding
       shell: pwsh
       run: scripts/Test-Encoding.ps1
   nowarn-empty:
     runs-on: ubuntu-24.04
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: 1
+      NUGET_PACKAGES: ${{ github.workspace }}/.github/nuget-packages
     steps:
-    - uses: actions/checkout@v6
+    - name: Check out the sources
+      uses: actions/checkout@v6
+    - name: Set up .NET SDK
+      uses: actions/setup-dotnet@v5
+    - name: Cache NuGet packages
+      uses: actions/cache@v5
+      with:
+        key: ${{ runner.os }}.nuget.${{ hashFiles('**/*.*proj', '**/*.props') }}
+        path: ${{ env.NUGET_PACKAGES }}
+    - name: Check out the sources
+      uses: actions/checkout@v6
     - name: Verify with NoWarn as empty
       run: dotnet build /p:NoWarn='' --no-incremental
