@@ -23,7 +23,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-24.04
     steps:
-    - name: Checkout
+    - name: Check out the sources
       uses: actions/checkout@v6
     - name: Set up .NET SDK
       uses: actions/setup-dotnet@v5
