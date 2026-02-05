@@ -74,7 +74,7 @@ let workflows = [
         dotNetJob "check" [
             strategy(failFast = false, matrix = [
                 "image", [
-                    "macos-14"
+                    "macos-15"
                     "ubuntu-24.04"
                     "ubuntu-24.04-arm"
                     "windows-11-arm"
