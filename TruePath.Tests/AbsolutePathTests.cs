@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 Friedrich von Never <friedrich@fornever.me>
+// SPDX-FileCopyrightText: 2024-2026 Friedrich von Never <friedrich@fornever.me>
 //
 // SPDX-License-Identifier: MIT
 
@@ -91,7 +91,18 @@ public class AbsolutePathTests
 
         var tempDirectoryInfo = Path.GetTempPath();
 
-        Directory.CreateSymbolicLink(currentDirectory, tempDirectoryInfo);
+        try
+        {
+            Directory.CreateSymbolicLink(currentDirectory, tempDirectoryInfo);
+        }
+        catch (IOException e) when (OperatingSystem.IsWindows()) // && !TestFramework.RunsOnCi())
+        {   // TODO: Implement `TestFramework.RunsOnCi`
+            if (e.Message.Contains("privilege") && (e.StackTrace?.Contains("CreateSymbolicLink") ?? false))
+            {
+                Assert.Skip("Tests involving symlink creation require elevated privileges on Windows, as this is enforced at the OS level.");
+            }
+            else throw;
+        }
 
         // Act
         var kind = localPath.ReadKind();
