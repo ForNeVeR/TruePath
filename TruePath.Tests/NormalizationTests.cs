@@ -6,7 +6,6 @@ using FsCheck;
 using FsCheck.Fluent;
 using FsCheck.Xunit;
 using JetBrains.Annotations;
-using Xunit.Abstractions;
 
 namespace TruePath.Tests;
 

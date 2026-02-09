@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using Xunit.Abstractions;
-
 namespace TruePath.Tests;
 
 public class LocalPathTests(ITestOutputHelper output)
