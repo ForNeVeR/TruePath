@@ -26,6 +26,7 @@ Use the following shell command:
 ```console
 $ dotnet test
 ```
+Tests involving symlink creation require elevated privileges on Windows, as this is enforced at the OS level.
 
 Test Documentation
 ------------------
