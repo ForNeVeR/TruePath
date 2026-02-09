@@ -795,8 +795,6 @@ public static class PathIo
             .Select(filename => path / filename);
     }
 
-    public static string[] GetFiles(this AbsolutePath path, string searchPattern, EnumerationOptions enumerationOptions) => Directory.GetFiles(path.Value, searchPattern, enumerationOptions);
-
 #if NET8_0_OR_GREATER
     /// <summary>
     /// Returns an enumerable collection of <see cref="AbsolutePath"/> of the names of files (including their paths) that match the specified search pattern and enumeration options in the specified directory.
