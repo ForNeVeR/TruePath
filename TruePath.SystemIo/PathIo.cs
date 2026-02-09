@@ -709,6 +709,13 @@ public static class PathIo
     /// <returns>An array of the full names (including paths) for the files in the specified directory that match the specified search pattern.</returns>
     public static string[] GetFiles(this AbsolutePath path) => Directory.GetFiles(path.Value);
 
+
+    public static IEnumerable<AbsolutePath> EnumerateFiles(this AbsolutePath path)
+    {
+        return Directory.EnumerateFiles(path.Value)
+            .Select(filename => path / filename);
+    }
+
     /// <summary>
     /// Returns the names of files (including their paths) that match the specified search pattern in the specified directory.
     /// </summary>
@@ -716,6 +723,12 @@ public static class PathIo
     /// <param name="searchPattern">The search string to match against the names of files in <paramref name="path"/>.</param>
     /// <returns>An array of the full names (including paths) for the files in the specified directory that match the specified search pattern.</returns>
     public static string[] GetFiles(this AbsolutePath path, string searchPattern) => Directory.GetFiles(path.Value, searchPattern);
+
+    public static IEnumerable<AbsolutePath> EnumerateFiles(this AbsolutePath path, string searchPattern)
+    {
+        return Directory.EnumerateFiles(path.Value, searchPattern)
+            .Select(filename => path / filename);
+    }
 
 #if NET8_0_OR_GREATER
     /// <summary>
@@ -736,6 +749,12 @@ public static class PathIo
     /// <param name="searchOption">One of the enumeration values that specifies whether the search operation should include only the current directory or should include all subdirectories.</param>
     /// <returns>An array of the full names (including paths) for the files in the specified directory that match the specified search pattern and option.</returns>
     public static string[] GetFiles(this AbsolutePath path, string searchPattern, SearchOption searchOption) => Directory.GetFiles(path.Value, searchPattern, searchOption);
+
+    public static IEnumerable<AbsolutePath> EnumerateFiles(this AbsolutePath path, string searchPattern, SearchOption searchOption)
+    {
+        return Directory.EnumerateFiles(path.Value, searchPattern, searchOption)
+            .Select(filename => path / filename);
+    }
 
     /// <summary>
     /// Returns the names of subdirectories (including their paths) in the specified directory.
