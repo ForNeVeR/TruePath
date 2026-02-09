@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+// SPDX-FileCopyrightText: 2024-2026 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 //
 // SPDX-License-Identifier: MIT
 
@@ -21,5 +21,10 @@ public static class Utils
         }
 
         return nonCanonicalPath;
+    }
+
+    internal static bool RunsOnCi()
+    {
+        return Environment.GetEnvironmentVariable("CI") is not null;
     }
 }
