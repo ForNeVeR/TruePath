@@ -82,7 +82,7 @@ public class AbsolutePathTests
         Directory.Delete(currentDirectory, true);
     }
 
-    [Fact]
+    [SkipIfWindowsAndNotRunningAsAdmin]
     public void ReadKind_IsSymlink()
     {
         // Arrange
