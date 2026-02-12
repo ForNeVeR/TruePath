@@ -120,9 +120,8 @@ let workflows = [
         name "Release"
         yield! mainTriggers
         onPushTags "v*"
-        job "nuget" [
+        dotNetJob "nuget" [
             runsOn ubuntu
-            checkOut
             jobPermission(PermissionKind.Contents, AccessKind.Write)
 
             let configuration = "Release"
@@ -200,17 +199,9 @@ let workflows = [
             group = "pages",
             cancelInProgress = false
         )
-        job "publish-docs" [
+        dotNetJob "publish-docs" [
             environment(name = "github-pages", url = "${{ steps.deployment.outputs.page_url }}")
             runsOn "ubuntu-24.04"
-            checkOut
-            step(
-                name = "Set up .NET SDK",
-                usesSpec = Auto "actions/setup-dotnet",
-                options = Map.ofList [
-                    "dotnet-version", "8.x"
-                ]
-            )
             step(
                 run = "dotnet tool restore"
             )
