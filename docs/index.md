@@ -37,6 +37,8 @@ TruePath provides two packages:
 - [TruePath][nuget.true-path] for path abstractions,
 - [TruePath.SystemIo][nuget.true-path.system-io] for the `System.IO` integration.
 
+A third-party package, [TruePath.TestableIO.System.IO][nuget.true-path.testable-io.system-io], which adds [TestableIO.System.IO.Abstractions][testable-io.system.io.abstractions] integration on top of TruePath.
+
 Usage
 -----
 The library offers several struct (i.e. low to zero memory overhead) types wrapping path strings. The types are designed to not involve any disk IO operations by default, and thus provide excellent performance during common operations. This comes with a drawback, though: **path comparison is only performed as string comparison so far** — though it tries to take platform-specific case sensitivity defaults into account. See the section **Path Comparison** for details.
@@ -120,4 +122,6 @@ To convert the path to the canonical form, use `AbsolutePath::Canonicalize`.
 [java.path]: https://docs.oracle.com/en%2Fjava%2Fjavase%2F21%2Fdocs%2Fapi%2F%2F/java.base/java/nio/file/Path.html
 [kotlin.path]: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io.path/java.nio.file.-path/
 [nuget.true-path.system-io]: https://www.nuget.org/packages/TruePath.SystemIo
+[nuget.true-path.testable-io.system-io]: https://www.nuget.org/packages/TruePath.TestableIO.System.IO/
 [nuget.true-path]: https://www.nuget.org/packages/TruePath
+[testable-io.system.io.abstractions]: https://github.com/TestableIO/System.IO.Abstractions
