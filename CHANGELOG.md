@@ -10,6 +10,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.0] - 2026-03-14
+### Changed
+- Update the dependencies.
+- Drop the dependency on **Microsoft.Bcl.Memory** from a non-.NET-Standard package version.
+
+### Added
+- [#203](https://github.com/ForNeVeR/TruePath/issues/203): Add `PathIo.EnumerateFiles` extension methods. Thanks to @pkazakov-dev!
+
 ## [1.11.0] - 2025-11-25
 ### Fixed
 - [#171: `AbsolutePath.Exists` should return `true` if the entity is a directory](https://github.com/ForNeVeR/TruePath/issues/171). Thanks to @cnaples79!
@@ -188,4 +196,5 @@ This is the first published version of the package. It doesn't contain any featu
 [1.9.0]: https://github.com/ForNeVeR/TruePath/compare/v1.8.0...v1.9.0
 [1.10.0]: https://github.com/ForNeVeR/TruePath/compare/v1.9.0...v1.10.0
 [1.11.0]: https://github.com/ForNeVeR/TruePath/compare/v1.10.0...v1.11.0
-[Unreleased]: https://github.com/ForNeVeR/TruePath/compare/v1.11.0...HEAD
+[1.12.0]: https://github.com/ForNeVeR/TruePath/compare/v1.11.0...v1.12.0
+[Unreleased]: https://github.com/ForNeVeR/TruePath/compare/v1.12.0...HEAD
