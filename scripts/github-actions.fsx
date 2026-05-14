@@ -15,7 +15,7 @@ open type Generaptor.GitHubActions.Commands
 let mainBranch = "main"
 let ubuntu = "ubuntu-24.04"
 let images = [
-    "macos-15"
+    "macos-26"
     ubuntu
     "windows-2025"
 ]
@@ -74,7 +74,7 @@ let workflows = [
         dotNetJob "check" [
             strategy(failFast = false, matrix = [
                 "image", [
-                    "macos-15"
+                    "macos-26"
                     "ubuntu-24.04"
                     "ubuntu-24.04-arm"
                     "windows-11-arm"
