@@ -28,7 +28,7 @@ jobs:
       NUGET_PACKAGES: ${{ github.workspace }}/.github/nuget-packages
     steps:
     - name: Check out the sources
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
     - name: Set up .NET SDK
       uses: actions/setup-dotnet@v5
     - name: Cache NuGet packages
