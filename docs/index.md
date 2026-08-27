@@ -124,4 +124,4 @@ To convert the path to the canonical form, use `AbsolutePath::Canonicalize`.
 [nuget.true-path.system-io]: https://www.nuget.org/packages/TruePath.SystemIo
 [nuget.true-path.testable-io.system-io]: https://www.nuget.org/packages/TruePath.TestableIO.System.IO/
 [nuget.true-path]: https://www.nuget.org/packages/TruePath
-[testable-io.system.io.abstractions]: https://github.com/TestableIO/System.IO.Abstractions
+[testable-io.system.io.abstractions]: https://github.com/jeppevammenkristensen/TruePath.TestableIO.System.IO

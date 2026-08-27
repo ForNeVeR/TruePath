@@ -32,8 +32,8 @@ Packages
 
 TruePath provides two NuGet packages:
 - [**TruePath**][nuget.true-path] for the main path abstractions,
-- [**TruePath.SystemIo**][nuget.true-path.system-io] for the `System.IO` integration. 
- 
+- [**TruePath.SystemIo**][nuget.true-path.system-io] for the `System.IO` integration.
+
 A third-party package, [**TruePath.TestableIO.System.IO**][nuget.true-path.testableio.system-io], adds [TestableIO.System.IO.Abstractions][testable-io.system.io.abstractions] integration on top of TruePath.
 
 Documentation
@@ -58,7 +58,7 @@ The license indication in the project's sources is compliant with the [REUSE spe
 [docs.true-path.system-io]: https://fornever.github.io/TruePath/api/TruePath.SystemIo.html
 [docs.true-path]: https://fornever.github.io/TruePath/api/TruePath.html
 [docs]: https://fornever.github.io/TruePath
-[github.true-path.testable-io]: https://github.com/jeppevammenkristensen/FileBasedApp.Toolkit/blob/main/Source/TruePath.TestableIO.System.IO/README.md
+[github.true-path.testable-io]: https://github.com/jeppevammenkristensen/TruePath.TestableIO.System.IO
 [issues]: https://github.com/ForNeVeR/TruePath/issues
 [java.path]: https://docs.oracle.com/en%2Fjava%2Fjavase%2F21%2Fdocs%2Fapi%2F%2F/java.base/java/nio/file/Path.html
 [kotlin.path]: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.io.path/java.nio.file.-path/
