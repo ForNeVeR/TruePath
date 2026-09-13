@@ -74,6 +74,10 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// <inheritdoc cref="IPath.Parent"/>
     public AbsolutePath? Parent => Underlying.Parent is { } path ? new(path.Value, checkAbsoluteness: false) : null;
 
+    /// <summary>Gets the root of this path.</summary>
+    public AbsolutePath PathRoot() =>
+        new(Path.GetPathRoot(Value)!, checkAbsoluteness: false);
+
     /// <inheritdoc cref="IPath.Parent"/>
     IPath? IPath.Parent => Parent;
 
