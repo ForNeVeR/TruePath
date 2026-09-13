@@ -17,6 +17,23 @@ public class AbsolutePathTests
     }
 
     [Fact]
+    public void PathRootReturnsRoot()
+    {
+      var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+      var path = root / "foo" / "bar";
+
+     Assert.Equal(root, path.PathRoot());
+    }
+
+    [Fact]
+    public void PathRootOfRootReturnsItself()
+    {
+       var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+
+     Assert.Equal(root, root.PathRoot());
+    }
+
+    [Fact]
     public void ReadKind_NonExistent()
     {
         // Arrange
