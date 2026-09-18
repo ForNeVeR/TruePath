@@ -121,7 +121,9 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     public bool IsPrefixOf(LocalPath other)
     {
         if (!(Value.Length <= other.Value.Length && other.Value.StartsWith(Value))) return false;
-        return other.Value.Length == Value.Length || other.Value[Value.Length] == Separator;
+        return other.Value.Length == Value.Length ||
+               Value[Value.Length - 1] == Separator ||
+               other.Value[Value.Length] == Separator;
     }
 
     /// <summary>
