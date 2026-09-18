@@ -97,7 +97,8 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// <inheritdoc cref="IPath{TPath}.IsPrefixOf(TPath)"/>
     public bool IsPrefixOf(AbsolutePath other)
     {
-        return Value.Length <= other.Value.Length && other.Value.StartsWith(Value);
+        if (!(Value.Length <= other.Value.Length && other.Value.StartsWith(Value))) return false;
+        return other.Value.Length == Value.Length || other.Value[Value.Length] == Path.DirectorySeparatorChar;
     }
 
     /// <summary>Gets or sets the current working directory as an AbsolutePath instance.</summary>
@@ -285,4 +286,3 @@ public enum FileEntryKind
     /// </summary>
     Junction
 }
-

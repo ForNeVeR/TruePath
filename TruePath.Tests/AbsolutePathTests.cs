@@ -163,6 +163,19 @@ public class AbsolutePathTests
         Assert.Equal(isPrefix, startsWith);
     }
 
+    [Theory]
+    [InlineData("sub", "sub/a.txt", true)]
+    [InlineData("sub", "sub", true)]
+    [InlineData("sub", "subx/a.txt", false)]
+    [InlineData("sub", "submarine", false)]
+    [InlineData("sub/folder", "sub", false)]
+    public void IsPrefixOfRespectsPathSegmentBoundaries(string prefix, string other, bool expected)
+    {
+        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+
+        Assert.Equal(expected, (root / prefix).IsPrefixOf(root / other));
+    }
+
     [Fact]
     public void CurrentWorkingDirectoryShouldReturnCorrectAbsolutePath()
     {
