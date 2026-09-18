@@ -31,7 +31,11 @@ public static class PathStrings
     ///             resolving any sequence of current and parent directory marks (subsequently, <c>.</c> and <c>..</c>)
     ///             if possible (meaning they will not be replaced if they are in the root position: paths such as
     ///             <c>.</c> or <c>../..</c> will not be affected by the normalization, while e.g. <c>foo/../.</c> will
-    ///             be resolved to just <c>foo</c>).
+    ///             be resolved to just <c>foo</c>),
+    ///         </item>
+    ///         <item>
+    ///             trimming <em>all</em> trailing separators (e.g. <c>a/b/c/d////</c> is normalized to
+    ///             <c>a/b/c/d</c>),
     ///         </item>
     ///     </list>
     /// </para>
