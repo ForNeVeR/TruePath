@@ -177,6 +177,14 @@ public class AbsolutePathTests
     }
 
     [Fact]
+    public void IsPrefixOfTreatsRootAsPrefixOfDescendants()
+    {
+        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+
+        Assert.True(root.IsPrefixOf(root / "sub" / "a.txt"));
+    }
+
+    [Fact]
     public void CurrentWorkingDirectoryShouldReturnCorrectAbsolutePath()
     {
         // Arrange
