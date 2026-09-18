@@ -92,9 +92,18 @@ public class LocalPathTests(ITestOutputHelper output)
     [InlineData("/foo", "/foo1/bar/", false)]
     [InlineData("/foo", "/foo1", false)]
     [InlineData("/foo", "/foo", true)]
+    [InlineData("/", "/frob", true)]
     public void IsPrefixOf(string prefix, string other, bool result)
     {
         Assert.Equal(result, new LocalPath(prefix).IsPrefixOf(new LocalPath(other)));
+    }
+
+    [Fact]
+    public void IsPrefixOfRooted()
+    {
+        var root = new LocalPath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var subRoot = root / "frob";
+        Assert.True(root.IsPrefixOf(subRoot));
     }
 
     [Fact]
