@@ -101,6 +101,9 @@ public class LocalPathTests(ITestOutputHelper output)
     [InlineData("", "/foo", false)]
     [InlineData("/", "foo", false)]
     [InlineData("/foo", "foo/bar", false)]
+    [InlineData("", "../evil", false)]
+    [InlineData(".", "..", false)]
+    [InlineData("", "..bar", true)]
     public void IsPrefixOfAndStartsWith(string prefix, string other, bool result)
     {
         var a = new LocalPath(prefix);
@@ -111,12 +114,20 @@ public class LocalPathTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public void EmptyParentIsPrefixOfAnyRelativePath()
+    public void EmptyParentIsPrefixOfDescendantPath()
     {
         var parent = new LocalPath("foo").Parent;
         Assert.NotNull(parent);
         Assert.Equal("", parent.Value.Value);
         Assert.True(parent.Value.IsPrefixOf(new LocalPath("bar")));
+    }
+
+    [Fact]
+    public void EmptyParentIsNotPrefixOfPathEscapingUpwards()
+    {
+        var parent = new LocalPath("foo").Parent;
+        Assert.NotNull(parent);
+        Assert.False(parent.Value.IsPrefixOf(new LocalPath("../evil")));
     }
 
     [Fact]
