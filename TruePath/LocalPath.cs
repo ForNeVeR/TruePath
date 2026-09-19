@@ -127,10 +127,15 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     public static LocalPath Create(string value) => new(value);
 
     /// <inheritdoc cref="IPath{TPath}.IsPrefixOf(TPath)"/>
+    /// <remarks>
+    /// An <b>empty</b> path designates the current directory, and is therefore a prefix of every relative path
+    /// (including itself).
+    /// </remarks>
     public bool IsPrefixOf(LocalPath other)
     {
         if (!(Value.Length <= other.Value.Length && other.Value.StartsWith(Value))) return false;
         return other.Value.Length == Value.Length ||
+               Value.Length == 0 ||
                Value[Value.Length - 1] == Separator ||
                other.Value[Value.Length] == Separator;
     }

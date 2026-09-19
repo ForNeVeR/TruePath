@@ -93,9 +93,22 @@ public class LocalPathTests(ITestOutputHelper output)
     [InlineData("/foo", "/foo1", false)]
     [InlineData("/foo", "/foo", true)]
     [InlineData("/", "/frob", true)]
+    [InlineData("", "foo", true)]
+    [InlineData(".", "foo", true)]
+    [InlineData(".", "", true)]
+    [InlineData("a/..", "foo/bar", true)]
     public void IsPrefixOf(string prefix, string other, bool result)
     {
         Assert.Equal(result, new LocalPath(prefix).IsPrefixOf(new LocalPath(other)));
+    }
+
+    [Fact]
+    public void EmptyParentIsPrefixOfAnyRelativePath()
+    {
+        var parent = new LocalPath("foo").Parent;
+        Assert.NotNull(parent);
+        Assert.Equal("", parent.Value.Value);
+        Assert.True(parent.Value.IsPrefixOf(new LocalPath("bar")));
     }
 
     [Fact]
