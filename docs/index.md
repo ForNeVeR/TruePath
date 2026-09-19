@@ -50,7 +50,7 @@ The paths are stored in the **normalized form**.
 - Any sequence of current and parent directory marks (subsequently, `.` and `..`) is resolved if possible (meaning they
   will not be replaced if they are in the root position: paths such as `.` or `../..` will not be affected by the
   normalization, while e.g. `foo/bar/../.` will be resolved to just `foo`).
-- All trailing separators are trimmed (e.g. `a/b/c/d////` is normalized to `a/b/c/d`).
+- All trailing separators are trimmed (e.g. `a/b/c/d////` is normalized to `a/b/c/d`), except for the case of the root folder: `/` (Unix) or `X:\` (Windows) keeps one final separator (because it would become an empty string or a reference to the current path on disk `X:` without the trailing separator).
 
 Note that the normalization operation will not perform any file IO, and is purely string manipulation.
 

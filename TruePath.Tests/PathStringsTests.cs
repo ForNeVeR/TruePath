@@ -24,6 +24,13 @@ public class PathStringsTests
         Assert.Equal(NormalizeSeparators(expected), PathStrings.Normalize(input));
     }
 
+    [Fact]
+    public void RootPathEndWithSeparator()
+    {
+        var root = OperatingSystem.IsWindows() ? @"A:\" : "/";
+        Assert.Equal(root, PathStrings.Normalize(root));
+    }
+
     [Theory]
     [InlineData("/a/b/c/d", "/a/b/c/d")]
     [InlineData("//a/b/c/d", "/a/b/c/d")]
