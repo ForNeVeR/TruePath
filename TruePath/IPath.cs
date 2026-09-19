@@ -38,7 +38,16 @@ public interface IPath<TPath> where TPath : IPath<TPath>
 #endif
 
     /// <remarks>
-    /// Checks for a non-strict prefix: if the paths are equal, then they are still considered prefixes of each other.
+    /// Checks for a non-strict prefix: if the paths are equal, then they are still considered prefixes of each other,
+    /// so every path is a prefix of itself.
+    /// </remarks>
+    /// <remarks>
+    /// The comparison is performed over whole path <b>segments</b>: <c>/foo</c> is <b>not</b> a prefix of
+    /// <c>/foo1</c>, even though one path string starts with the other.
+    /// </remarks>
+    /// <remarks>
+    /// This is the exact inverse of <see cref="StartsWith"/>: <c>a.IsPrefixOf(b)</c> means the same as
+    /// <c>b.StartsWith(a)</c>.
     /// </remarks>
     /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
     bool IsPrefixOf(TPath other);
@@ -47,6 +56,18 @@ public interface IPath<TPath> where TPath : IPath<TPath>
     /// Determines whether the current path starts with the specified path.
     /// </summary>
     /// <param name="other">The path to compare to the current path.</param>
+    /// <remarks>
+    /// Checks for a non-strict prefix: if the paths are equal, then each still starts with the other, so every path
+    /// starts with itself.
+    /// </remarks>
+    /// <remarks>
+    /// The comparison is performed over whole path <b>segments</b>: <c>/foo1</c> does <b>not</b> start with
+    /// <c>/foo</c>, even though one path string starts with the other.
+    /// </remarks>
+    /// <remarks>
+    /// This is the exact inverse of <see cref="IsPrefixOf"/>: <c>a.StartsWith(b)</c> means the same as
+    /// <c>b.IsPrefixOf(a)</c>.
+    /// </remarks>
     /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
     bool StartsWith(TPath other);
 

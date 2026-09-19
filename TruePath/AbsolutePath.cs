@@ -85,7 +85,7 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     public string FileName => Underlying.FileName;
 
     /// <inheritdoc cref="IPath{TPath}.StartsWith(TPath)"/>
-    public bool StartsWith(AbsolutePath other) => Value.StartsWith(other.Value);
+    public bool StartsWith(AbsolutePath other) => other.IsPrefixOf(this);
 
     /// <summary>
     /// Creates a new path instance of type <see cref="AbsolutePath" /> from the specified string value.
