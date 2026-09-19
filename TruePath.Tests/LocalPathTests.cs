@@ -97,6 +97,10 @@ public class LocalPathTests(ITestOutputHelper output)
     [InlineData(".", "foo", true)]
     [InlineData(".", "", true)]
     [InlineData("a/..", "foo/bar", true)]
+    [InlineData(".", "/foo", false)]
+    [InlineData("", "/foo", false)]
+    [InlineData("/", "foo", false)]
+    [InlineData("/foo", "foo/bar", false)]
     public void IsPrefixOf(string prefix, string other, bool result)
     {
         Assert.Equal(result, new LocalPath(prefix).IsPrefixOf(new LocalPath(other)));
