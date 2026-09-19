@@ -104,6 +104,8 @@ public class LocalPathTests(ITestOutputHelper output)
     [InlineData("", "../evil", false)]
     [InlineData(".", "..", false)]
     [InlineData("", "..bar", true)]
+    [InlineData("\u00ADfoo", "fooo/bar", false)]
+    [InlineData("\u00ADfoo", "\u00ADfoo/bar", true)]
     public void IsPrefixOfAndStartsWith(string prefix, string other, bool result)
     {
         var a = new LocalPath(prefix);
