@@ -143,22 +143,19 @@ public class AbsolutePathTests
     }
 
     [Theory]
-    [InlineData("/home/user", "/home/user/documents")]
-    [InlineData("/home/usEr", "/home/User/documents")]
-    [InlineData("/home/user/documents", "/home/user/documents")]
-    [InlineData("/home/user/documents", "/home/user")]
-    public void IsPrefixOfShouldBeEquivalentToStartsWith(string pathA, string pathB)
+    [InlineData("/home/user", "/home/user/documents", true)]
+    [InlineData("/home/usEr", "/home/User/documents", false)]
+    [InlineData("/home/user/documents", "/home/user/documents", true)]
+    [InlineData("/home/user/documents", "/home/user", false)]
+    public void IsPrefixOfShouldBeEquivalentToStartsWith(string pathA, string pathB, bool expected)
     {
         // Arrange
         var a = new AbsolutePath(pathA);
         var b = new AbsolutePath(pathB);
 
-        // Act
-        var isPrefix = a.IsPrefixOf(b);
-        var startsWith = b.StartsWith(a);
-
         // Assert
-        Assert.Equal(isPrefix, startsWith);
+        Assert.Equal(expected, a.IsPrefixOf(b));
+        Assert.Equal(expected, b.StartsWith(a));
     }
 
     [Theory]
