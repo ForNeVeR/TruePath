@@ -35,7 +35,8 @@ public static class PathStrings
     ///         </item>
     ///         <item>
     ///             trimming <em>all</em> trailing separators (e.g. <c>a/b/c/d////</c> is normalized to
-    ///             <c>a/b/c/d</c>),
+    ///             <c>a/b/c/d</c>), except for the case with root folder: <c>X:\</c> (Windows) or (/) (Unix)
+    ///             doesn't get trimmed.
     ///         </item>
     ///     </list>
     /// </para>
