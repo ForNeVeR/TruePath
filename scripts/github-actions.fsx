@@ -13,7 +13,7 @@ open Generaptor.GitHubActions
 open type Generaptor.GitHubActions.Commands
 
 let mainBranch = "main"
-let ubuntu = "ubuntu-24.04"
+let ubuntu = "ubuntu-26.04"
 let images = [
     "macos-26"
     ubuntu
@@ -67,7 +67,7 @@ let workflows = [
         yield! mainTriggers
 
         dotNetJob "verify-workflows" [
-            runsOn "ubuntu-24.04"
+            runsOn "ubuntu-26.04"
             step(run = "dotnet fsi ./scripts/github-actions.fsx verify")
         ]
 
@@ -75,8 +75,8 @@ let workflows = [
             strategy(failFast = false, matrix = [
                 "image", [
                     "macos-26"
-                    "ubuntu-24.04"
-                    "ubuntu-24.04-arm"
+                    "ubuntu-26.04"
+                    "ubuntu-26.04-arm"
                     "windows-11-arm"
                     "windows-2025"
                 ]
@@ -201,7 +201,7 @@ let workflows = [
         )
         dotNetJob "publish-docs" [
             environment(name = "github-pages", url = "${{ steps.deployment.outputs.page_url }}")
-            runsOn "ubuntu-24.04"
+            runsOn "ubuntu-26.04"
             step(
                 run = "dotnet tool restore"
             )
