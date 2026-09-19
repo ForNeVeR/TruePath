@@ -46,6 +46,10 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
 
     private static char Separator => Path.DirectorySeparatorChar;
 
+    private static bool StartsWithParentDirectoryReference(string value) =>
+        value.Length >= 2 && value[0] == '.' && value[1] == '.'
+        && (value.Length == 2 || value[2] == Separator);
+
     /// <inheritdoc cref="IPath.Value"/>
     public string Value { get; } = PathStrings.Normalize(value);
 
@@ -131,8 +135,9 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     /// <inheritdoc cref="IPath{TPath}.IsPrefixOf(TPath)"/>
     /// <remarks>
     /// <para>
-    ///     An <b>empty</b> path designates the current directory, and is therefore a prefix of every relative path
-    ///     (including itself).
+    ///     An <b>empty</b> path designates the current directory. It is a prefix of every relative path that stays
+    ///     at or below that directory, which means every relative path that does not begin with a <c>..</c>
+    ///     reference.
     /// </para>
     /// <para>
     ///     An <b>absolute</b> path is never a prefix of a <b>relative</b> one, and vice versa: such a comparison
@@ -155,11 +160,15 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
         // field or property and matched on here.
         if (IsAbsolute != other.IsAbsolute) return false;
 
+        // The empty path is the current directory, so every path at or below it has it as a prefix - but one
+        // starting with a ".." reference points outside it. Normalization only ever keeps such references at the
+        // very start of a path, so testing the first segment is enough.
+        if (Value.Length == 0) return !StartsWithParentDirectoryReference(other.Value);
+
         // TODO[#225]: this comparison is ordinal, while Equals follows the platform default, so on Windows and macOS
         // two paths may be equal and yet not prefixes of each other.
         if (!(Value.Length <= other.Value.Length && other.Value.StartsWith(Value))) return false;
         return other.Value.Length == Value.Length ||
-               Value.Length == 0 ||
                Value[Value.Length - 1] == Separator ||
                other.Value[Value.Length] == Separator;
     }
