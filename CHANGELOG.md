@@ -10,6 +10,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Changed
+- **Breaking:** `LocalPath.StartsWith` and `AbsolutePath.StartsWith` now compare whole path segments instead of raw strings, which makes them exact inverses of `IsPrefixOf` as originally intended in [#43](https://github.com/ForNeVeR/TruePath/issues/43). For example, `new LocalPath("/foo1").StartsWith(new LocalPath("/foo"))` is now `false`, where it used to be `true`.
+- `LocalPath.IsPrefixOf` now returns `false` whenever the two paths differ in absoluteness: an absolute path is never a prefix of a relative one, nor the other way round. Previously, the result depended on an incidental string comparison.
+
+### Fixed
+- `LocalPath.IsPrefixOf` now correctly reports a root path (`/` or `X:\`) as a prefix of its children, and no longer throws on an empty path.
+
 ## [1.12.0] - 2026-03-14
 ### Changed
 - Update the dependencies.
