@@ -29,6 +29,9 @@ public class PathStringsTests
     {
         var root = OperatingSystem.IsWindows() ? @"A:\" : "/";
         Assert.Equal(root, PathStrings.Normalize(root));
+
+        var rootWithRepeatedSeparators = OperatingSystem.IsWindows() ? @"A:\\\\" : "//";
+        Assert.Equal(root, PathStrings.Normalize(rootWithRepeatedSeparators));
     }
 
     [Theory]
