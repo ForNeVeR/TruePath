@@ -10,6 +10,11 @@ namespace TruePath;
 /// <para>A path pointing to a place in the local file system.</para>
 /// <para>It may be either absolute or relative.</para>
 /// <para>
+///     An <b>empty</b> path designates the <b>current directory</b>. Normalizing an empty string, <c>.</c> or
+///     <c>a/..</c> produces it, and so does <see cref="Parent"/> of a relative path consisting of a single segment
+///     (e.g. the parent of <c>foo</c>).
+/// </para>
+/// <para>
 ///     Always stored in a normalized form. Read the documentation on <see cref="TruePath.PathStrings.Normalize"/> to
 ///     know what form of normalization the path uses.
 /// </para>
@@ -54,6 +59,10 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     public bool IsAbsolute => Path.IsPathRooted(Value);
 
     /// <inheritdoc cref="IPath.Parent"/>
+    /// <remarks>
+    /// The parent of a relative path consisting of a single segment is the <b>empty</b> path (the current
+    /// directory), not <see langword="null"/>.
+    /// </remarks>
     public LocalPath? Parent
     {
         get
