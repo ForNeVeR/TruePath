@@ -28,10 +28,12 @@ public static class PathStrings
     ///             <c>/</c> on Unix),
     ///         </item>
     ///         <item>
-    ///             resolving any sequence of current and parent directory marks (subsequently, <c>.</c> and <c>..</c>)
-    ///             if possible (meaning they will not be replaced if they are in the root position: paths such as
-    ///             <c>.</c> or <c>../..</c> will not be affected by the normalization, while e.g. <c>foo/../.</c> will
-    ///             be resolved to just <c>foo</c>),
+    ///             resolving any sequence of current and parent directory references (subsequently, <c>.</c> and
+    ///             <c>..</c>) if possible (e.g. <c>foo/../.</c> is resolved to just <c>foo</c>). A path that resolves
+    ///             to the current directory is normalized to an <b>empty</b> path: both <c>.</c> and <c>a/..</c>
+    ///             become <c>&quot;&quot;</c>. Parent directory references that cannot be resolved are preserved,
+    ///             since there is nothing above them to fold into: <c>..</c> and <c>../..</c> are not affected by the
+    ///             normalization,
     ///         </item>
     ///         <item>
     ///             trimming <b>all</b> trailing separators (e.g. <c>a/b/c/d////</c> is normalized to
