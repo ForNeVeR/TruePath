@@ -14,9 +14,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 - **Breaking:** `LocalPath.StartsWith` and `AbsolutePath.StartsWith` now compare whole path segments instead of raw strings, which makes them exact inverses of `IsPrefixOf` as originally intended in [#43](https://github.com/ForNeVeR/TruePath/issues/43). For example, `new LocalPath("/foo1").StartsWith(new LocalPath("/foo"))` is now `false`, where it used to be `true`.
 - `LocalPath.IsPrefixOf` now returns `false` whenever the two paths differ in absoluteness: an absolute path is never a prefix of a relative one, nor the other way round. Previously, the result depended on an incidental string comparison.
+- `LocalPath.IsPrefixOf` now treats an empty path — the normalized form of `""`, `"."` and `"a/.."`, and the parent of any single-segment relative path — as the current directory, so it is a prefix of every relative path that does not begin with a `..` reference. Previously, it was a prefix of nothing but itself.
 
 ### Fixed
-- `LocalPath.IsPrefixOf` now correctly reports a root path (`/` or `X:\`) as a prefix of its children, and no longer throws on an empty path.
+- `LocalPath.IsPrefixOf` now correctly reports a root path (`/` or `X:\`) as a prefix of its children.
+- `LocalPath.IsPrefixOf` and `StartsWith` now compare path strings ordinally. Previously they used the current culture, which ignores collation-ignorable characters, so a path could be reported as a prefix of an unrelated one.
 
 ## [1.12.0] - 2026-03-14
 ### Changed
