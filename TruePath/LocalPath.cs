@@ -167,7 +167,8 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
 
         // TODO[#225]: this comparison is ordinal, while Equals follows the platform default, so on Windows and macOS
         // two paths may be equal and yet not prefixes of each other.
-        if (!(Value.Length <= other.Value.Length && other.Value.StartsWith(Value))) return false;
+        if (!(Value.Length <= other.Value.Length && other.Value.StartsWith(Value, StringComparison.Ordinal)))
+            return false;
         return other.Value.Length == Value.Length ||
                Value[Value.Length - 1] == Separator ||
                other.Value[Value.Length] == Separator;
