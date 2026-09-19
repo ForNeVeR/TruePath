@@ -56,6 +56,8 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     ///     will be an additional requirement for a path to be either a DOS device path or start from a disk letter.
     /// </para>
     /// </summary>
+    // TODO[#224]: narrowing this to true absolute paths (kind 1 in the taxonomy at IsPrefixOf) requires updating
+    // IsPrefixOf in the same change: it relies on this property to tell rooted paths from relative ones.
     public bool IsAbsolute => Path.IsPathRooted(Value);
 
     /// <inheritdoc cref="IPath.Parent"/>
@@ -128,11 +130,33 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
 
     /// <inheritdoc cref="IPath{TPath}.IsPrefixOf(TPath)"/>
     /// <remarks>
-    /// An <b>empty</b> path designates the current directory, and is therefore a prefix of every relative path
-    /// (including itself).
+    /// <para>
+    ///     An <b>empty</b> path designates the current directory, and is therefore a prefix of every relative path
+    ///     (including itself).
+    /// </para>
+    /// <para>
+    ///     An <b>absolute</b> path is never a prefix of a <b>relative</b> one, and vice versa: such a comparison
+    ///     would require resolving the relative path against the current directory, which this type never does. Any
+    ///     pair of paths differing in <see cref="IsAbsolute"/> is reported as unrelated.
+    /// </para>
     /// </remarks>
     public bool IsPrefixOf(LocalPath other)
     {
+        // TODO[#224]: IsAbsolute is Path.IsPathRooted, which is too coarse for this algorithm. On Windows there are
+        // really four kinds of path, and no path of one kind should ever be considered a prefix of a path of another:
+        //   1. true absolute:   C:\Windows
+        //   2. rooted diskless: \Windows
+        //   3. current on disk: C: (and C:Windows, relative to the current directory of drive C:)
+        //   4. true relative:   Windows, ..\Windows
+        // AbsolutePath exists to cover kind 1 only, while LocalPath is applicable to all four. IsPathRooted answers
+        // true for kinds 1, 2 and 3 alike, so the check below only separates {1, 2, 3} from {4}. When IsAbsolute is
+        // eventually narrowed to kind 1 - as its own documentation anticipates - this comparison must not simply
+        // follow it: it needs the full four-way distinction. The path kind should then be extracted into a separate
+        // field or property and matched on here.
+        if (IsAbsolute != other.IsAbsolute) return false;
+
+        // TODO[#225]: this comparison is ordinal, while Equals follows the platform default, so on Windows and macOS
+        // two paths may be equal and yet not prefixes of each other.
         if (!(Value.Length <= other.Value.Length && other.Value.StartsWith(Value))) return false;
         return other.Value.Length == Value.Length ||
                Value.Length == 0 ||
