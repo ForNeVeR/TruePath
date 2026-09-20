@@ -88,7 +88,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     public override string ToString() => Value;
 
     /// <summary>Compares the path with another.</summary>
-    /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
+    /// <remarks>Uses <see cref="PlatformDefaultComparer"/> for platform-default case sensitivity.</remarks>
     public bool Equals(LocalPath other) => Equals(other, PlatformDefaultComparer);
 
     /// <summary>
@@ -165,9 +165,8 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
         // very start of a path, so testing the first segment is enough.
         if (Value.Length == 0) return !StartsWithParentDirectoryReference(other.Value);
 
-        // TODO[#225]: this comparison is ordinal, while Equals follows the platform default, so on Windows and macOS
-        // two paths may be equal and yet not prefixes of each other.
-        if (!(Value.Length <= other.Value.Length && other.Value.StartsWith(Value, StringComparison.Ordinal)))
+        if (!(Value.Length <= other.Value.Length &&
+              other.Value.StartsWith(Value, PlatformDefaultPathComparer<LocalPath>.DefaultStringComparison)))
             return false;
         return other.Value.Length == Value.Length ||
                Value[Value.Length - 1] == Separator ||
