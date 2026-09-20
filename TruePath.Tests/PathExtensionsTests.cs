@@ -75,9 +75,7 @@ public class PathExtensionsTests
     }
 
     [Theory]
-    [InlineData(@"C:\", "bar", @"C:\.bar")]
     [InlineData(@"C:\filename.foo", "bar", @"C:\filename.bar")]
-    [InlineData(@"\", "bar", @"\.bar")]
     [InlineData(@"\file", "bar", @"\file.bar")]
     [InlineData(@"\file", ".bar", @"\file.bar")]
     [InlineData(@"\file.", ".bar", @"\file.bar")]
@@ -123,7 +121,6 @@ public class PathExtensionsTests
     }
 
     [Theory]
-    [InlineData("/", "bar", "/.bar")]
     [InlineData("/file", "bar", "/file.bar")]
     [InlineData("/file", ".bar", "/file.bar")]
     [InlineData("/file.", ".bar", "/file.bar")]
@@ -144,5 +141,66 @@ public class PathExtensionsTests
 
         // Assert
         Assert.Equal(expected, newPath.Value);
+    }
+
+    [Theory]
+    [InlineData(".gitignore", null)]
+    [InlineData(".gitignore", "")]
+    [InlineData(".gitignore", ".")]
+    [InlineData("foo/.gitignore", null)]
+    [InlineData("..", null)]
+    [InlineData("..", "bar")]
+    [InlineData("../..", "txt")]
+    [InlineData("", "txt")]
+    [InlineData("a/..", "txt")]
+    [InlineData("file.txt", "foo/bar")]
+    public void WithExtensionThrowsIfTheResultIsNotAFileName(string inputPath, string? newExtension)
+    {
+        // Arrange
+        var path = new LocalPath(inputPath);
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => path.WithExtension(newExtension));
+    }
+
+    [Theory]
+    [InlineData(@"C:\foo\.gitignore", null)]
+    [InlineData(@"C:\.gitignore", null)]
+    [InlineData(@"C:\", "bar")]
+    [InlineData(@"\", "bar")]
+    public void WithExtensionThrowsIfTheResultIsNotAFileName_Windows(string inputPath, string? newExtension)
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return;
+        }
+
+        // Arrange
+        var local = new LocalPath(inputPath);
+        var absolute = new AbsolutePath(inputPath);
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => local.WithExtension(newExtension));
+        Assert.Throws<ArgumentException>(() => absolute.WithExtension(newExtension));
+    }
+
+    [Theory]
+    [InlineData("/foo/.gitignore", null)]
+    [InlineData("/.gitignore", null)]
+    [InlineData("/", "bar")]
+    public void WithExtensionThrowsIfTheResultIsNotAFileName_Unix(string inputPath, string? newExtension)
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && !RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            return;
+        }
+
+        // Arrange
+        var local = new LocalPath(inputPath);
+        var absolute = new AbsolutePath(inputPath);
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => local.WithExtension(newExtension));
+        Assert.Throws<ArgumentException>(() => absolute.WithExtension(newExtension));
     }
 }
