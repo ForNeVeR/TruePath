@@ -49,7 +49,7 @@ public interface IPath<TPath> where TPath : IPath<TPath>
     /// This is the exact inverse of <see cref="StartsWith"/>: <c>a.IsPrefixOf(b)</c> means the same as
     /// <c>b.StartsWith(a)</c>.
     /// </remarks>
-    /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
+    /// <remarks>Case sensitivity follows the path type's platform-default comparer.</remarks>
     bool IsPrefixOf(TPath other);
 
     /// <summary>
@@ -68,7 +68,7 @@ public interface IPath<TPath> where TPath : IPath<TPath>
     /// This is the exact inverse of <see cref="IsPrefixOf"/>: <c>a.StartsWith(b)</c> means the same as
     /// <c>b.IsPrefixOf(a)</c>.
     /// </remarks>
-    /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
+    /// <remarks>Case sensitivity follows the path type's platform-default comparer.</remarks>
     bool StartsWith(TPath other);
 
 #if NET8_0_OR_GREATER

@@ -70,7 +70,9 @@ public class LocalPathTests(ITestOutputHelper output)
 
         // Act
         var isPrefix = a.IsPrefixOf(b);
-        var startsWith = b.Value.StartsWith(a.Value);
+        var startsWith = b.Value.StartsWith(a.Value, OperatingSystem.IsWindows() || OperatingSystem.IsMacOS()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal);
 
         // Assert
         Assert.Equal(isPrefix, startsWith);
@@ -113,6 +115,21 @@ public class LocalPathTests(ITestOutputHelper output)
 
         Assert.Equal(result, a.IsPrefixOf(b));
         Assert.Equal(result, b.StartsWith(a));
+    }
+
+    [Theory]
+    [InlineData("Foo", "foo")]
+    [InlineData("Foo", "foo/bar")]
+    [InlineData("Foo", "foobar")]
+    public void IsPrefixOfFollowsPlatformDefaultCaseSensitivity(string prefix, string other)
+    {
+        var a = new LocalPath(prefix);
+        var b = new LocalPath(other);
+        var expected = (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS()) && other != "foobar";
+
+        Assert.Equal(expected, a.IsPrefixOf(b));
+        Assert.Equal(expected, b.StartsWith(a));
+        if (other == "foo") Assert.Equal(a == b, a.IsPrefixOf(b));
     }
 
     [Fact]

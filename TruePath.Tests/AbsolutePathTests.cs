@@ -144,7 +144,6 @@ public class AbsolutePathTests
 
     [Theory]
     [InlineData("/home/user", "/home/user/documents", true)]
-    [InlineData("/home/usEr", "/home/User/documents", false)]
     [InlineData("/home/user/documents", "/home/user/documents", true)]
     [InlineData("/home/user/documents", "/home/user", false)]
     public void IsPrefixOfShouldBeEquivalentToStartsWith(string pathA, string pathB, bool expected)
@@ -156,6 +155,22 @@ public class AbsolutePathTests
         // Assert
         Assert.Equal(expected, a.IsPrefixOf(b));
         Assert.Equal(expected, b.StartsWith(a));
+    }
+
+    [Theory]
+    [InlineData("Foo", "foo")]
+    [InlineData("Foo", "foo/file.txt")]
+    [InlineData("Foo", "foobar")]
+    public void IsPrefixOfFollowsPlatformDefaultCaseSensitivity(string prefix, string other)
+    {
+        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var a = root / prefix;
+        var b = root / other;
+        var expected = (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS()) && other != "foobar";
+
+        Assert.Equal(expected, a.IsPrefixOf(b));
+        Assert.Equal(expected, b.StartsWith(a));
+        if (other == "foo") Assert.Equal(a == b, a.IsPrefixOf(b));
     }
 
     [Theory]

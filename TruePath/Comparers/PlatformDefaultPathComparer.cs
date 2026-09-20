@@ -21,19 +21,14 @@ namespace TruePath.Comparers;
 /// </remarks>
 internal class PlatformDefaultPathComparer<TPath> : IPathComparer<TPath> where TPath : IPath
 {
-    private readonly StringComparer _stringComparer;
+    internal static readonly StringComparison DefaultStringComparison =
+        RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
 
-    public PlatformDefaultPathComparer()
-    {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            _stringComparer = StringComparer.OrdinalIgnoreCase;
-        }
-        else
-        {
-            _stringComparer = StringComparer.Ordinal;
-        }
-    }
+    private readonly StringComparer _stringComparer = DefaultStringComparison == StringComparison.OrdinalIgnoreCase
+        ? StringComparer.OrdinalIgnoreCase
+        : StringComparer.Ordinal;
 
     public bool Equals(TPath? x, TPath? y)
     {

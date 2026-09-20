@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - `LocalPath.IsPrefixOf` now treats an empty path — the normalized form of `""`, `"."` and `"a/.."`, and the parent of any single-segment relative path — as the current directory, so it is a prefix of every relative path that does not begin with a `..` reference.
 
 ### Fixed
+- [#225](https://github.com/ForNeVeR/TruePath/issues/225): Make path prefix checks use the same platform-default case sensitivity as path equality.
 - `LocalPath.IsPrefixOf` and `StartsWith` now compare path strings ordinally. Previously they used the current culture, which ignores collation-ignorable characters, so a path could be reported as a prefix of an unrelated one.
 
 ## [1.12.0] - 2026-03-14

@@ -137,7 +137,7 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     public override string ToString() => Value;
 
     /// <summary>Compares the path with another.</summary>
-    /// <remarks>Note that currently this comparison is case-sensitive.</remarks>
+    /// <remarks>Uses <see cref="PlatformDefaultComparer"/> for platform-default case sensitivity.</remarks>
     public bool Equals(AbsolutePath other) => Equals(other, PlatformDefaultComparer);
 
     /// <summary>
