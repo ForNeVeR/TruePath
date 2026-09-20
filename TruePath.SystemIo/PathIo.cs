@@ -713,7 +713,12 @@ public static class PathIo
     /// Returns the names of files (including their paths) that match the specified search pattern in the specified directory.
     /// </summary>
     /// <param name="path">The directory to search.</param>
-    /// <param name="searchPattern">The search string to match against the names of files in <paramref name="path"/>.</param>
+    /// <param name="searchPattern">
+    /// The search string to match against the names of files in <paramref name="path"/>. It may combine literal
+    /// characters with the <c>*</c> (zero or more characters) and <c>?</c> (exactly one character) wildcards, but it
+    /// does not support regular expressions. For the full pattern syntax and its caveats, see
+    /// <see href="https://learn.microsoft.com/dotnet/api/system.io.directory.getfiles"/>.
+    /// </param>
     /// <returns>An array of the full names (including paths) for the files in the specified directory that match the specified search pattern.</returns>
     public static string[] GetFiles(this AbsolutePath path, string searchPattern) => Directory.GetFiles(path.Value, searchPattern);
 
@@ -722,7 +727,12 @@ public static class PathIo
     /// Returns the names of files (including their paths) that match the specified search pattern and enumeration options in the specified directory.
     /// </summary>
     /// <param name="path">The directory to search.</param>
-    /// <param name="searchPattern">The search string to match against the names of files in <paramref name="path"/>.</param>
+    /// <param name="searchPattern">
+    /// The search string to match against the names of files in <paramref name="path"/>. It may combine literal
+    /// characters with the <c>*</c> (zero or more characters) and <c>?</c> (exactly one character) wildcards, but it
+    /// does not support regular expressions. For the full pattern syntax and its caveats, see
+    /// <see href="https://learn.microsoft.com/dotnet/api/system.io.directory.getfiles"/>.
+    /// </param>
     /// <param name="enumerationOptions">An object that contains the search options to use.</param>
     /// <returns>An array of the full names (including paths) for the files in the specified directory that match the specified search pattern and enumeration options.</returns>
     public static string[] GetFiles(this AbsolutePath path, string searchPattern, EnumerationOptions enumerationOptions) => Directory.GetFiles(path.Value, searchPattern, enumerationOptions);
@@ -732,7 +742,12 @@ public static class PathIo
     /// Returns the names of files (including their paths) that match the specified search pattern in the specified directory, using a value to determine whether to search subdirectories.
     /// </summary>
     /// <param name="path">The directory to search.</param>
-    /// <param name="searchPattern">The search string to match against the names of files in <paramref name="path"/>.</param>
+    /// <param name="searchPattern">
+    /// The search string to match against the names of files in <paramref name="path"/>. It may combine literal
+    /// characters with the <c>*</c> (zero or more characters) and <c>?</c> (exactly one character) wildcards, but it
+    /// does not support regular expressions. For the full pattern syntax and its caveats, see
+    /// <see href="https://learn.microsoft.com/dotnet/api/system.io.directory.getfiles"/>.
+    /// </param>
     /// <param name="searchOption">One of the enumeration values that specifies whether the search operation should include only the current directory or should include all subdirectories.</param>
     /// <returns>An array of the full names (including paths) for the files in the specified directory that match the specified search pattern and option.</returns>
     public static string[] GetFiles(this AbsolutePath path, string searchPattern, SearchOption searchOption) => Directory.GetFiles(path.Value, searchPattern, searchOption);
@@ -748,7 +763,12 @@ public static class PathIo
     /// Returns the names of subdirectories (including their paths) that match the specified search pattern in the specified directory.
     /// </summary>
     /// <param name="path">The directory to search.</param>
-    /// <param name="searchPattern">The search string to match against the names of subdirectories in <paramref name="path"/>.</param>
+    /// <param name="searchPattern">
+    /// The search string to match against the names of subdirectories in <paramref name="path"/>. It may combine literal
+    /// characters with the <c>*</c> (zero or more characters) and <c>?</c> (exactly one character) wildcards, but it
+    /// does not support regular expressions. For the full pattern syntax and its caveats, see
+    /// <see href="https://learn.microsoft.com/dotnet/api/system.io.directory.getdirectories"/>.
+    /// </param>
     /// <returns>An array of the full names (including paths) for the subdirectories in the specified directory that match the specified search pattern.</returns>
     public static string[] GetDirectories(this AbsolutePath path, string searchPattern) => Directory.GetDirectories(path.Value, searchPattern);
 
@@ -757,7 +777,12 @@ public static class PathIo
     /// Returns the names of subdirectories (including their paths) that match the specified search pattern and enumeration options in the specified directory.
     /// </summary>
     /// <param name="path">The directory to search.</param>
-    /// <param name="searchPattern">The search string to match against the names of subdirectories in <paramref name="path"/>.</param>
+    /// <param name="searchPattern">
+    /// The search string to match against the names of subdirectories in <paramref name="path"/>. It may combine literal
+    /// characters with the <c>*</c> (zero or more characters) and <c>?</c> (exactly one character) wildcards, but it
+    /// does not support regular expressions. For the full pattern syntax and its caveats, see
+    /// <see href="https://learn.microsoft.com/dotnet/api/system.io.directory.getdirectories"/>.
+    /// </param>
     /// <param name="enumerationOptions">An object that contains the search options to use.</param>
     /// <returns>An array of the full names (including paths) for the subdirectories in the specified directory that match the specified search pattern and enumeration options.</returns>
     public static string[] GetDirectories(this AbsolutePath path, string searchPattern, EnumerationOptions enumerationOptions) => Directory.GetDirectories(path.Value, searchPattern, enumerationOptions);
@@ -767,7 +792,12 @@ public static class PathIo
     /// Returns the names of subdirectories (including their paths) that match the specified search pattern in the specified directory, using a value to determine whether to search subdirectories.
     /// </summary>
     /// <param name="path">The directory to search.</param>
-    /// <param name="searchPattern">The search string to match against the names of subdirectories in <paramref name="path"/>.</param>
+    /// <param name="searchPattern">
+    /// The search string to match against the names of subdirectories in <paramref name="path"/>. It may combine literal
+    /// characters with the <c>*</c> (zero or more characters) and <c>?</c> (exactly one character) wildcards, but it
+    /// does not support regular expressions. For the full pattern syntax and its caveats, see
+    /// <see href="https://learn.microsoft.com/dotnet/api/system.io.directory.getdirectories"/>.
+    /// </param>
     /// <param name="searchOption">One of the enumeration values that specifies whether the search operation should include only the current directory or should include all subdirectories.</param>
     /// <returns>An array of the full names (including paths) for the subdirectories in the specified directory that match the specified search pattern and option.</returns>
     public static string[] GetDirectories(this AbsolutePath path, string searchPattern, SearchOption searchOption) => Directory.GetDirectories(path.Value, searchPattern, searchOption);
@@ -787,7 +817,12 @@ public static class PathIo
     /// Returns an enumerable collection of <see cref="AbsolutePath"/> of full file names in a specified path.
     /// </summary>
     /// <param name="path">The directory to search.</param>
-    /// <param name="searchPattern">The search string to match against the names of files in <paramref name="path"/>.</param>
+    /// <param name="searchPattern">
+    /// The search string to match against the names of files in <paramref name="path"/>. It may combine literal
+    /// characters with the <c>*</c> (zero or more characters) and <c>?</c> (exactly one character) wildcards, but it
+    /// does not support regular expressions. For the full pattern syntax and its caveats, see
+    /// <see href="https://learn.microsoft.com/dotnet/api/system.io.directory.enumeratefiles"/>.
+    /// </param>
     /// <returns>An enumerable collection of <see cref="AbsolutePath"/> of the full names (including paths) for the files in the specified directory that match the specified search pattern.</returns>
     public static IEnumerable<AbsolutePath> EnumerateFiles(this AbsolutePath path, string searchPattern)
     {
@@ -800,7 +835,12 @@ public static class PathIo
     /// Returns an enumerable collection of <see cref="AbsolutePath"/> of the names of files (including their paths) that match the specified search pattern and enumeration options in the specified directory.
     /// </summary>
     /// <param name="path">The directory to search.</param>
-    /// <param name="searchPattern">The search string to match against the names of files in <paramref name="path"/>.</param>
+    /// <param name="searchPattern">
+    /// The search string to match against the names of files in <paramref name="path"/>. It may combine literal
+    /// characters with the <c>*</c> (zero or more characters) and <c>?</c> (exactly one character) wildcards, but it
+    /// does not support regular expressions. For the full pattern syntax and its caveats, see
+    /// <see href="https://learn.microsoft.com/dotnet/api/system.io.directory.enumeratefiles"/>.
+    /// </param>
     /// <param name="enumerationOptions">An object that contains the search options to use.</param>
     /// <returns>An enumerable collection of <see cref="AbsolutePath"/> of the full names (including paths) for the files in the specified directory that match the specified search pattern and enumeration options.</returns>
     public static IEnumerable<AbsolutePath> EnumerateFiles(this AbsolutePath path, string searchPattern, EnumerationOptions enumerationOptions)
@@ -814,7 +854,12 @@ public static class PathIo
     /// Returns an enumerable collection of <see cref="AbsolutePath"/> with the names of files (including their paths) that match the specified search pattern in the specified directory, using a value to determine whether to search subdirectories.
     /// </summary>
     /// <param name="path">The directory to search.</param>
-    /// <param name="searchPattern">The search string to match against the names of files in <paramref name="path"/>.</param>
+    /// <param name="searchPattern">
+    /// The search string to match against the names of files in <paramref name="path"/>. It may combine literal
+    /// characters with the <c>*</c> (zero or more characters) and <c>?</c> (exactly one character) wildcards, but it
+    /// does not support regular expressions. For the full pattern syntax and its caveats, see
+    /// <see href="https://learn.microsoft.com/dotnet/api/system.io.directory.enumeratefiles"/>.
+    /// </param>
     /// <param name="searchOption">One of the enumeration values that specifies whether the search operation should include only the current directory or should include all subdirectories.</param>
     /// <returns>An enumerable collection of <see cref="AbsolutePath"/> of the full names (including paths) for the files in the specified directory that match the specified search pattern.</returns>
     public static IEnumerable<AbsolutePath> EnumerateFiles(this AbsolutePath path, string searchPattern, SearchOption searchOption)
