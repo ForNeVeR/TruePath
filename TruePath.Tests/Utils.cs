@@ -23,6 +23,9 @@ public static class Utils
         return nonCanonicalPath;
     }
 
+    internal static bool IsPlatformCaseInsensitive() =>
+        OperatingSystem.IsWindows() || OperatingSystem.IsMacOS();
+
     internal static bool RunsOnCi()
     {
         return Environment.GetEnvironmentVariable("CI") is not null;

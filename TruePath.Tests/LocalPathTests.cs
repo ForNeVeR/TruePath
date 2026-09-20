@@ -70,9 +70,7 @@ public class LocalPathTests(ITestOutputHelper output)
 
         // Act
         var isPrefix = a.IsPrefixOf(b);
-        var startsWith = b.Value.StartsWith(a.Value, OperatingSystem.IsWindows() || OperatingSystem.IsMacOS()
-            ? StringComparison.OrdinalIgnoreCase
-            : StringComparison.Ordinal);
+        var startsWith = b.StartsWith(a);
 
         // Assert
         Assert.Equal(isPrefix, startsWith);
@@ -117,19 +115,35 @@ public class LocalPathTests(ITestOutputHelper output)
         Assert.Equal(result, b.StartsWith(a));
     }
 
-    [Theory]
-    [InlineData("Foo", "foo")]
-    [InlineData("Foo", "foo/bar")]
-    [InlineData("Foo", "foobar")]
-    public void IsPrefixOfFollowsPlatformDefaultCaseSensitivity(string prefix, string other)
+    [Fact]
+    public void IsPrefixOfFollowsPlatformCaseSensitivityForSameName()
     {
-        var a = new LocalPath(prefix);
-        var b = new LocalPath(other);
-        var expected = (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS()) && other != "foobar";
+        var a = new LocalPath("Foo");
+        var b = new LocalPath("foo");
 
-        Assert.Equal(expected, a.IsPrefixOf(b));
-        Assert.Equal(expected, b.StartsWith(a));
-        if (other == "foo") Assert.Equal(a == b, a.IsPrefixOf(b));
+        Assert.Equal(Utils.IsPlatformCaseInsensitive(), a.IsPrefixOf(b));
+        Assert.Equal(Utils.IsPlatformCaseInsensitive(), b.StartsWith(a));
+        Assert.Equal(a == b, a.IsPrefixOf(b));
+    }
+
+    [Fact]
+    public void IsPrefixOfFollowsPlatformCaseSensitivityForDescendant()
+    {
+        var a = new LocalPath("Foo");
+        var b = new LocalPath("foo/bar");
+
+        Assert.Equal(Utils.IsPlatformCaseInsensitive(), a.IsPrefixOf(b));
+        Assert.Equal(Utils.IsPlatformCaseInsensitive(), b.StartsWith(a));
+    }
+
+    [Fact]
+    public void IsPrefixOfRequiresWholeSegmentRegardlessOfCase()
+    {
+        var a = new LocalPath("Foo");
+        var b = new LocalPath("foobar");
+
+        Assert.False(a.IsPrefixOf(b));
+        Assert.False(b.StartsWith(a));
     }
 
     [Fact]

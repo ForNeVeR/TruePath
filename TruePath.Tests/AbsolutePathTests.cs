@@ -157,20 +157,38 @@ public class AbsolutePathTests
         Assert.Equal(expected, b.StartsWith(a));
     }
 
-    [Theory]
-    [InlineData("Foo", "foo")]
-    [InlineData("Foo", "foo/file.txt")]
-    [InlineData("Foo", "foobar")]
-    public void IsPrefixOfFollowsPlatformDefaultCaseSensitivity(string prefix, string other)
+    [Fact]
+    public void IsPrefixOfFollowsPlatformCaseSensitivityForSameName()
     {
         var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
-        var a = root / prefix;
-        var b = root / other;
-        var expected = (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS()) && other != "foobar";
+        var a = root / "Foo";
+        var b = root / "foo";
 
-        Assert.Equal(expected, a.IsPrefixOf(b));
-        Assert.Equal(expected, b.StartsWith(a));
-        if (other == "foo") Assert.Equal(a == b, a.IsPrefixOf(b));
+        Assert.Equal(Utils.IsPlatformCaseInsensitive(), a.IsPrefixOf(b));
+        Assert.Equal(Utils.IsPlatformCaseInsensitive(), b.StartsWith(a));
+        Assert.Equal(a == b, a.IsPrefixOf(b));
+    }
+
+    [Fact]
+    public void IsPrefixOfFollowsPlatformCaseSensitivityForDescendant()
+    {
+        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var a = root / "Foo";
+        var b = root / "foo/file.txt";
+
+        Assert.Equal(Utils.IsPlatformCaseInsensitive(), a.IsPrefixOf(b));
+        Assert.Equal(Utils.IsPlatformCaseInsensitive(), b.StartsWith(a));
+    }
+
+    [Fact]
+    public void IsPrefixOfRequiresWholeSegmentRegardlessOfCase()
+    {
+        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var a = root / "Foo";
+        var b = root / "foobar";
+
+        Assert.False(a.IsPrefixOf(b));
+        Assert.False(b.StartsWith(a));
     }
 
     [Theory]
