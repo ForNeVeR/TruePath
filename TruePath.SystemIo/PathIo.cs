@@ -703,10 +703,10 @@ public static class PathIo
 #endif
 
     /// <summary>
-    /// Returns the names of files (including their paths) that match the specified search pattern in the specified directory.
+    /// Returns the names of files (including their paths) in the specified directory.
     /// </summary>
     /// <param name="path">The directory to search.</param>
-    /// <returns>An array of the full names (including paths) for the files in the specified directory that match the specified search pattern.</returns>
+    /// <returns>An array of the full names (including paths) for the files in the specified directory.</returns>
     public static string[] GetFiles(this AbsolutePath path) => Directory.GetFiles(path.Value);
 
     /// <summary>
