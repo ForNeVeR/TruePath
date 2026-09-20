@@ -740,13 +740,18 @@ public static class PathIo
     /// </summary>
     /// <param name="path">The directory to search.</param>
     /// <param name="searchPattern">
-    /// The search string to match against the names of files in <paramref name="path"/>. It may combine literal
-    /// characters with the <c>*</c> (zero or more characters) and <c>?</c> wildcards, but it does not support
-    /// regular expressions. Under the default <see cref="MatchType.Simple"/>, <c>?</c> matches exactly one
-    /// character; under <see cref="MatchType.Win32"/>, selected through <paramref name="enumerationOptions"/>, it
-    /// may also match none immediately before a period or at the end of the name. For the full pattern syntax
-    /// and its caveats, see
-    /// <see href="https://learn.microsoft.com/dotnet/api/system.io.directory.getfiles"/>.
+    ///     <para>
+    ///         The search string to match against the names of files in <paramref name="path"/>. It may combine
+    ///         literal characters with the <c>*</c> and <c>?</c> wildcards, but it does not support regular
+    ///         expressions. This overload matches with Win32 semantics, where <c>*</c> stands for zero or more
+    ///         characters and <c>?</c> for exactly one, except immediately before a period or at the end of the
+    ///         name, where it may also match none: <c>a?.txt</c> matches both <c>ab.txt</c> and <c>a.txt</c>,
+    ///         while <c>?ello.txt</c> matches only <c>hello.txt</c>.
+    ///     </para>
+    ///     <para>
+    ///         For the full pattern syntax and its caveats, see
+    ///         <see href="https://learn.microsoft.com/dotnet/api/system.io.directory.getfiles"/>.
+    ///     </para>
     /// </param>
     /// <param name="enumerationOptions">An object that contains the search options to use.</param>
     /// <returns>An array of the full names (including paths) for the files in the specified directory that match the specified search pattern and enumeration options.</returns>
@@ -799,10 +804,6 @@ public static class PathIo
     ///         the name, where it may also match none: <c>a?</c> matches both <c>ab</c> and <c>a</c>.
     ///     </para>
     ///     <para>
-    ///         When running on .NET Framework, a three-character extension also matches longer ones, so
-    ///         <c>*.xls</c> additionally matches <c>book.xlsx</c>.
-    ///     </para>
-    ///     <para>
     ///         For the full pattern syntax and its caveats, see
     ///         <see href="https://learn.microsoft.com/dotnet/api/system.io.directory.getdirectories"/>.
     ///     </para>
@@ -840,10 +841,6 @@ public static class PathIo
     ///         regular expressions. This overload matches with Win32 semantics, where <c>*</c> stands for zero or
     ///         more characters and <c>?</c> for exactly one, except immediately before a period or at the end of
     ///         the name, where it may also match none: <c>a?</c> matches both <c>ab</c> and <c>a</c>.
-    ///     </para>
-    ///     <para>
-    ///         When running on .NET Framework, a three-character extension also matches longer ones, so
-    ///         <c>*.xls</c> additionally matches <c>book.xlsx</c>.
     ///     </para>
     ///     <para>
     ///         For the full pattern syntax and its caveats, see
