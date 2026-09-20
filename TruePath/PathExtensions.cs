@@ -57,11 +57,33 @@ public static class PathExtensions
     /// </summary>
     /// <typeparam name="TPath">The type of the path, which must implement <see cref="IPath{TPath}"/>.</typeparam>
     /// <param name="path">The original path.</param>
-    /// <param name="extension">The new extension to apply.</param>
+    /// <param name="extension">
+    ///     <para>
+    ///         The new extension, either with or without the leading dot: both <c>txt</c> and <c>.txt</c> give the
+    ///         same result, since the dot is added when missing.
+    ///     </para>
+    ///     <para>
+    ///         Pass <see langword="null"/> to remove the extension entirely (<c>file.txt</c> becomes <c>file</c>), or
+    ///         an empty string to remove it but keep the trailing dot (<c>file.txt</c> becomes <c>file.</c>).
+    ///     </para>
+    /// </param>
     /// <returns>
     /// A new path of type <typeparamref name="TPath"/> with the modified file name component.
     /// The original <paramref name="path"/> object is not modified.
     /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         Only the last extension is replaced: for <c>archive.tar.gz</c> and the extension <c>zip</c>, the result
+    ///         is <c>archive.tar.zip</c>. The extension itself may contain dots, so <c>.tar.gz</c> applied to
+    ///         <c>archive.zip</c> gives <c>archive.tar.gz</c>.
+    ///     </para>
+    ///     <para>If the file name has no extension, the new one is appended: <c>file</c> becomes <c>file.txt</c>.</para>
+    ///     <para>
+    ///         A file name consisting entirely of an extension is treated as an extension, consistently with
+    ///         <see cref="GetExtensionWithDot"/>: <c>.gitignore</c> with the extension <c>hgignore</c> becomes
+    ///         <c>.hgignore</c>.
+    ///     </para>
+    /// </remarks>
     public static TPath WithExtension<TPath>(this TPath path, string? extension) where TPath : IPath<TPath> =>
         TPath.Create(Path.ChangeExtension(((IPath)path).Value, extension));
 #else
@@ -70,11 +92,33 @@ public static class PathExtensions
     /// or with a new extension-like component if the original file name was empty.
     /// </summary>
     /// <param name="path">The original path.</param>
-    /// <param name="extension">The new extension to apply.</param>
+    /// <param name="extension">
+    ///     <para>
+    ///         The new extension, either with or without the leading dot: both <c>txt</c> and <c>.txt</c> give the
+    ///         same result, since the dot is added when missing.
+    ///     </para>
+    ///     <para>
+    ///         Pass <see langword="null"/> to remove the extension entirely (<c>file.txt</c> becomes <c>file</c>), or
+    ///         an empty string to remove it but keep the trailing dot (<c>file.txt</c> becomes <c>file.</c>).
+    ///     </para>
+    /// </param>
     /// <returns>
     /// A new path of type <see cref="AbsolutePath"/> with the modified file name component.
     /// The original <paramref name="path"/> object is not modified.
     /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         Only the last extension is replaced: for <c>archive.tar.gz</c> and the extension <c>zip</c>, the result
+    ///         is <c>archive.tar.zip</c>. The extension itself may contain dots, so <c>.tar.gz</c> applied to
+    ///         <c>archive.zip</c> gives <c>archive.tar.gz</c>.
+    ///     </para>
+    ///     <para>If the file name has no extension, the new one is appended: <c>file</c> becomes <c>file.txt</c>.</para>
+    ///     <para>
+    ///         A file name consisting entirely of an extension is treated as an extension, consistently with
+    ///         <see cref="GetExtensionWithDot"/>: <c>.gitignore</c> with the extension <c>hgignore</c> becomes
+    ///         <c>.hgignore</c>.
+    ///     </para>
+    /// </remarks>
     public static AbsolutePath WithExtension(this AbsolutePath path, string? extension) =>
         AbsolutePath.Create(Path.ChangeExtension(path.Value, extension));
 
@@ -83,11 +127,33 @@ public static class PathExtensions
     /// or with a new extension-like component if the original file name was empty.
     /// </summary>
     /// <param name="path">The original path.</param>
-    /// <param name="extension">The new extension to apply.</param>
+    /// <param name="extension">
+    ///     <para>
+    ///         The new extension, either with or without the leading dot: both <c>txt</c> and <c>.txt</c> give the
+    ///         same result, since the dot is added when missing.
+    ///     </para>
+    ///     <para>
+    ///         Pass <see langword="null"/> to remove the extension entirely (<c>file.txt</c> becomes <c>file</c>), or
+    ///         an empty string to remove it but keep the trailing dot (<c>file.txt</c> becomes <c>file.</c>).
+    ///     </para>
+    /// </param>
     /// <returns>
     /// A new path of type <see cref="LocalPath"/> with the modified file name component.
     /// The original <paramref name="path"/> object is not modified.
     /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         Only the last extension is replaced: for <c>archive.tar.gz</c> and the extension <c>zip</c>, the result
+    ///         is <c>archive.tar.zip</c>. The extension itself may contain dots, so <c>.tar.gz</c> applied to
+    ///         <c>archive.zip</c> gives <c>archive.tar.gz</c>.
+    ///     </para>
+    ///     <para>If the file name has no extension, the new one is appended: <c>file</c> becomes <c>file.txt</c>.</para>
+    ///     <para>
+    ///         A file name consisting entirely of an extension is treated as an extension, consistently with
+    ///         <see cref="GetExtensionWithDot"/>: <c>.gitignore</c> with the extension <c>hgignore</c> becomes
+    ///         <c>.hgignore</c>.
+    ///     </para>
+    /// </remarks>
     public static LocalPath WithExtension(this LocalPath path, string? extension) =>
         LocalPath.Create(Path.ChangeExtension(path.Value, extension));
 #endif

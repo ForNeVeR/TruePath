@@ -101,6 +101,28 @@ public class PathExtensionsTests
     }
 
     [Theory]
+    [InlineData("file.txt", "md", "file.md")]
+    [InlineData("file.txt", ".md", "file.md")]
+    [InlineData("file", "md", "file.md")]
+    [InlineData("file", ".md", "file.md")]
+    [InlineData("archive.tar.gz", "zip", "archive.tar.zip")]
+    [InlineData("archive.zip", ".tar.gz", "archive.tar.gz")]
+    [InlineData("file.txt", "", "file.")]
+    [InlineData("file.txt", null, "file")]
+    [InlineData(".gitignore", "hgignore", ".hgignore")]
+    public void WithExtensionArgumentTests(string inputPath, string? newExtension, string expected)
+    {
+        // Arrange
+        var path = new LocalPath(inputPath);
+
+        // Act
+        var newPath = path.WithExtension(newExtension);
+
+        // Assert
+        Assert.Equal(expected, newPath.Value);
+    }
+
+    [Theory]
     [InlineData("/", "bar", "/.bar")]
     [InlineData("/file", "bar", "/file.bar")]
     [InlineData("/file", ".bar", "/file.bar")]
