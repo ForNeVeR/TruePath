@@ -52,8 +52,8 @@ public static class PathExtensions
 
 #if NET8_0_OR_GREATER
     /// <summary>
-    /// Returns a new path of the same type <typeparamref name="TPath"/> with the extension of its file name component changed,
-    /// or with a new extension-like component if the original file name was empty.
+    /// Returns a new path of the same type <typeparamref name="TPath"/> with the extension of its file name
+    /// component changed.
     /// </summary>
     /// <typeparam name="TPath">The type of the path, which must implement <see cref="IPath{TPath}"/>.</typeparam>
     /// <param name="path">The original path.</param>
@@ -66,11 +66,28 @@ public static class PathExtensions
     ///         Pass <see langword="null"/> to remove the extension entirely (<c>file.txt</c> becomes <c>file</c>), or
     ///         an empty string to remove it but keep the trailing dot (<c>file.txt</c> becomes <c>file.</c>).
     ///     </para>
+    ///     <para>
+    ///         The extension may not contain a directory separator, and neither <see langword="null"/>, an empty
+    ///         string nor a lone dot may be passed for a file name that consists entirely of an extension: see the
+    ///         exception below.
+    ///     </para>
     /// </param>
     /// <returns>
     /// A new path of type <typeparamref name="TPath"/> with the modified file name component.
     /// The original <paramref name="path"/> object is not modified.
     /// </returns>
+    /// <exception cref="ArgumentException">
+    ///     <para>
+    ///         Thrown if the <paramref name="path"/> has no file name to change: it is empty (which designates the
+    ///         current directory), it consists of a root or a drive designator alone, such as <c>C:\</c>, <c>/</c>
+    ///         or <c>C:</c>, or its last segment is a parent directory reference (<c>..</c>).
+    ///     </para>
+    ///     <para>
+    ///         Also thrown if the requested change would leave something other than a file name in the file name's
+    ///         place: <c>C:\foo\.gitignore</c> with <see langword="null"/> would leave nothing at all, and
+    ///         <c>file.txt</c> with the extension <c>foo/bar</c> would leave a whole new segment.
+    ///     </para>
+    /// </exception>
     /// <remarks>
     ///     <para>
     ///         Only the last extension is replaced: for <c>archive.tar.gz</c> and the extension <c>zip</c>, the result
@@ -81,15 +98,23 @@ public static class PathExtensions
     ///     <para>
     ///         A file name consisting entirely of an extension is treated as an extension, consistently with
     ///         <see cref="GetExtensionWithDot"/>: <c>.gitignore</c> with the extension <c>hgignore</c> becomes
-    ///         <c>.hgignore</c>.
+    ///         <c>.hgignore</c>. <b>Removing</b> the extension of such a name is impossible, though: nothing would
+    ///         be left of the file name.
+    ///     </para>
+    ///     <para>
+    ///         This method changes the extension and nothing else: the path always ends with a file name both
+    ///         before and after the call, and the number and the kind of its segments are always the same. Whenever
+    ///         the requested change would break that, it throws instead of returning a path of a different shape.
     ///     </para>
     /// </remarks>
-    public static TPath WithExtension<TPath>(this TPath path, string? extension) where TPath : IPath<TPath> =>
-        TPath.Create(Path.ChangeExtension(((IPath)path).Value, extension));
+    public static TPath WithExtension<TPath>(this TPath path, string? extension) where TPath : IPath<TPath>
+    {
+        var p = (IPath)path;
+        return TPath.Create(ChangeExtension(p.Value, p.FileName, extension));
+    }
 #else
     /// <summary>
-    /// Returns a new path of type <see cref="AbsolutePath"/> with the extension of its file name component changed,
-    /// or with a new extension-like component if the original file name was empty.
+    /// Returns a new path of type <see cref="AbsolutePath"/> with the extension of its file name component changed.
     /// </summary>
     /// <param name="path">The original path.</param>
     /// <param name="extension">
@@ -100,12 +125,29 @@ public static class PathExtensions
     ///     <para>
     ///         Pass <see langword="null"/> to remove the extension entirely (<c>file.txt</c> becomes <c>file</c>), or
     ///         an empty string to remove it but keep the trailing dot (<c>file.txt</c> becomes <c>file.</c>).
+    ///     </para>
+    ///     <para>
+    ///         The extension may not contain a directory separator, and neither <see langword="null"/>, an empty
+    ///         string nor a lone dot may be passed for a file name that consists entirely of an extension: see the
+    ///         exception below.
     ///     </para>
     /// </param>
     /// <returns>
     /// A new path of type <see cref="AbsolutePath"/> with the modified file name component.
     /// The original <paramref name="path"/> object is not modified.
     /// </returns>
+    /// <exception cref="ArgumentException">
+    ///     <para>
+    ///         Thrown if the <paramref name="path"/> has no file name to change: it is empty (which designates the
+    ///         current directory), it consists of a root or a drive designator alone, such as <c>C:\</c>, <c>/</c>
+    ///         or <c>C:</c>, or its last segment is a parent directory reference (<c>..</c>).
+    ///     </para>
+    ///     <para>
+    ///         Also thrown if the requested change would leave something other than a file name in the file name's
+    ///         place: <c>C:\foo\.gitignore</c> with <see langword="null"/> would leave nothing at all, and
+    ///         <c>file.txt</c> with the extension <c>foo/bar</c> would leave a whole new segment.
+    ///     </para>
+    /// </exception>
     /// <remarks>
     ///     <para>
     ///         Only the last extension is replaced: for <c>archive.tar.gz</c> and the extension <c>zip</c>, the result
@@ -116,15 +158,20 @@ public static class PathExtensions
     ///     <para>
     ///         A file name consisting entirely of an extension is treated as an extension, consistently with
     ///         <see cref="GetExtensionWithDot"/>: <c>.gitignore</c> with the extension <c>hgignore</c> becomes
-    ///         <c>.hgignore</c>.
+    ///         <c>.hgignore</c>. <b>Removing</b> the extension of such a name is impossible, though: nothing would
+    ///         be left of the file name.
+    ///     </para>
+    ///     <para>
+    ///         This method changes the extension and nothing else: the path always ends with a file name both
+    ///         before and after the call, and the number and the kind of its segments are always the same. Whenever
+    ///         the requested change would break that, it throws instead of returning a path of a different shape.
     ///     </para>
     /// </remarks>
     public static AbsolutePath WithExtension(this AbsolutePath path, string? extension) =>
-        AbsolutePath.Create(Path.ChangeExtension(path.Value, extension));
+        AbsolutePath.Create(ChangeExtension(path.Value, path.FileName, extension));
 
     /// <summary>
-    /// Returns a new path of type <see cref="LocalPath"/> with the extension of its file name component changed,
-    /// or with a new extension-like component if the original file name was empty.
+    /// Returns a new path of type <see cref="LocalPath"/> with the extension of its file name component changed.
     /// </summary>
     /// <param name="path">The original path.</param>
     /// <param name="extension">
@@ -136,11 +183,28 @@ public static class PathExtensions
     ///         Pass <see langword="null"/> to remove the extension entirely (<c>file.txt</c> becomes <c>file</c>), or
     ///         an empty string to remove it but keep the trailing dot (<c>file.txt</c> becomes <c>file.</c>).
     ///     </para>
+    ///     <para>
+    ///         The extension may not contain a directory separator, and neither <see langword="null"/>, an empty
+    ///         string nor a lone dot may be passed for a file name that consists entirely of an extension: see the
+    ///         exception below.
+    ///     </para>
     /// </param>
     /// <returns>
     /// A new path of type <see cref="LocalPath"/> with the modified file name component.
     /// The original <paramref name="path"/> object is not modified.
     /// </returns>
+    /// <exception cref="ArgumentException">
+    ///     <para>
+    ///         Thrown if the <paramref name="path"/> has no file name to change: it is empty (which designates the
+    ///         current directory), it consists of a root or a drive designator alone, such as <c>C:\</c>, <c>/</c>
+    ///         or <c>C:</c>, or its last segment is a parent directory reference (<c>..</c>).
+    ///     </para>
+    ///     <para>
+    ///         Also thrown if the requested change would leave something other than a file name in the file name's
+    ///         place: <c>C:\foo\.gitignore</c> with <see langword="null"/> would leave nothing at all, and
+    ///         <c>file.txt</c> with the extension <c>foo/bar</c> would leave a whole new segment.
+    ///     </para>
+    /// </exception>
     /// <remarks>
     ///     <para>
     ///         Only the last extension is replaced: for <c>archive.tar.gz</c> and the extension <c>zip</c>, the result
@@ -151,10 +215,45 @@ public static class PathExtensions
     ///     <para>
     ///         A file name consisting entirely of an extension is treated as an extension, consistently with
     ///         <see cref="GetExtensionWithDot"/>: <c>.gitignore</c> with the extension <c>hgignore</c> becomes
-    ///         <c>.hgignore</c>.
+    ///         <c>.hgignore</c>. <b>Removing</b> the extension of such a name is impossible, though: nothing would
+    ///         be left of the file name.
+    ///     </para>
+    ///     <para>
+    ///         This method changes the extension and nothing else: the path always ends with a file name both
+    ///         before and after the call, and the number and the kind of its segments are always the same. Whenever
+    ///         the requested change would break that, it throws instead of returning a path of a different shape.
     ///     </para>
     /// </remarks>
     public static LocalPath WithExtension(this LocalPath path, string? extension) =>
-        LocalPath.Create(Path.ChangeExtension(path.Value, extension));
+        LocalPath.Create(ChangeExtension(path.Value, path.FileName, extension));
 #endif
+
+    private static bool IsFileName(string segment) =>
+        segment.Length > 0
+        && segment is not ("." or "..")
+        && segment.IndexOf(Path.DirectorySeparatorChar) < 0
+        && segment.IndexOf(Path.AltDirectorySeparatorChar) < 0;
+
+    private static string ChangeExtension(string value, string fileName, string? extension)
+    {
+        if (!IsFileName(fileName))
+            throw new ArgumentException(
+                $"Path \"{value}\" does not end with a file name, so its extension cannot be changed.",
+                "path");
+
+        // A file name consisting entirely of an extension, such as ".gitignore", has nothing left once the extension
+        // is removed: the new file name would either be empty or a lone dot that the normalization drops, and so the
+        // path would lose a segment.
+        var newFileName = Path.ChangeExtension(fileName, extension);
+        if (!IsFileName(newFileName))
+        {
+            var extensionText = extension is null ? "null" : $"\"{extension}\"";
+            throw new ArgumentException(
+                $"Changing the extension of path \"{value}\" to {extensionText} would replace its file name " +
+                $"\"{fileName}\" with \"{newFileName}\", which is not a file name.",
+                nameof(extension));
+        }
+
+        return Path.ChangeExtension(value, extension);
+    }
 }
