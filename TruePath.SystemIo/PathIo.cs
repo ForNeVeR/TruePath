@@ -937,7 +937,7 @@ public static class PathIo
     ///     </para>
     /// </param>
     /// <param name="searchOption">One of the enumeration values that specifies whether the search operation should include only the current directory or should include all subdirectories.</param>
-    /// <returns>An enumerable collection of <see cref="AbsolutePath"/> of the full names (including paths) for the files in the specified directory that match the specified search pattern.</returns>
+    /// <returns>An enumerable collection of <see cref="AbsolutePath"/> of the full names (including paths) for the files in the specified directory that match the specified search pattern and option.</returns>
     public static IEnumerable<AbsolutePath> EnumerateFiles(this AbsolutePath path, string searchPattern, SearchOption searchOption)
     {
         return Directory.EnumerateFiles(path.Value, searchPattern, searchOption)
