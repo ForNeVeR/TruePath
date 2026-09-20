@@ -806,7 +806,7 @@ public static class PathIo
     /// Returns an enumerable collection of <see cref="AbsolutePath"/> of full file names in a specified path.
     /// </summary>
     /// <param name="path">The directory to search.</param>
-    /// <returns>An enumerable collection of <see cref="AbsolutePath"/> of the full names (including paths) for the files in the specified directory that match the specified search pattern.</returns>
+    /// <returns>An enumerable collection of <see cref="AbsolutePath"/> of the full names (including paths) for the files in the specified directory.</returns>
     public static IEnumerable<AbsolutePath> EnumerateFiles(this AbsolutePath path)
     {
         return Directory.EnumerateFiles(path.Value)
