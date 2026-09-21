@@ -46,12 +46,15 @@ public static class PathStrings
     ///     Note that this operation will never perform any file IO, and is purely string manipulation.
     /// </para>
     /// </summary>
+    public static string Normalize(string path) =>
+        Normalize(path, checkDriveLetter: Path.DirectorySeparatorChar == '\\');
+
 #if NET8_0_OR_GREATER
     [SkipLocalsInit] // is necessary to prevent the CLR from filling stackalloc with zeros.
 #endif
-    public static string Normalize(string path)
+    internal static string Normalize(string path, bool checkDriveLetter)
     {
-        bool containsDriveLetter = SourceContainsDriveLetter(path.AsSpan());
+        bool containsDriveLetter = checkDriveLetter && SourceContainsDriveLetter(path.AsSpan());
 
         int written = 0;
 

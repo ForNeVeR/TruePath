@@ -128,6 +128,35 @@ public class PathStringsTests
         }
     }
 
+    [Theory]
+    [InlineData("C:/", "C:")]
+    [InlineData("C:/../file", "file")]
+    public void Normalize_DriveLetterCheckDisabled_TreatsColonAsRegularPathCharacter(string input, string expected)
+    {
+        var actual = PathStrings.Normalize(input, checkDriveLetter: false);
+
+        Assert.Equal(NormalizeSeparators(expected), actual);
+    }
+
+    [Theory]
+    [InlineData("C:/", "C:/")]
+    [InlineData("C:/../file", "C:/../file")]
+    public void Normalize_DriveLetterCheckEnabled_PreservesWindowsDrivePrefix(string input, string expected)
+    {
+        var actual = PathStrings.Normalize(input, checkDriveLetter: true);
+
+        Assert.Equal(NormalizeSeparators(expected), actual);
+    }
+
+    [Fact]
+    public void Normalize_DriveLetterHandling_MatchesCurrentPlatform()
+    {
+        var actual = PathStrings.Normalize("C:/../file");
+        var expected = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "C:/../file" : "file";
+
+        Assert.Equal(NormalizeSeparators(expected), actual);
+    }
+
     private static string NormalizeSeparators(string path) =>
         path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
 }
