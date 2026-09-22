@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Runtime.InteropServices;
 using TruePath.Comparers;
 
 namespace TruePath;
@@ -63,6 +64,38 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     // TODO[#224]: narrowing this to true absolute paths (kind 1 in the taxonomy at IsPrefixOf) requires updating
     // IsPrefixOf in the same change: it relies on this property to tell rooted paths from relative ones.
     public bool IsAbsolute => Path.IsPathRooted(Value);
+
+    /// <summary>
+    /// <para>Gets the root of this path, if it can be determined without resolving against the current directory.</para>
+    /// <list type="bullet">
+    ///     <item>
+    ///         For an absolute path, this is its root: <c>C:\</c> for <c>C:\foo</c> on Windows, <c>/</c> for
+    ///         <c>/foo</c> on Unix.
+    ///     </item>
+    ///     <item>
+    ///         For a drive-relative path on Windows (e.g. <c>C:foo</c> or <c>C:</c>), this is the root of that drive
+    ///         (<c>C:\</c>).
+    ///     </item>
+    ///     <item>
+    ///         For a relative path, or a path rooted without a drive letter on Windows (e.g. <c>\foo</c>), this is
+    ///         <see langword="null"/>.
+    ///     </item>
+    /// </list>
+    /// </summary>
+    public AbsolutePath? PathRoot
+    {
+        get
+        {
+            var root = Path.GetPathRoot(Value);
+            if (string.IsNullOrEmpty(root)) return null;
+            // Drive-relative path (C:foo): the root is still the drive root.
+            if (root.Length == 2 && root[1] == ':')
+                return new AbsolutePath(root + Separator, checkAbsoluteness: false);
+            // Rooted path without a drive (\foo): the root depends on the current drive.
+            if (root.Length == 1 && RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return null;
+            return new AbsolutePath(root, checkAbsoluteness: false);
+        }
+    }
 
     /// <inheritdoc cref="IPath.Parent"/>
     /// <remarks>

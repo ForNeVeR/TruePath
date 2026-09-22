@@ -171,6 +171,52 @@ public class LocalPathTests(ITestOutputHelper output)
         Assert.True(root.IsPrefixOf(subRoot));
     }
 
+    [Theory]
+    [InlineData("")]
+    [InlineData("foo")]
+    [InlineData("foo/bar")]
+    [InlineData("..")]
+    public void PathRootOfRelativePathIsNull(string path)
+    {
+        Assert.Null(new LocalPath(path).PathRoot);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("foo/bar")]
+    public void PathRootOfAbsolutePath(string relativePart)
+    {
+        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var path = new LocalPath(root / relativePart);
+        Assert.Equal(root, path.PathRoot);
+    }
+
+    [Theory]
+    [InlineData(@"C:\foo", @"C:\")]
+    [InlineData(@"C:\", @"C:\")]
+    [InlineData("C:foo", @"C:\")]
+    [InlineData(@"C:foo\bar", @"C:\")]
+    [InlineData("C:", @"C:\")]
+    [InlineData(@"\foo", null)]
+    [InlineData(@"\", null)]
+    public void PathRootOnWindows(string path, string? expectedRoot)
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        AbsolutePath? expected = expectedRoot == null ? null : new AbsolutePath(expectedRoot);
+        Assert.Equal(expected, new LocalPath(path).PathRoot);
+    }
+
+    [Theory]
+    [InlineData("C:foo")]
+    [InlineData("C:")]
+    public void PathRootOfDriveLikePathOnUnixIsNull(string path)
+    {
+        if (OperatingSystem.IsWindows()) return;
+
+        Assert.Null(new LocalPath(path).PathRoot);
+    }
+
     [Fact]
     public void RelativePathIsNormalizedOnCreation()
     {
