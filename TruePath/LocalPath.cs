@@ -15,8 +15,8 @@ namespace TruePath;
 ///     (e.g. the parent of <c>foo</c>).
 /// </para>
 /// <para>
-///     Always stored in a normalized form. Read the documentation on <see cref="TruePath.PathStrings.Normalize"/> to
-///     know what form of normalization the path uses.
+///     Always stored in a normalized form. Read the documentation on <see cref="TruePath.PathStrings.Normalize(string)"/>
+///     to know what form of normalization the path uses.
 /// </para>
 /// </summary>
 public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IComparable<LocalPath>, IPath, IPath<LocalPath>
