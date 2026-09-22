@@ -1,9 +1,12 @@
-// SPDX-FileCopyrightText: 2024 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+// SPDX-FileCopyrightText: 2024-2026 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 //
 // SPDX-License-Identifier: MIT
 
 using System.Buffers;
+using System.Runtime.InteropServices;
+#if NET8_0_OR_GREATER
 using System.Runtime.CompilerServices;
+#endif
 
 namespace TruePath;
 
@@ -47,14 +50,14 @@ public static class PathStrings
     /// </para>
     /// </summary>
     public static string Normalize(string path) =>
-        Normalize(path, checkDriveLetter: Path.DirectorySeparatorChar == '\\');
+        Normalize(path, driveBasedSystem: RuntimeInformation.IsOSPlatform(OSPlatform.Windows));
 
 #if NET8_0_OR_GREATER
     [SkipLocalsInit] // is necessary to prevent the CLR from filling stackalloc with zeros.
 #endif
-    internal static string Normalize(string path, bool checkDriveLetter)
+    internal static string Normalize(string path, bool driveBasedSystem)
     {
-        bool containsDriveLetter = checkDriveLetter && SourceContainsDriveLetter(path.AsSpan());
+        bool containsDriveLetter = driveBasedSystem && SourceContainsDriveLetter(path.AsSpan());
 
         int written = 0;
 
