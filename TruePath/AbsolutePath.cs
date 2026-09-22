@@ -17,8 +17,8 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// <summary>
     /// <para>Provides a default comparer for comparing file paths, aware of the current platform.</para>
     /// <para>
-    ///     On <b>Windows</b> and <b>macOS</b>, this will perform <b>case-insensitive</b> string comparison, since the
-    ///     file systems are case-insensitive on these operating systems by default.
+    /// On <b>Windows</b> and <b>macOS</b>, this will perform <b>case-insensitive</b> string comparison, since the
+    /// file systems are case-insensitive on these operating systems by default.
     /// </para>
     /// <para>On <b>Linux</b>, the comparison will be <b>case-sensitive</b>.</para>
     /// </summary>

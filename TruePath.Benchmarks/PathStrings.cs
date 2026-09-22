@@ -71,29 +71,29 @@ public static class PathStrings
 
     /// <summary>
     /// <para>
-    ///     Will convert a path string to a normalized path, using path separator specific for the current system.
+    /// Will convert a path string to a normalized path, using path separator specific for the current system.
     /// </para>
     /// <para>
-    ///     The normalization includes:
-    ///     <list type="bullet">
-    ///         <item>
-    ///             converting all the <see cref="Path.AltDirectorySeparatorChar"/> to
-    ///             <see cref="Path.DirectorySeparatorChar"/> (e.g. <c>/</c> to <c>\</c> on Windows),
-    ///         </item>
-    ///         <item>
-    ///             collapsing any repeated separators in the input to only one separator (e.g. <c>//</c> to just
-    ///             <c>/</c> on Unix),
-    ///         </item>
-    ///         <item>
-    ///             resolving any sequence of current and parent directory marks (subsequently, <c>.</c> and <c>..</c>)
-    ///             if possible (meaning they will not be replaced if they are in the root position: paths such as
-    ///             <c>.</c> or <c>../..</c> will not be affected by the normalization, while e.g. <c>foo/../.</c> will
-    ///             be resolved to just <c>foo</c>).
-    ///         </item>
-    ///     </list>
+    /// The normalization includes:
+    /// <list type="bullet">
+    ///     <item>
+    ///         converting all the <see cref="Path.AltDirectorySeparatorChar"/> to
+    ///         <see cref="Path.DirectorySeparatorChar"/> (e.g. <c>/</c> to <c>\</c> on Windows),
+    ///     </item>
+    ///     <item>
+    ///         collapsing any repeated separators in the input to only one separator (e.g. <c>//</c> to just
+    ///         <c>/</c> on Unix),
+    ///     </item>
+    ///     <item>
+    ///         resolving any sequence of current and parent directory marks (subsequently, <c>.</c> and <c>..</c>)
+    ///         if possible (meaning they will not be replaced if they are in the root position: paths such as
+    ///         <c>.</c> or <c>../..</c> will not be affected by the normalization, while e.g. <c>foo/../.</c> will
+    ///         be resolved to just <c>foo</c>).
+    ///     </item>
+    /// </list>
     /// </para>
     /// <para>
-    ///     Note that this operation will never perform any file IO, and is purely string manipulation.
+    /// Note that this operation will never perform any file IO, and is purely string manipulation.
     /// </para>
     /// </summary>
     [SkipLocalsInit] // is necessary to prevent the CLR from filling stackalloc with zeros.

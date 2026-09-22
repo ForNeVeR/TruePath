@@ -7,8 +7,8 @@ namespace TruePath;
 /// <summary>
 /// <para>An opaque pattern that may be checked if it corresponds to a local path.</para>
 /// <para>
-///     This is a token type, created with an idea that it should be interpreted in usage-specific way by some external
-///     means.
+/// This is a token type, created with an idea that it should be interpreted in usage-specific way by some external
+/// means.
 /// </para>
 /// </summary>
 /// <param name="Value">

@@ -17,36 +17,36 @@ public static class PathStrings
 
     /// <summary>
     /// <para>
-    ///     Will convert a path string to a normalized path, using path separator specific for the current system.
+    /// Will convert a path string to a normalized path, using path separator specific for the current system.
     /// </para>
     /// <para>
-    ///     The normalization includes:
-    ///     <list type="bullet">
-    ///         <item>
-    ///             converting all the <see cref="Path.AltDirectorySeparatorChar"/> to
-    ///             <see cref="Path.DirectorySeparatorChar"/> (e.g. <c>/</c> to <c>\</c> on Windows),
-    ///         </item>
-    ///         <item>
-    ///             collapsing any repeated separators in the input to only one separator (e.g. <c>//</c> to just
-    ///             <c>/</c> on Unix),
-    ///         </item>
-    ///         <item>
-    ///             resolving any sequence of current and parent directory references (subsequently, <c>.</c> and
-    ///             <c>..</c>) if possible (e.g. <c>foo/../.</c> is resolved to just <c>foo</c>). A path that resolves
-    ///             to the current directory is normalized to an <b>empty</b> path: both <c>.</c> and <c>a/..</c>
-    ///             become <c>&quot;&quot;</c>. Parent directory references that cannot be resolved are preserved,
-    ///             since there is nothing above them to fold into: <c>..</c> and <c>../..</c> are not affected by the
-    ///             normalization,
-    ///         </item>
-    ///         <item>
-    ///             trimming <b>all</b> trailing separators (e.g. <c>a/b/c/d////</c> is normalized to
-    ///             <c>a/b/c/d</c>), except for the case with root folder: <c>X:\</c> (Windows) or <c>/</c> (Unix)
-    ///             doesn't get trimmed.
-    ///         </item>
-    ///     </list>
+    /// The normalization includes:
+    /// <list type="bullet">
+    ///     <item>
+    ///         converting all the <see cref="Path.AltDirectorySeparatorChar"/> to
+    ///         <see cref="Path.DirectorySeparatorChar"/> (e.g. <c>/</c> to <c>\</c> on Windows),
+    ///     </item>
+    ///     <item>
+    ///         collapsing any repeated separators in the input to only one separator (e.g. <c>//</c> to just
+    ///         <c>/</c> on Unix),
+    ///     </item>
+    ///     <item>
+    ///         resolving any sequence of current and parent directory references (subsequently, <c>.</c> and
+    ///         <c>..</c>) if possible (e.g. <c>foo/../.</c> is resolved to just <c>foo</c>). A path that resolves
+    ///         to the current directory is normalized to an <b>empty</b> path: both <c>.</c> and <c>a/..</c>
+    ///         become <c>&quot;&quot;</c>. Parent directory references that cannot be resolved are preserved,
+    ///         since there is nothing above them to fold into: <c>..</c> and <c>../..</c> are not affected by the
+    ///         normalization,
+    ///     </item>
+    ///     <item>
+    ///         trimming <b>all</b> trailing separators (e.g. <c>a/b/c/d////</c> is normalized to
+    ///         <c>a/b/c/d</c>), except for the case with root folder: <c>X:\</c> (Windows) or <c>/</c> (Unix)
+    ///         doesn't get trimmed.
+    ///     </item>
+    /// </list>
     /// </para>
     /// <para>
-    ///     Note that this operation will never perform any file IO, and is purely string manipulation.
+    /// Note that this operation will never perform any file IO, and is purely string manipulation.
     /// </para>
     /// </summary>
     public static string Normalize(string path) =>

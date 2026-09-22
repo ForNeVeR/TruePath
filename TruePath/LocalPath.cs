@@ -10,13 +10,13 @@ namespace TruePath;
 /// <para>A path pointing to a place in the local file system.</para>
 /// <para>It may be either absolute or relative.</para>
 /// <para>
-///     An <b>empty</b> path designates the <b>current directory</b>. Normalizing an empty string, <c>.</c> or
-///     <c>a/..</c> produces it, and so does <see cref="Parent"/> of a relative path consisting of a single segment
-///     (e.g. the parent of <c>foo</c>).
+/// An <b>empty</b> path designates the <b>current directory</b>. Normalizing an empty string, <c>.</c> or
+/// <c>a/..</c> produces it, and so does <see cref="Parent"/> of a relative path consisting of a single segment
+/// (e.g. the parent of <c>foo</c>).
 /// </para>
 /// <para>
-///     Always stored in a normalized form. Read the documentation on <see cref="TruePath.PathStrings.Normalize(string)"/>
-///     to know what form of normalization the path uses.
+/// Always stored in a normalized form. Read the documentation on <see cref="TruePath.PathStrings.Normalize(string)"/>
+/// to know what form of normalization the path uses.
 /// </para>
 /// </summary>
 public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IComparable<LocalPath>, IPath, IPath<LocalPath>
@@ -24,8 +24,8 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     /// <summary>
     /// <para>Provides a default comparer for comparing file paths, aware of the current platform.</para>
     /// <para>
-    ///     On <b>Windows</b> and <b>macOS</b>, this will perform <b>case-insensitive</b> string comparison, since the
-    ///     file systems are case-insensitive on these operating systems by default.
+    /// On <b>Windows</b> and <b>macOS</b>, this will perform <b>case-insensitive</b> string comparison, since the
+    /// file systems are case-insensitive on these operating systems by default.
     /// </para>
     /// <para>On <b>Linux</b>, the comparison will be <b>case-sensitive</b>.</para>
     /// </summary>
@@ -56,8 +56,8 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     /// <summary>
     /// <para>Checks whether the path is absolute.</para>
     /// <para>
-    ///     Currently, any rooted paths are considered absolute, but this is subject to change: on Windows, there
-    ///     will be an additional requirement for a path to be either a DOS device path or start from a disk letter.
+    /// Currently, any rooted paths are considered absolute, but this is subject to change: on Windows, there
+    /// will be an additional requirement for a path to be either a DOS device path or start from a disk letter.
     /// </para>
     /// </summary>
     // TODO[#224]: narrowing this to true absolute paths (kind 1 in the taxonomy at IsPrefixOf) requires updating
@@ -135,14 +135,14 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     /// <inheritdoc cref="IPath{TPath}.IsPrefixOf(TPath)"/>
     /// <remarks>
     /// <para>
-    ///     An <b>empty</b> path designates the current directory. It is a prefix of every relative path that stays
-    ///     at or below that directory, which means every relative path that does not begin with a <c>..</c>
-    ///     reference.
+    /// An <b>empty</b> path designates the current directory. It is a prefix of every relative path that stays
+    /// at or below that directory, which means every relative path that does not begin with a <c>..</c>
+    /// reference.
     /// </para>
     /// <para>
-    ///     An <b>absolute</b> path is never a prefix of a <b>relative</b> one, and vice versa: such a comparison
-    ///     would require resolving the relative path against the current directory, which this type never does. Any
-    ///     pair of paths differing in <see cref="IsAbsolute"/> is reported as unrelated.
+    /// An <b>absolute</b> path is never a prefix of a <b>relative</b> one, and vice versa: such a comparison
+    /// would require resolving the relative path against the current directory, which this type never does. Any
+    /// pair of paths differing in <see cref="IsAbsolute"/> is reported as unrelated.
     /// </para>
     /// </remarks>
     public bool IsPrefixOf(LocalPath other)
