@@ -22,7 +22,7 @@ public class AbsolutePathTests
       var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
       var path = root / "foo" / "bar";
 
-     Assert.Equal(root, path.PathRoot());
+     Assert.Equal(root, path.PathRoot);
     }
 
     [Fact]
@@ -30,7 +30,7 @@ public class AbsolutePathTests
     {
        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
 
-     Assert.Equal(root, root.PathRoot());
+     Assert.Equal(root, root.PathRoot);
     }
 
     [Fact]

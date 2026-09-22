@@ -46,7 +46,7 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// <param name="value">Path string to normalize.</param>
     /// <param name="checkAbsoluteness">Flag indicating whether absoluteness of path should be checked</param>
     /// <exception cref="ArgumentException">Thrown if the passed string does not represent an absolute path.</exception>>
-    private AbsolutePath(string value, bool checkAbsoluteness)
+    internal AbsolutePath(string value, bool checkAbsoluteness)
     {
         Underlying = new LocalPath(value);
 
@@ -74,9 +74,8 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// <inheritdoc cref="IPath.Parent"/>
     public AbsolutePath? Parent => Underlying.Parent is { } path ? new(path.Value, checkAbsoluteness: false) : null;
 
-    /// <summary>Gets the root of this path.</summary>
-    public AbsolutePath PathRoot() =>
-        new(Path.GetPathRoot(Value)!, checkAbsoluteness: false);
+    /// <summary>Gets the root of this path: e.g. <c>C:\</c> on Windows or <c>/</c> on Unix.</summary>
+    public AbsolutePath PathRoot => new(Path.GetPathRoot(Value)!, checkAbsoluteness: false);
 
     /// <inheritdoc cref="IPath.Parent"/>
     IPath? IPath.Parent => Parent;
