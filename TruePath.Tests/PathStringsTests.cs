@@ -133,7 +133,7 @@ public class PathStringsTests
     [InlineData("C:/../file", "file")]
     public void Normalize_DriveLetterCheckDisabled_TreatsColonAsRegularPathCharacter(string input, string expected)
     {
-        var actual = PathStrings.Normalize(input, checkDriveLetter: false);
+        var actual = PathStrings.Normalize(input, driveBasedSystem: false);
 
         Assert.Equal(NormalizeSeparators(expected), actual);
     }
@@ -143,7 +143,7 @@ public class PathStringsTests
     [InlineData("C:/../file", "C:/../file")]
     public void Normalize_DriveLetterCheckEnabled_PreservesWindowsDrivePrefix(string input, string expected)
     {
-        var actual = PathStrings.Normalize(input, checkDriveLetter: true);
+        var actual = PathStrings.Normalize(input, driveBasedSystem: true);
 
         Assert.Equal(NormalizeSeparators(expected), actual);
     }
