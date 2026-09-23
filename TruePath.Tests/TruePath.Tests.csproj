@@ -11,6 +11,7 @@ SPDX-License-Identifier: MIT
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);TRUEPATH001</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

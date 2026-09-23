@@ -193,7 +193,7 @@ public static class PathStrings
     /// <returns>
     ///   <c>true</c> if the source contains a drive letter (e.g., 'C:'); otherwise, <c>false</c>.
     /// </returns>
-    private static bool SourceContainsDriveLetter(ReadOnlySpan<char> source)
+    internal static bool SourceContainsDriveLetter(ReadOnlySpan<char> source)
     {
         if (source.Length < 2)
         {

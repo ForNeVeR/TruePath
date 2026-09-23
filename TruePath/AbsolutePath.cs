@@ -117,19 +117,31 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// <summary>Corrects the file name case on case-insensitive file systems, resolves symlinks.</summary>
     public AbsolutePath Canonicalize() => new(DiskUtils.GetRealPath(Value));
 
-    /// <summary>Appends another path to this one.</summary>
+    /// <summary>
+    /// <para>
+    /// Works the same way as <see cref="LocalPath.op_Division(LocalPath, LocalPath)"/> (read its documentation for
+    /// the details, including the differences from <see cref="Path.Combine(string, string)"/>), except that it throws
+    /// if the result is not absolute.
+    /// </para>
+    /// <para>
+    /// The result designates the same location as changing the current directory first to
+    /// <paramref name="basePath"/>, and then to <paramref name="b"/>: <c>a / b</c> means the same as
+    /// <c>cd /d a &amp;&amp; cd /d b</c> on Windows, or <c>cd a &amp;&amp; cd b</c> on Unix. This is the algorithm
+    /// of C++'s <c>std::filesystem::path::operator/</c>, except that the drive letters are compared
+    /// case-insensitively, and that the result is normalized.
+    /// </para>
+    /// </summary>
     /// <remarks>
-    /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the
-    /// <paramref name="basePath"/> will be ignored.
+    /// A result that is not absolute is only possible on Windows, when appending a path relative to the current
+    /// directory of <b>another</b> drive: e.g. <c>C:\base / D:x</c> would be <c>D:x</c>. On the same drive, such a
+    /// path is resolved against the base path: <c>C:\base / C:x</c> is <c>C:\base\x</c>. A path rooted without a
+    /// drive letter keeps the drive of the base path: <c>C:\base / \x</c> is <c>C:\x</c>.
     /// </remarks>
-    public static AbsolutePath operator /(AbsolutePath basePath, LocalPath b) =>
-        new(Path.Combine(basePath.Value, b.Value), false);
+    /// <exception cref="ArgumentException">Thrown if the resulting path is not absolute.</exception>
+    /// <seealso href="https://eel.is/c++draft/fs.path.append">C++ standard: path appends (fs.path.append)</seealso>
+    public static AbsolutePath operator /(AbsolutePath basePath, LocalPath b) => new(basePath.Underlying / b);
 
-    /// <summary>Appends another path to this one.</summary>
-    /// <remarks>
-    /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the
-    /// <paramref name="basePath"/> will be ignored.
-    /// </remarks>
+    /// <inheritdoc cref="op_Division(AbsolutePath, LocalPath)"/>
     public static AbsolutePath operator /(AbsolutePath basePath, string b) => basePath / new LocalPath(b);
 
     /// <returns>The normalized path string contained in this object.</returns>

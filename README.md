@@ -36,6 +36,10 @@ TruePath provides two NuGet packages:
 
 A third-party package, [**TruePath.TestableIO.System.IO**][nuget.true-path.testableio.system-io], adds [TestableIO.System.IO.Abstractions][testable-io.system.io.abstractions] integration on top of TruePath.
 
+Versioning
+----------
+This project follows [Semantic Versioning][semver], with one exception: the behavior of the types and members marked as `[System.Diagnostics.CodeAnalysis.ExperimentalAttribute]` may change without a major version bump. Using them causes the compiler to report diagnostic `TRUEPATH001`; suppress it (e.g. by adding `<NoWarn>$(NoWarn);TRUEPATH001</NoWarn>` into your project file, or with `#pragma warning disable TRUEPATH001`) to acknowledge that.
+
 Documentation
 -------------
 - [Project Documentation Site][docs]
@@ -68,6 +72,7 @@ The license indication in the project's sources is compliant with the [REUSE spe
 [nuget.true-path.system-io]: https://www.nuget.org/packages/TruePath.SystemIo
 [nuget.true-path.testableio.system-io]: https://www.nuget.org/packages/TruePath.TestableIO.System.IO/
 [nuget.true-path]: https://www.nuget.org/packages/TruePath
+[semver]: https://semver.org/spec/v2.0.0.html
 [reuse.spec]: https://reuse.software/spec-3.3/
 [status-ventis]: https://img.shields.io/badge/status-ventis-yellow.svg
 [testable-io.system.io.abstractions]: https://github.com/TestableIO/System.IO.Abstractions
