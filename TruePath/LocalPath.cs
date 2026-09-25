@@ -119,13 +119,17 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     /// <inheritdoc cref="IPath.Parent"/>
     /// <remarks>
     /// The parent of a relative path consisting of a single segment is the <b>empty</b> path (the current
-    /// directory), not <see langword="null"/>.
+    /// directory), not <see langword="null"/>. Similarly, on Windows, the parent of a bare drive (<c>C:</c>, the
+    /// current directory of that drive) is <c>C:..</c>.
     /// </remarks>
     public LocalPath? Parent
     {
         get
         {
-            if (Value == "" || Value == ".." || Value.EndsWith($"{Separator}..")) return this / "..";
+            // For C:foo, the rest after the drive letter is a relative path, and follows the same rules.
+            var relativePart = Kind == PathKind.DriveCurrentDirectoryRelative ? Value[2..] : Value;
+            if (relativePart == "" || relativePart == ".." || relativePart.EndsWith($"{Separator}.."))
+                return this / "..";
             return Path.GetDirectoryName(Value) is { } parent ? new(parent) : null;
         }
     }

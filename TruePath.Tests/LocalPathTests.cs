@@ -58,6 +58,21 @@ public class LocalPathTests(ITestOutputHelper output)
     }
 
     [Theory]
+    [InlineData("C:", "C:..")]
+    [InlineData("C:..", @"C:..\..")]
+    [InlineData(@"C:..\..", @"C:..\..\..")]
+    [InlineData("C:foo", "C:")]
+    [InlineData(@"C:foo\bar", "C:foo")]
+    public void DriveRelativePathParent(string path, string expected)
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var parent = new LocalPath(path).Parent;
+
+        Assert.Equal(expected, parent?.Value);
+    }
+
+    [Theory]
     [InlineData("user", "user/documents")]
     [InlineData("usEr", "User/documents")]
     [InlineData("user/documents", "user/documents")]
