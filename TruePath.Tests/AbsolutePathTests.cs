@@ -275,7 +275,6 @@ public class AbsolutePathTests
         Assert.Equal(expectedPath, absolutePath.Value);
     }
 
-
     [Theory]
     [InlineData(@"/...")]
     [InlineData(@"/..SomeFolder")]
@@ -300,7 +299,6 @@ public class AbsolutePathTests
     [InlineData(@"/../()")]
     [InlineData(@"/./..")]
     [InlineData(@"/./../.")]
-
     public void ConstructorThrowsOnInvalidPathInUnix(string path)
     {
         if (OperatingSystem.IsWindows()) return;
@@ -325,13 +323,11 @@ public class AbsolutePathTests
         Assert.Equal(expectedPath, absolutePath.Value);
     }
 
-
     [Theory]
     [InlineData(@"C:\...")]
     [InlineData(@"C:\..SomeFolder")]
     [InlineData(@"C:\..00")]
     [InlineData(@"C:\..#")]
-
     public void ConstructorCreatesValidPathCorrectlyInWindows(string path)
     {
         if (OperatingSystem.IsWindows() is false) return;
@@ -351,7 +347,6 @@ public class AbsolutePathTests
     [InlineData(@"C:\..\()")]
     [InlineData(@"C:\.\..")]
     [InlineData(@"C:\.\..\.")]
-
     public void ConstructorThrowsOnInvalidPathInWindows(string path)
     {
         if (OperatingSystem.IsWindows() is false) return;
