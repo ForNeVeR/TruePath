@@ -19,7 +19,9 @@ This library aims to fill this gap by providing a set of types that represent pa
 
 Also, the methods in the library provide some qualities that are missing from the `System.IO.Path`: say, we aim to provide several ways of path normalization and comparison, the ones that will and will not perform disk IO to resolve paths on case-insensitive file systems.
 
-The library is inspired by the path libraries used in other ecosystems: in particular, Java's [java.nio.file.Path][java.path] and [Kotlin's extensions][kotlin.path].
+The library is inspired by the path libraries used in other ecosystems, in no particular order:
+- Java's [java.nio.file.Path][java.path] and [Kotlin's extensions][kotlin.path] for general API shape;
+- [\[fs.path.append\]][cpp.fs.path.append] from the C++ standard for path concatenation algorithms.
 
 Project Summary
 ---------------
@@ -116,8 +118,8 @@ To convert the path to the canonical form, use `AbsolutePath::Canonicalize`.
 [api.local-path-pattern]: api/TruePath.LocalPathPattern.yml
 [api.local-path]: api/TruePath.LocalPath.yml
 [api.path-io]: api/TruePath.SystemIo.PathIo.yml
-[api.reference]: api/TruePath.yml
 [api.temporary]: api/TruePath.Temporary.yml
+[cpp.fs.path.append]: https://eel.is/c++draft/fs.path.append
 [file-system-globbing.nuget]: https://www.nuget.org/packages/Microsoft.Extensions.FileSystemGlobbing
 [issue.20]: https://github.com/ForNeVeR/TruePath/issues/20
 [java.path]: https://docs.oracle.com/en%2Fjava%2Fjavase%2F21%2Fdocs%2Fapi%2F%2F/java.base/java/nio/file/Path.html
