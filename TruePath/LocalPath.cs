@@ -57,6 +57,21 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
         value.Length >= 2 && value[0] == '.' && value[1] == '.'
         && (value.Length == 2 || value[2] == Separator);
 
+    /// <summary>
+    /// Strips the leading <c>..</c> references off a normalized path, and returns their number.
+    /// </summary>
+    private static int SkipLeadingParentReferences(ref ReadOnlySpan<char> value)
+    {
+        var count = 0;
+        while (StartsWithParentDirectoryReference(value))
+        {
+            count++;
+            value = value.Length == 2 ? ReadOnlySpan<char>.Empty : value.Slice(3);
+        }
+
+        return count;
+    }
+
     /// <inheritdoc cref="IPath.Value"/>
     public string Value { get; } = PathStrings.Normalize(value);
 
@@ -210,6 +225,12 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     /// current directory, which this type never does.
     /// </para>
     /// <para>
+    /// For <b>relative</b> paths, leading <c>..</c> references are taken into account as levels above the current
+    /// directory rather than compared as strings. A bare train of <c>..</c> references is a prefix of every relative
+    /// path starting at or below it (e.g. <c>..</c> is a prefix of <c>foo</c>), while a path starting lower is
+    /// never a prefix of one starting higher (e.g. <c>..</c> is not a prefix of <c>../..</c>).
+    /// </para>
+    /// <para>
     /// On Windows, paths relative to the current directory of a drive (such as <c>C:Windows</c>) are only related
     /// if they have the same drive letter. A bare drive (<c>C:</c>) designates that drive's current directory, and
     /// behaves the same way as the empty path does for relative paths.
@@ -233,6 +254,21 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
             if (!IsSameDrive(Value, other.Value)) return false;
             prefix = prefix.Slice(2);
             path = path.Slice(2);
+        }
+
+        if (kind is PathKind.Relative or PathKind.DriveCurrentDirectoryRelative)
+        {
+            // A relative path starts some number of levels above the current directory: one per leading ".."
+            // reference. Normalization only ever keeps such references at the very start of a path, so a relative
+            // path is fully described by that number and the segments that follow.
+            var parentReferences = SkipLeadingParentReferences(ref prefix);
+            var otherParentReferences = SkipLeadingParentReferences(ref path);
+
+            // A path starting higher up contains the other one only if it is a bare train of ".." references:
+            // otherwise, it descends into a directory whose name would only be known after resolving the current
+            // directory. A path starting lower down never contains one starting higher up.
+            if (parentReferences != otherParentReferences)
+                return parentReferences > otherParentReferences && prefix.Length == 0;
         }
 
         return IsSegmentPrefix(prefix, path);

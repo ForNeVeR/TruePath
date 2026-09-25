@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - The platform-default path comparers (`LocalPath.PlatformDefaultComparer`, `AbsolutePath.PlatformDefaultComparer`) are now case-insensitive on iOS and tvOS as well, matching the .NET runtime.
 
 ### Fixed
+- [#226](https://github.com/ForNeVeR/TruePath/issues/226): `LocalPath.IsPrefixOf` and `StartsWith` now take leading `..` references of relative paths into account instead of comparing them as strings. For example, `new LocalPath("..").IsPrefixOf(new LocalPath("foo"))` is now `true`, and `new LocalPath("..").IsPrefixOf(new LocalPath("../.."))` is now `false`.
 - [#225](https://github.com/ForNeVeR/TruePath/issues/225): Make path prefix checks use the same platform-default case sensitivity as path equality.
 - `LocalPath.IsPrefixOf` and `StartsWith` now compare path strings ordinally. Previously they used the current culture, which ignores collation-ignorable characters, so a path could be reported as a prefix of an unrelated one.
 - Path normalization no longer drops the root separator when a rooted path ends with `..`: `C:\base\..` is now normalized to `C:\` (was `C:`, a path relative to the current directory of drive `C:`), and `/base/..` to `/` (was an empty path, i.e. the current directory). This affects `PathStrings.Normalize`, `LocalPath` and `AbsolutePath`.
