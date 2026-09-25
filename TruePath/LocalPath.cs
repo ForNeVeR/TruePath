@@ -50,6 +50,32 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
         value.Length >= 2 && value[0] == '.' && value[1] == '.'
         && (value.Length == 2 || value[2] == Separator);
 
+    /// <summary>
+    /// Splits a normalized path into the number of its leading <c>..</c> references and the rest of the path.
+    /// </summary>
+    private static (int ParentReferences, string Remainder) SplitLeadingParentReferences(string value)
+    {
+        var count = 0;
+        while (StartsWithParentDirectoryReference(value))
+        {
+            count++;
+            value = value.Length == 2 ? "" : value.Substring(3);
+        }
+
+        return (count, value);
+    }
+
+    private static bool IsSegmentPrefix(string prefix, string path)
+    {
+        if (prefix.Length == 0) return true;
+        if (!(prefix.Length <= path.Length &&
+              path.StartsWith(prefix, PlatformDefaultPathComparer<LocalPath>.DefaultStringComparison)))
+            return false;
+        return path.Length == prefix.Length ||
+               prefix[prefix.Length - 1] == Separator ||
+               path[prefix.Length] == Separator;
+    }
+
     /// <inheritdoc cref="IPath.Value"/>
     public string Value { get; } = PathStrings.Normalize(value);
 
@@ -140,6 +166,12 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     /// reference.
     /// </para>
     /// <para>
+    /// For <b>relative</b> paths, leading <c>..</c> references are taken into account as levels above the current
+    /// directory rather than compared as strings. A bare train of <c>..</c> references is a prefix of every relative
+    /// path starting at or below it (e.g. <c>..</c> is a prefix of <c>foo</c>), while a path starting lower is
+    /// never a prefix of one starting higher (e.g. <c>..</c> is not a prefix of <c>../..</c>).
+    /// </para>
+    /// <para>
     /// An <b>absolute</b> path is never a prefix of a <b>relative</b> one, and vice versa: such a comparison
     /// would require resolving the relative path against the current directory, which this type never does. Any
     /// pair of paths differing in <see cref="IsAbsolute"/> is reported as unrelated.
@@ -160,17 +192,21 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
         // field or property and matched on here.
         if (IsAbsolute != other.IsAbsolute) return false;
 
-        // The empty path is the current directory, so every path at or below it has it as a prefix - but one
-        // starting with a ".." reference points outside it. Normalization only ever keeps such references at the
-        // very start of a path, so testing the first segment is enough.
-        if (Value.Length == 0) return !StartsWithParentDirectoryReference(other.Value);
+        if (IsAbsolute) return IsSegmentPrefix(Value, other.Value);
 
-        if (!(Value.Length <= other.Value.Length &&
-              other.Value.StartsWith(Value, PlatformDefaultPathComparer<LocalPath>.DefaultStringComparison)))
-            return false;
-        return other.Value.Length == Value.Length ||
-               Value[Value.Length - 1] == Separator ||
-               other.Value[Value.Length] == Separator;
+        // A relative path starts some number of levels above the current directory: one per leading ".."
+        // reference. Normalization only ever keeps such references at the very start of a path, so a relative path
+        // is fully described by that number and the segments that follow.
+        var (parentReferences, rest) = SplitLeadingParentReferences(Value);
+        var (otherParentReferences, otherRest) = SplitLeadingParentReferences(other.Value);
+
+        // A path starting higher up contains the other one only if it is a bare train of ".." references: otherwise,
+        // it descends into a directory whose name would only be known after resolving the current directory.
+        // A path starting lower down never contains one starting higher up.
+        if (parentReferences != otherParentReferences)
+            return parentReferences > otherParentReferences && rest.Length == 0;
+
+        return IsSegmentPrefix(rest, otherRest);
     }
 
     /// <summary>
