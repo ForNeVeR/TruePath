@@ -78,7 +78,7 @@ jobs:
     - name: Verify encoding
       shell: pwsh
       run: scripts/Test-Encoding.ps1
-  nowarn-empty:
+  xml-doc:
     runs-on: ubuntu-26.04
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
@@ -94,7 +94,5 @@ jobs:
       with:
         key: ${{ runner.os }}.nuget.${{ hashFiles('**/*.*proj', '**/*.props') }}
         path: ${{ env.NUGET_PACKAGES }}
-    - name: Check out the sources
-      uses: actions/checkout@v7
-    - name: Verify with NoWarn as empty
-      run: dotnet build /p:NoWarn='' --no-incremental
+    - name: Verify XML documentation
+      run: dotnet build -p:CheckXmlDoc=true --no-incremental
