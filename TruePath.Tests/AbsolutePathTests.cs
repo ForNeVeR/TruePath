@@ -19,18 +19,18 @@ public class AbsolutePathTests
     [Fact]
     public void PathRootReturnsRoot()
     {
-      var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
-      var path = root / "foo" / "bar";
+        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var path = root / "foo" / "bar";
 
-     Assert.Equal(root, path.PathRoot());
+        Assert.Equal(root, path.PathRoot());
     }
 
     [Fact]
     public void PathRootOfRootReturnsItself()
     {
-       var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
 
-     Assert.Equal(root, root.PathRoot());
+        Assert.Equal(root, root.PathRoot());
     }
 
     [Fact]
@@ -259,6 +259,107 @@ public class AbsolutePathTests
         const string path = @"C:/Users/John Doe\Documents";
         var absolutePath = new AbsolutePath(path);
         Assert.Equal(@"C:\Users\John Doe\Documents", absolutePath.Value);
+    }
+
+    [Theory]
+    [InlineData(@"/.")]
+    [InlineData(@"/./.")]
+    [InlineData(@"/././.")]
+    public void ConstructorCreatesValidPathWithDotInUnix(string path)
+    {
+        if (OperatingSystem.IsWindows()) return;
+        const string expectedPath = @"/";
+
+        var absolutePath = new AbsolutePath(path);
+
+        Assert.Equal(expectedPath, absolutePath.Value);
+    }
+
+
+    [Theory]
+    [InlineData(@"/...")]
+    [InlineData(@"/..SomeFolder")]
+    [InlineData(@"/..00")]
+    [InlineData(@"/..#")]
+    public void ConstructorCreatesValidPathCorrectlyInUnix(string path)
+    {
+        if (OperatingSystem.IsWindows()) return;
+
+        var absolutePath = new AbsolutePath(path);
+
+        Assert.Equal(path, absolutePath.Value);
+    }
+
+    [Theory]
+    [InlineData(@"/../")]
+    [InlineData(@"/../..")]
+    [InlineData(@"/../../SomeFolder")]
+    [InlineData(@"/../.SomeFolder")]
+    [InlineData(@"/../SomeFolder")]
+    [InlineData(@"/../1123")]
+    [InlineData(@"/../()")]
+    [InlineData(@"/./..")]
+    [InlineData(@"/./../.")]
+
+    public void ConstructorThrowsOnInvalidPathInUnix(string path)
+    {
+        if (OperatingSystem.IsWindows()) return;
+        string expectedMessage = $"Path \"{path}\" is not valid.";
+
+        var ex = Assert.Throws<ArgumentException>(() => new AbsolutePath(path));
+
+        Assert.Equal(expectedMessage, ex.Message);
+    }
+
+    [Theory]
+    [InlineData(@"C:\.")]
+    [InlineData(@"C:\.\.")]
+    [InlineData(@"C:\.\.\.")]
+    public void ConstructorCreatesValidPathWithDotInWindows(string path)
+    {
+        if (OperatingSystem.IsWindows() is false) return;
+        const string expectedPath = @"C:\";
+
+        var absolutePath = new AbsolutePath(path);
+
+        Assert.Equal(expectedPath, absolutePath.Value);
+    }
+
+
+    [Theory]
+    [InlineData(@"C:\...")]
+    [InlineData(@"C:\..SomeFolder")]
+    [InlineData(@"C:\..00")]
+    [InlineData(@"C:\..#")]
+
+    public void ConstructorCreatesValidPathCorrectlyInWindows(string path)
+    {
+        if (OperatingSystem.IsWindows() is false) return;
+
+        var absolutePath = new AbsolutePath(path);
+
+        Assert.Equal(path, absolutePath.Value);
+    }
+
+    [Theory]
+    [InlineData(@"C:\..\")]
+    [InlineData(@"C:\..\..")]
+    [InlineData(@"C:\..\..SomeFolder")]
+    [InlineData(@"C:\..\.SomeFolder")]
+    [InlineData(@"C:\..\SomeFolder")]
+    [InlineData(@"C:\..\1123")]
+    [InlineData(@"C:\..\()")]
+    [InlineData(@"C:\.\..")]
+    [InlineData(@"C:\.\..\.")]
+
+    public void ConstructorThrowsOnInvalidPathInWindows(string path)
+    {
+        if (OperatingSystem.IsWindows() is false) return;
+        string expectedMessage = $"Path \"{path}\" is not valid.";
+
+        var ex = Assert.Throws<ArgumentException>(() => new AbsolutePath(path));
+
+        Assert.Equal(expectedMessage, ex.Message);
     }
 
     [Fact]
