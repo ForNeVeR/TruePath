@@ -1,15 +1,15 @@
-// SPDX-FileCopyrightText: 2025 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+// SPDX-FileCopyrightText: 2025-2026 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 //
 // SPDX-License-Identifier: MIT
 
 #if !NET8_0_OR_GREATER
-// ReSharper disable once CheckNamespace
-namespace System.IO;
+
+namespace TruePath.Polyfills;
 
 /// <summary>
 /// Class that contains custom implementations methods of <see cref="Directory"/> class presented in .NET 8 but missing in .NET Standard 2.0.
 /// </summary>
-internal static class DirectoryEx
+internal static class DirectoryPolyfills
 {
     public static DirectoryInfo CreateTempSubdirectory(string? prefix = null)
     {

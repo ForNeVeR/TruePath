@@ -1,9 +1,12 @@
-// SPDX-FileCopyrightText: 2024 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+// SPDX-FileCopyrightText: 2024-2026 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 //
 // SPDX-License-Identifier: MIT
 
 using System.Runtime.InteropServices;
 using TruePath.Comparers;
+#if !NET8_0_OR_GREATER
+using TruePath.Extensions;
+#endif
 
 namespace TruePath;
 
@@ -119,7 +122,7 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
 #if NET8_0_OR_GREATER
     public LocalPath RelativeTo(AbsolutePath basePath) => new(Path.GetRelativePath(basePath.Value, Value));
 #else
-    public LocalPath RelativeTo(AbsolutePath basePath) => new(PathEx.GetRelativePath(basePath.Value, Value));
+    public LocalPath RelativeTo(AbsolutePath basePath) => new(PathPolyfill.GetRelativePath(basePath.Value, Value));
 #endif
     /// <summary>Corrects the file name case on case-insensitive file systems, resolves symlinks.</summary>
     public AbsolutePath Canonicalize() => new(DiskUtils.GetRealPath(Value));

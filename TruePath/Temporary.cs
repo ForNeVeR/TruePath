@@ -1,6 +1,10 @@
-// SPDX-FileCopyrightText: 2024 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+// SPDX-FileCopyrightText: 2024-2026 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 //
 // SPDX-License-Identifier: MIT
+
+#if !NET8_0_OR_GREATER
+using TruePath.Polyfills;
+#endif
 
 namespace TruePath;
 
@@ -40,7 +44,7 @@ public static class Temporary
 #if NET8_0_OR_GREATER
         var tempDirectoryInfo = Directory.CreateTempSubdirectory(prefix);
 #else
-        var tempDirectoryInfo = DirectoryEx.CreateTempSubdirectory(prefix);
+        var tempDirectoryInfo = DirectoryPolyfills.CreateTempSubdirectory(prefix);
 #endif
         return AbsolutePath.CurrentWorkingDirectory / tempDirectoryInfo.FullName;
     }

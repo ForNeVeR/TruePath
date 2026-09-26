@@ -4,6 +4,9 @@
 
 using System.Runtime.InteropServices;
 using TruePath.Comparers;
+#if !NET8_0_OR_GREATER
+using TruePath.Extensions;
+#endif
 
 namespace TruePath;
 
@@ -236,7 +239,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
         // very start of a path, so testing the first segment is enough.
         if (prefix.Length == 0) return !StartsWithParentDirectoryReference(path);
 
-        if (!path.StartsWith(prefix, PlatformDefaultPathComparer<LocalPath>.DefaultStringComparison))
+        if (!path.StartsWith(prefix, PlatformDefaultPathComparer.DefaultStringComparison))
             return false;
         return path.Length == prefix.Length ||
                prefix[^1] == Separator ||
@@ -274,7 +277,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
 #if NET8_0_OR_GREATER
         return new(Path.GetRelativePath(relativeTo, path));
 #else
-        return new(PathEx.GetRelativePath(relativeTo, path));
+        return new(PathPolyfill.GetRelativePath(relativeTo, path));
 #endif
     }
 
