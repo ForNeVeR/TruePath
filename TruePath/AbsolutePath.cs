@@ -108,7 +108,14 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// Calculates the relative path from a base path to this path.
     /// </summary>
     /// <param name="basePath">The base path from which to calculate the relative path.</param>
-    /// <returns>The relative path from the base path to this path.</returns>
+    /// <returns>
+    /// The relative path from the base path to this path, or this path itself if the paths have different roots.
+    /// </returns>
+    /// <remarks>
+    /// If the paths have different roots (on Windows, e.g. paths on different drives), there's no relative path
+    /// between them, and this path is returned unchanged: <c>D:\x</c> relative to <c>C:\y</c> is <c>D:\x</c>. On
+    /// Unix, all paths share the same root, so this never happens.
+    /// </remarks>
 #if NET8_0_OR_GREATER
     public LocalPath RelativeTo(AbsolutePath basePath) => new(Path.GetRelativePath(basePath.Value, Value));
 #else

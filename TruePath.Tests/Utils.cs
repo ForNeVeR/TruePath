@@ -29,6 +29,11 @@ public static class Utils
     /// <inheritdoc cref="SyntheticRootString"/>
     internal static AbsolutePath SyntheticRoot => new(SyntheticRootString);
 
+    internal static AbsolutePath NonCurrentSyntheticRoot =>
+        AbsolutePath.CurrentWorkingDirectory.PathRoot == SyntheticRoot
+            ? new AbsolutePath(@"B:\")
+            : SyntheticRoot;
+
     internal static bool IsPlatformCaseInsensitive() =>
         OperatingSystem.IsWindows() || OperatingSystem.IsMacOS();
 

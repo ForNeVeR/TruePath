@@ -330,12 +330,27 @@ public class AbsolutePathTests
     }
 
     [Theory]
+    [InlineData("a/c", "a/b", "../b")]
+    [InlineData("a", "a", ".")]
+    public void RelativeToReturnsCorrectRelativePathCrossPlatform(string from, string to, string expected)
+    {
+        var fromPath = Utils.SyntheticRoot / from;
+        var toPath = Utils.SyntheticRoot / to;
+
+        LocalPath relativePath = toPath.RelativeTo(fromPath);
+
+        Assert.Equal(new LocalPath(expected), relativePath);
+    }
+
+    [Theory]
     [InlineData(@"C:\bin", @"D:\bin", @"D:\bin")]
+    [InlineData(@"C:\bin", @"D:\bin\x", @"D:\bin\x")]
     [InlineData(@"C:\bin\debug", @"C:\bin", "..")]
     [InlineData(@"C:\bin", @"C:\bin\log", "log")]
+    [InlineData(@"c:\bin", @"C:\bin\log", "log")]
     public void RelativeToReturnsCorrectRelativePathForWindows(string from, string to, string expected)
     {
-        if (OperatingSystem.IsWindows() is false) return;
+        if (!OperatingSystem.IsWindows()) return;
 
         var fromPath = new AbsolutePath(from);
         var toPath = new AbsolutePath(to);

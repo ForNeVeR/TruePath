@@ -2,13 +2,16 @@
 //
 // SPDX-License-Identifier: MIT
 
-#if !NET8_0_OR_GREATER
 // ReSharper disable once CheckNamespace
 namespace System.IO;
 
 /// <summary>
 /// Class that contains custom implementations methods of <see cref="Path"/> class presented in .NET 8 but missing in .NET Standard 2.0.
 /// </summary>
+/// <remarks>
+/// Only used by the .NET Standard 2.0 build, but compiled for every target, so it can be tested against the
+/// implementations in <see cref="Path"/>.
+/// </remarks>
 internal static class PathEx
 {
     public static string GetRelativePath(string relativeTo, string path)
@@ -28,4 +31,3 @@ internal static class PathEx
         return relativePath.Replace('/', Path.DirectorySeparatorChar);
     }
 }
-#endif

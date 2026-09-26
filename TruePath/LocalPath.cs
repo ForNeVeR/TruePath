@@ -249,12 +249,35 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     /// Calculates the relative path from a base path to this path.
     /// </summary>
     /// <param name="basePath">The base path from which to calculate the relative path.</param>
-    /// <returns>The relative path from the base path to this path.</returns>
+    /// <returns>
+    /// The relative path from the base path to this path, or the resolved absolute path to this path if the paths
+    /// have different roots.
+    /// </returns>
+    /// <remarks>
+    /// <para>
+    /// If either path is not absolute, it is first <b>resolved</b> against the current directory, the same way
+    /// <see cref="ResolveToCurrentDirectory"/> does, so the result may depend on the current directory (or a
+    /// drive-specific current directory on Windows). Two relative paths are resolved against the same directory, so
+    /// <c>a/b</c> relative to <c>a</c> is <c>b</c>. An empty path designates the current directory.
+    /// </para>
+    /// <para>
+    /// If the resolved paths have different roots (on Windows, e.g. paths on different drives), there's no relative
+    /// path between them, and the resolved <b>absolute</b> path to this path is returned instead: <c>D:\x</c>
+    /// relative to <c>C:\y</c> is <c>D:\x</c>. On Unix, all paths share the same root, so this never happens.
+    /// </para>
+    /// </remarks>
+    public LocalPath RelativeTo(LocalPath basePath)
+    {
+        // An empty value means the current directory, but GetRelativePath doesn't work for empty strings.
+        var relativeTo = basePath.Value.Length == 0 ? "." : basePath.Value;
+        var path = Value.Length == 0 ? "." : Value;
 #if NET8_0_OR_GREATER
-    public LocalPath RelativeTo(LocalPath basePath) => new(Path.GetRelativePath(basePath.Value, Value));
+        return new(Path.GetRelativePath(relativeTo, path));
 #else
-    public LocalPath RelativeTo(LocalPath basePath) => new(PathEx.GetRelativePath(basePath.Value, Value));
+        return new(PathEx.GetRelativePath(relativeTo, path));
 #endif
+    }
+
     /// <summary>Appends another path to this one.</summary>
     /// <param name="basePath">The path to append to.</param>
     /// <param name="b">The path to append.</param>

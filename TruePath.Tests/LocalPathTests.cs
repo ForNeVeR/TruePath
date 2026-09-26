@@ -289,6 +289,73 @@ public class LocalPathTests(ITestOutputHelper output)
     }
 
     [Theory]
+    [InlineData("a", "a/b", "b")]
+    [InlineData("a/b", "a", "..")]
+    [InlineData("a/c", "a/b", "../b")]
+    [InlineData("a", "a", "")]
+    public void RelativeToForRelativePaths(string from, string to, string expected)
+    {
+        var relativePath = new LocalPath(to).RelativeTo(new LocalPath(from));
+        Assert.Equal(new LocalPath(expected), relativePath);
+    }
+
+    [Fact]
+    public void RelativeToResolvesAgainstCurrentDirectory()
+    {
+        var currentDirectory = AbsolutePath.CurrentWorkingDirectory;
+        var foo = new LocalPath("foo");
+
+        Assert.Equal(foo, foo.RelativeTo(currentDirectory));
+        Assert.Equal(foo, new LocalPath(currentDirectory / "foo").RelativeTo(new LocalPath("")));
+        Assert.Equal(foo, foo.RelativeTo(new LocalPath(".")));
+    }
+
+    [Theory]
+    [InlineData(@"C:\a", @"C:\a\b", "b")] // PathKind.Absolute
+    [InlineData("a", @"a\b", "b")] // PathKind.Relative
+    [InlineData(@"\a", @"\a\b", "b")] // PathKind.DriveRootRelative
+    [InlineData(@"A:x", @"A:x\y", "y")] // PathKind.DriveCurrentDirectoryRelative
+    public void RelativeToForPathKindsOnWindows(string from, string to, string expected)
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var relativePath = new LocalPath(to).RelativeTo(new LocalPath(from));
+        Assert.Equal(new LocalPath(expected), relativePath);
+    }
+
+    [Fact]
+    public void RelativeToForMixedPathKindsOnWindows()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var currentDirectory = AbsolutePath.CurrentWorkingDirectory;
+        var drive = currentDirectory.PathRoot;
+        var foo = new LocalPath("foo");
+        var driveCurrentDir = new LocalPath($"{drive.Value.Substring(0, 2)}");
+        Assert.Equal(PathKind.DriveCurrentDirectoryRelative, driveCurrentDir.Kind);
+
+        Assert.Equal(foo, new LocalPath(@"\foo").RelativeTo(drive));
+        Assert.Equal(foo, (driveCurrentDir / "foo").RelativeTo(currentDirectory));
+        Assert.Equal(foo, new LocalPath(currentDirectory / "foo").RelativeTo(driveCurrentDir));
+    }
+
+    [Fact]
+    public void RelativeToReturnsAbsolutePathForDifferentRootsOnWindows()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        Assert.Equal(new LocalPath(@"D:\x"), new LocalPath(@"D:\x").RelativeTo(new LocalPath(@"C:\y")));
+        Assert.Equal(
+            new LocalPath(new LocalPath("B:x").ResolveToCurrentDirectory()),
+            new LocalPath("B:x").RelativeTo(new LocalPath(@"A:\y")));
+
+        var currentDirectory = AbsolutePath.CurrentWorkingDirectory;
+        Assert.Equal(
+            new LocalPath(currentDirectory / "foo"),
+            new LocalPath("foo").RelativeTo(Utils.NonCurrentSyntheticRoot));
+    }
+
+    [Theory]
     [InlineData(@"C:\", PathKind.Absolute)]
     [InlineData(@"C:\Windows", PathKind.Absolute)]
     [InlineData("c:/windows/system32", PathKind.Absolute)]
