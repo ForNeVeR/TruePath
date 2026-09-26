@@ -12,7 +12,7 @@ public class LocalPathTests(ITestOutputHelper output)
     [InlineData("/", null)]
     public void AbsolutePathParent(string relativePath, string? expectedRelativePath)
     {
-        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var root = Utils.SyntheticRoot;
         var parent = root / relativePath;
         AbsolutePath? expectedPath = expectedRelativePath == null ? null : new(root / expectedRelativePath);
         Assert.Equal(expectedPath, parent.Parent);
@@ -55,6 +55,21 @@ public class LocalPathTests(ITestOutputHelper output)
 
         // Assert
         Assert.Equal(expectedPath, parent);
+    }
+
+    [Theory]
+    [InlineData("C:", "C:..")]
+    [InlineData("C:..", @"C:..\..")]
+    [InlineData(@"C:..\..", @"C:..\..\..")]
+    [InlineData("C:foo", "C:")]
+    [InlineData(@"C:foo\bar", "C:foo")]
+    public void DriveRelativePathParent(string path, string expected)
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var parent = new LocalPath(path).Parent;
+
+        Assert.Equal(expected, parent?.Value);
     }
 
     [Theory]
@@ -166,9 +181,55 @@ public class LocalPathTests(ITestOutputHelper output)
     [Fact]
     public void IsPrefixOfRooted()
     {
-        var root = new LocalPath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var root = new LocalPath(Utils.SyntheticRoot);
         var subRoot = root / "frob";
         Assert.True(root.IsPrefixOf(subRoot));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("foo")]
+    [InlineData("foo/bar")]
+    [InlineData("..")]
+    public void PathRootOfRelativePathIsNull(string path)
+    {
+        Assert.Null(new LocalPath(path).PathRoot);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("foo/bar")]
+    public void PathRootOfAbsolutePath(string relativePart)
+    {
+        var root = Utils.SyntheticRoot;
+        var path = new LocalPath(root / relativePart);
+        Assert.Equal(root, path.PathRoot);
+    }
+
+    [Theory]
+    [InlineData(@"C:\foo", @"C:\")]
+    [InlineData(@"C:\", @"C:\")]
+    [InlineData("C:foo", @"C:\")]
+    [InlineData(@"C:foo\bar", @"C:\")]
+    [InlineData("C:", @"C:\")]
+    [InlineData(@"\foo", null)]
+    [InlineData(@"\", null)]
+    public void PathRootOnWindows(string path, string? expectedRoot)
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        AbsolutePath? expected = expectedRoot == null ? null : new AbsolutePath(expectedRoot);
+        Assert.Equal(expected, new LocalPath(path).PathRoot);
+    }
+
+    [Theory]
+    [InlineData("C:foo")]
+    [InlineData("C:")]
+    public void PathRootOfDriveLikePathOnUnixIsNull(string path)
+    {
+        if (OperatingSystem.IsWindows()) return;
+
+        Assert.Null(new LocalPath(path).PathRoot);
     }
 
     [Fact]
@@ -184,7 +245,7 @@ public class LocalPathTests(ITestOutputHelper output)
     [Fact]
     public void LocalPathConvertedFromAbsolute()
     {
-        var absolutePath = new AbsolutePath("/foo/bar");
+        var absolutePath = Utils.SyntheticRoot / "foo/bar";
         LocalPath localPath1 = absolutePath;
         var localPath2 = new LocalPath(absolutePath);
 
@@ -212,6 +273,287 @@ public class LocalPathTests(ITestOutputHelper output)
             Environment.CurrentDirectory = currentDirectory.Value;
             output.WriteLine("Current directory reset back to: " + currentDirectory);
         }
+    }
+
+    [Fact]
+    public void ResolveToCurrentDirectoryForDriveRelativePathsOnWindows()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var currentDirectory = AbsolutePath.CurrentWorkingDirectory;
+        var drive = currentDirectory.Value.Substring(0, 2);
+
+        Assert.Equal(new AbsolutePath(drive + @"\foo"), new LocalPath(@"\foo").ResolveToCurrentDirectory());
+        Assert.Equal(currentDirectory / "foo", new LocalPath(drive + "foo").ResolveToCurrentDirectory());
+        Assert.Equal(currentDirectory, new LocalPath(drive).ResolveToCurrentDirectory());
+    }
+
+    [Theory]
+    [InlineData("a", "a/b", "b")]
+    [InlineData("a/b", "a", "..")]
+    [InlineData("a/c", "a/b", "../b")]
+    [InlineData("a", "a", "")]
+    public void RelativeToForRelativePaths(string from, string to, string expected)
+    {
+        var relativePath = new LocalPath(to).RelativeTo(new LocalPath(from));
+        Assert.Equal(new LocalPath(expected), relativePath);
+    }
+
+    [Fact]
+    public void RelativeToResolvesAgainstCurrentDirectory()
+    {
+        var currentDirectory = AbsolutePath.CurrentWorkingDirectory;
+        var foo = new LocalPath("foo");
+
+        Assert.Equal(foo, foo.RelativeTo(currentDirectory));
+        Assert.Equal(foo, new LocalPath(currentDirectory / "foo").RelativeTo(new LocalPath("")));
+        Assert.Equal(foo, foo.RelativeTo(new LocalPath(".")));
+    }
+
+    [Theory]
+    [InlineData(@"C:\a", @"C:\a\b", "b")] // PathKind.Absolute
+    [InlineData("a", @"a\b", "b")] // PathKind.Relative
+    [InlineData(@"\a", @"\a\b", "b")] // PathKind.DriveRootRelative
+    [InlineData(@"A:x", @"A:x\y", "y")] // PathKind.DriveCurrentDirectoryRelative
+    public void RelativeToForPathKindsOnWindows(string from, string to, string expected)
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var relativePath = new LocalPath(to).RelativeTo(new LocalPath(from));
+        Assert.Equal(new LocalPath(expected), relativePath);
+    }
+
+    [Fact]
+    public void RelativeToForMixedPathKindsOnWindows()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var currentDirectory = AbsolutePath.CurrentWorkingDirectory;
+        var drive = currentDirectory.PathRoot;
+        var foo = new LocalPath("foo");
+        var driveCurrentDir = new LocalPath($"{drive.Value.Substring(0, 2)}");
+        Assert.Equal(PathKind.DriveCurrentDirectoryRelative, driveCurrentDir.Kind);
+
+        Assert.Equal(foo, new LocalPath(@"\foo").RelativeTo(drive));
+        Assert.Equal(foo, (driveCurrentDir / "foo").RelativeTo(currentDirectory));
+        Assert.Equal(foo, new LocalPath(currentDirectory / "foo").RelativeTo(driveCurrentDir));
+    }
+
+    [Fact]
+    public void RelativeToReturnsAbsolutePathForDifferentRootsOnWindows()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        Assert.Equal(new LocalPath(@"D:\x"), new LocalPath(@"D:\x").RelativeTo(new LocalPath(@"C:\y")));
+        Assert.Equal(
+            new LocalPath(new LocalPath("B:x").ResolveToCurrentDirectory()),
+            new LocalPath("B:x").RelativeTo(new LocalPath(@"A:\y")));
+
+        var currentDirectory = AbsolutePath.CurrentWorkingDirectory;
+        Assert.Equal(
+            new LocalPath(currentDirectory / "foo"),
+            new LocalPath("foo").RelativeTo(Utils.NonCurrentSyntheticRoot));
+    }
+
+    [Theory]
+    [InlineData(@"C:\", PathKind.Absolute)]
+    [InlineData(@"C:\Windows", PathKind.Absolute)]
+    [InlineData("c:/windows/system32", PathKind.Absolute)]
+    [InlineData("", PathKind.Relative)]
+    [InlineData(".", PathKind.Relative)]
+    [InlineData("Windows", PathKind.Relative)]
+    [InlineData(@"..\Windows", PathKind.Relative)]
+    [InlineData(@"Windows\System32", PathKind.Relative)]
+    [InlineData("1:foo", PathKind.Relative)]
+    [InlineData(@"\", PathKind.DriveRootRelative)]
+    [InlineData(@"\Windows", PathKind.DriveRootRelative)]
+    [InlineData("/Windows", PathKind.DriveRootRelative)]
+    [InlineData("C:", PathKind.DriveCurrentDirectoryRelative)]
+    [InlineData("C:Windows", PathKind.DriveCurrentDirectoryRelative)]
+    [InlineData(@"c:Windows\System32", PathKind.DriveCurrentDirectoryRelative)]
+    [InlineData("C:..", PathKind.DriveCurrentDirectoryRelative)]
+    [InlineData("C:.", PathKind.DriveCurrentDirectoryRelative)]
+    public void KindOnWindows(string path, PathKind expected)
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var localPath = new LocalPath(path);
+        Assert.Equal(expected, localPath.Kind);
+        Assert.Equal(expected == PathKind.Absolute, localPath.IsAbsolute);
+    }
+
+    [Theory]
+    [InlineData("/", PathKind.Absolute)]
+    [InlineData("/usr/bin", PathKind.Absolute)]
+    [InlineData("//usr", PathKind.Absolute)]
+    [InlineData("", PathKind.Relative)]
+    [InlineData("usr", PathKind.Relative)]
+    [InlineData("../usr", PathKind.Relative)]
+    [InlineData("C:", PathKind.Relative)]
+    [InlineData("C:foo", PathKind.Relative)]
+    [InlineData(@"C:\foo", PathKind.Relative)]
+    [InlineData(@"\foo", PathKind.Relative)]
+    public void KindOnUnix(string path, PathKind expected)
+    {
+        if (OperatingSystem.IsWindows()) return;
+
+        var localPath = new LocalPath(path);
+        Assert.Equal(expected, localPath.Kind);
+        Assert.Equal(expected == PathKind.Absolute, localPath.IsAbsolute);
+    }
+
+    [Theory]
+    [InlineData(@"\", @"\Windows", true)]
+    [InlineData(@"C:\", @"\Windows", false)]
+    [InlineData(@"\Windows", @"C:\Windows", false)]
+    [InlineData("C:", "C:Windows", true)]
+    [InlineData("c:", "C:Windows", true)]
+    [InlineData("C:", "C:", true)]
+    [InlineData("C:Windows", @"C:Windows\System32", true)]
+    [InlineData("C:Win", "C:Windows", false)]
+    [InlineData("C:", @"C:..\x", false)]
+    [InlineData("C:", "D:Windows", false)]
+    [InlineData("C:", @"C:\Windows", false)]
+    [InlineData(@"C:\", @"C:Windows", false)]
+    [InlineData("C:Windows", @"Windows\x", false)]
+    [InlineData("", "C:Windows", false)]
+    [InlineData("", @"\Windows", false)]
+    public void IsPrefixOfAcrossKindsOnWindows(string prefix, string other, bool result)
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var a = new LocalPath(prefix);
+        var b = new LocalPath(other);
+
+        Assert.Equal(result, a.IsPrefixOf(b));
+        Assert.Equal(result, b.StartsWith(a));
+    }
+
+    [Fact]
+    public void AppendMatrixOnWindows()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        // Every base path kind combined with every appended path kind. The Expected column is the result of
+        // LocalPath's operator /. It matches C++ std::filesystem::path::operator/ (as observed on MSVC 14.51), except
+        // that drive letters are compared case-insensitively (the c:x cases), and that the result is normalized.
+        // The PathCombine column pins the behavior of Path.Combine for the same arguments on purpose, to document
+        // where the two differ.
+        (string Base, string Appended, string Expected, string PathCombine)[] cases =
+        [
+            (@"C:\base", "x", @"C:\base\x", @"C:\base\x"),
+            (@"C:\base", @"\x", @"C:\x", @"\x"),
+            (@"C:\base", @"D:\x", @"D:\x", @"D:\x"),
+            (@"C:\base", "D:x", "D:x", "D:x"),
+            (@"C:\base", "C:x", @"C:\base\x", "C:x"),
+            (@"C:\base", "c:x", @"C:\base\x", "c:x"),
+            (@"C:\base", "", @"C:\base", @"C:\base"),
+
+            ("base", "x", @"base\x", @"base\x"),
+            ("base", @"\x", @"\x", @"\x"),
+            ("base", @"D:\x", @"D:\x", @"D:\x"),
+            ("base", "D:x", "D:x", "D:x"),
+            ("base", "C:x", "C:x", "C:x"),
+            ("base", "c:x", "c:x", "c:x"),
+            ("base", "", "base", "base"),
+
+            (@"\base", "x", @"\base\x", @"\base\x"),
+            (@"\base", @"\x", @"\x", @"\x"),
+            (@"\base", @"D:\x", @"D:\x", @"D:\x"),
+            (@"\base", "D:x", "D:x", "D:x"),
+            (@"\base", "C:x", "C:x", "C:x"),
+            (@"\base", "c:x", "c:x", "c:x"),
+            (@"\base", "", @"\base", @"\base"),
+
+            ("C:base", "x", @"C:base\x", @"C:base\x"),
+            ("C:base", @"\x", @"C:\x", @"\x"),
+            ("C:base", @"D:\x", @"D:\x", @"D:\x"),
+            ("C:base", "D:x", "D:x", "D:x"),
+            ("C:base", "C:x", @"C:base\x", "C:x"),
+            ("C:base", "c:x", @"C:base\x", "c:x"),
+            ("C:base", "", "C:base", "C:base"),
+
+            ("C:", "x", "C:x", @"C:\x"),
+            ("C:", @"\x", @"C:\x", @"\x"),
+            ("C:", @"D:\x", @"D:\x", @"D:\x"),
+            ("C:", "D:x", "D:x", "D:x"),
+            ("C:", "C:x", "C:x", "C:x"),
+            ("C:", "c:x", "C:x", "c:x"),
+            ("C:", "", "C:", "C:"),
+
+            (@"C:\", "x", @"C:\x", @"C:\x"),
+            (@"C:\", @"\x", @"C:\x", @"\x"),
+            (@"C:\", @"D:\x", @"D:\x", @"D:\x"),
+            (@"C:\", "D:x", "D:x", "D:x"),
+            (@"C:\", "C:x", @"C:\x", "C:x"),
+            (@"C:\", "c:x", @"C:\x", "c:x"),
+            (@"C:\", "", @"C:\", @"C:\"),
+
+            (@"\", "x", @"\x", @"\x"),
+            (@"\", @"\x", @"\x", @"\x"),
+            (@"\", @"D:\x", @"D:\x", @"D:\x"),
+            (@"\", "D:x", "D:x", "D:x"),
+            (@"\", "C:x", "C:x", "C:x"),
+            (@"\", "c:x", "c:x", "c:x"),
+            (@"\", "", @"\", @"\"),
+
+            ("", "x", "x", "x"),
+            ("", @"\x", @"\x", @"\x"),
+            ("", @"D:\x", @"D:\x", @"D:\x"),
+            ("", "D:x", "D:x", "D:x"),
+            ("", "C:x", "C:x", "C:x"),
+            ("", "c:x", "c:x", "c:x"),
+            ("", "", "", ""),
+        ];
+
+        var failures = new List<string>();
+        foreach (var (basePath, appended, expected, expectedPathCombine) in cases)
+        {
+            var actual = (new LocalPath(basePath) / appended).Value;
+            if (actual != expected)
+                failures.Add($"\"{basePath}\" / \"{appended}\": expected \"{expected}\", got \"{actual}\".");
+
+            var actualPathCombine = Path.Combine(basePath, appended);
+            if (actualPathCombine != expectedPathCombine)
+                failures.Add(
+                    $"Path.Combine(\"{basePath}\", \"{appended}\"): expected \"{expectedPathCombine}\", got \"{actualPathCombine}\".");
+        }
+
+        Assert.Empty(failures);
+    }
+
+    [Fact]
+    public void AppendMatrixOnUnix()
+    {
+        if (OperatingSystem.IsWindows()) return;
+
+        // On Unix, operator / always agrees with Path.Combine, up to normalization.
+        (string Base, string Appended, string Expected)[] cases =
+        [
+            ("/base", "x", "/base/x"),
+            ("/base", "/x", "/x"),
+            ("/base", @"\x", @"/base/\x"),
+            ("/base", "", "/base"),
+            ("/", "x", "/x"),
+            ("base", "C:x", "base/C:x"),
+            ("C:", "x", "C:/x"),
+            ("", "x", "x"),
+        ];
+
+        var failures = new List<string>();
+        foreach (var (basePath, appended, expected) in cases)
+        {
+            var actual = (new LocalPath(basePath) / appended).Value;
+            if (actual != expected)
+                failures.Add($"\"{basePath}\" / \"{appended}\": expected \"{expected}\", got \"{actual}\".");
+
+            var actualPathCombine = new LocalPath(Path.Combine(basePath, appended)).Value;
+            if (actualPathCombine != expected)
+                failures.Add(
+                    $"Path.Combine(\"{basePath}\", \"{appended}\"): expected \"{expected}\", got \"{actualPathCombine}\".");
+        }
+
+        Assert.Empty(failures);
     }
 
     [Fact]

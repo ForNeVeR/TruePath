@@ -1,5 +1,5 @@
 <!--
-SPDX-FileCopyrightText: 2024-2025 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+SPDX-FileCopyrightText: 2024-2026 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 
 SPDX-License-Identifier: MIT
 -->
@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
     <PropertyGroup Label="Packaging">
         <Version>1.12.0</Version>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <Copyright>2024-2026 TruePath contributors &lt;https://github.com/ForNeVeR/TruePath&gt;</Copyright>
+        <Copyright>2024-2026 TruePath contributors &lt;https://github.com/ForNeVeR/TruePath&gt;; .NET Foundation and Contributors</Copyright>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <IncludeSymbols>true</IncludeSymbols>
@@ -20,7 +20,8 @@ SPDX-License-Identifier: MIT
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <NoWarn>CS0419;CS1570;CS1571;CS1572;CS1573;CS1574;CS1580;CS1581;CS1584;CS1587;CS1589;CS1590;CS1591;CS1592;CS1598;CS1710;CS1711;CS1712;$(NoWarn)</NoWarn>
+        <!-- XML documentation warnings are suppressed for local development; CI verifies them with -p:CheckXmlDoc=true. -->
+        <NoWarn Condition="'$(CheckXmlDoc)' != 'true'">CS0419;CS1570;CS1571;CS1572;CS1573;CS1574;CS1580;CS1581;CS1584;CS1587;CS1589;CS1590;CS1591;CS1592;CS1598;CS1710;CS1711;CS1712;$(NoWarn)</NoWarn>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
     </PropertyGroup>

@@ -16,7 +16,9 @@ This library aims to fill this gap by providing a set of types that represent pa
 
 Also, the methods in the library provide some qualities that are missing from the `System.IO.Path`: say, we aim to provide several ways of path normalization and comparison, the ones that will and will not perform disk IO to resolve paths on case-insensitive file systems.
 
-The library is inspired by the path libraries used in other ecosystems: in particular, Java's [java.nio.file.Path][java.path] and [Kotlin's extensions][kotlin.path].
+The library is inspired by the path libraries used in other ecosystems, in no particular order:
+- Java's [java.nio.file.Path][java.path] and [Kotlin's extensions][kotlin.path] for general API shape;
+- [\[fs.path.append\]][cpp.fs.path.append] from the C++ standard for path concatenation algorithms.
 
 Read more on [the documentation site][docs].
 
@@ -36,6 +38,10 @@ TruePath provides two NuGet packages:
 
 A third-party package, [**TruePath.TestableIO.System.IO**][nuget.true-path.testableio.system-io], adds [TestableIO.System.IO.Abstractions][testable-io.system.io.abstractions] integration on top of TruePath.
 
+Versioning
+----------
+This project follows [Semantic Versioning][semver], with one exception: the behavior of the types and members marked as `[System.Diagnostics.CodeAnalysis.ExperimentalAttribute]` may change without a major version bump. Using them causes the compiler to report diagnostic `TRUEPATH001`; suppress it (e.g. by adding `<NoWarn>$(NoWarn);TRUEPATH001</NoWarn>` into your project file, or with `#pragma warning disable TRUEPATH001`) to acknowledge that.
+
 Documentation
 -------------
 - [Project Documentation Site][docs]
@@ -50,6 +56,7 @@ The project is distributed under the terms of [the MIT license][docs.license].
 The license indication in the project's sources is compliant with the [REUSE specification v3.3][reuse.spec].
 
 [andivionian-status-classifier]: https://andivionian.fornever.me/v1/#status-ventis-
+[cpp.fs.path.append]: https://eel.is/c++draft/fs.path.append
 [discussions]: https://github.com/ForNeVeR/TruePath/discussions
 [docs.changelog]: CHANGELOG.md
 [docs.contributing]: CONTRIBUTING.md
@@ -69,5 +76,6 @@ The license indication in the project's sources is compliant with the [REUSE spe
 [nuget.true-path.testableio.system-io]: https://www.nuget.org/packages/TruePath.TestableIO.System.IO/
 [nuget.true-path]: https://www.nuget.org/packages/TruePath
 [reuse.spec]: https://reuse.software/spec-3.3/
+[semver]: https://semver.org/spec/v2.0.0.html
 [status-ventis]: https://img.shields.io/badge/status-ventis-yellow.svg
 [testable-io.system.io.abstractions]: https://github.com/TestableIO/System.IO.Abstractions

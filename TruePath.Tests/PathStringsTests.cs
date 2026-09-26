@@ -27,7 +27,7 @@ public class PathStringsTests
     [Fact]
     public void RootPathEndWithSeparator()
     {
-        var root = OperatingSystem.IsWindows() ? @"A:\" : "/";
+        var root = Utils.SyntheticRootString;
         Assert.Equal(root, PathStrings.Normalize(root));
 
         var rootWithRepeatedSeparators = OperatingSystem.IsWindows() ? @"A:\\\\" : "//";

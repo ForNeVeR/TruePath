@@ -23,8 +23,19 @@ public static class Utils
         return nonCanonicalPath;
     }
 
+    /// <summary>A root path that exists syntactically on the current platform: <c>A:\</c> on Windows, <c>/</c> elsewhere.</summary>
+    internal static string SyntheticRootString => OperatingSystem.IsWindows() ? @"A:\" : "/";
+
+    /// <inheritdoc cref="SyntheticRootString"/>
+    internal static AbsolutePath SyntheticRoot => new(SyntheticRootString);
+
+    internal static AbsolutePath NonCurrentSyntheticRoot =>
+        AbsolutePath.CurrentWorkingDirectory.PathRoot == SyntheticRoot
+            ? new AbsolutePath(@"B:\")
+            : SyntheticRoot;
+
     internal static bool IsPlatformCaseInsensitive() =>
-        OperatingSystem.IsWindows() || OperatingSystem.IsMacOS();
+        OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() || OperatingSystem.IsIOS() || OperatingSystem.IsTvOS();
 
     internal static bool RunsOnCi()
     {

@@ -11,7 +11,7 @@ public class AbsolutePathTests
     [Fact]
     public void ConstructionTest()
     {
-        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var root = Utils.SyntheticRoot;
         var path = new AbsolutePath($"{root}/...");
         Assert.Equal($"{root}...", path.Value);
     }
@@ -19,18 +19,18 @@ public class AbsolutePathTests
     [Fact]
     public void PathRootReturnsRoot()
     {
-      var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+      var root = Utils.SyntheticRoot;
       var path = root / "foo" / "bar";
 
-     Assert.Equal(root, path.PathRoot());
+     Assert.Equal(root, path.PathRoot);
     }
 
     [Fact]
     public void PathRootOfRootReturnsItself()
     {
-       var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+       var root = Utils.SyntheticRoot;
 
-     Assert.Equal(root, root.PathRoot());
+     Assert.Equal(root, root.PathRoot);
     }
 
     [Fact]
@@ -136,21 +136,21 @@ public class AbsolutePathTests
     [InlineData("/", null)]
     public void ParentIsCalculatedCorrectly(string relativePath, string? expectedRelativePath)
     {
-        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var root = Utils.SyntheticRoot;
         var parent = root / relativePath;
         AbsolutePath? expectedPath = expectedRelativePath == null ? null : new(root / expectedRelativePath);
         Assert.Equal(expectedPath, parent.Parent);
     }
 
     [Theory]
-    [InlineData("/home/user", "/home/user/documents", true)]
-    [InlineData("/home/user/documents", "/home/user/documents", true)]
-    [InlineData("/home/user/documents", "/home/user", false)]
+    [InlineData("home/user", "home/user/documents", true)]
+    [InlineData("home/user/documents", "home/user/documents", true)]
+    [InlineData("home/user/documents", "home/user", false)]
     public void IsPrefixOfShouldBeEquivalentToStartsWith(string pathA, string pathB, bool expected)
     {
         // Arrange
-        var a = new AbsolutePath(pathA);
-        var b = new AbsolutePath(pathB);
+        var a = Utils.SyntheticRoot / pathA;
+        var b = Utils.SyntheticRoot / pathB;
 
         // Assert
         Assert.Equal(expected, a.IsPrefixOf(b));
@@ -160,7 +160,7 @@ public class AbsolutePathTests
     [Fact]
     public void IsPrefixOfFollowsPlatformCaseSensitivityForSameName()
     {
-        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var root = Utils.SyntheticRoot;
         var a = root / "Foo";
         var b = root / "foo";
 
@@ -172,7 +172,7 @@ public class AbsolutePathTests
     [Fact]
     public void IsPrefixOfFollowsPlatformCaseSensitivityForDescendant()
     {
-        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var root = Utils.SyntheticRoot;
         var a = root / "Foo";
         var b = root / "foo/file.txt";
 
@@ -183,7 +183,7 @@ public class AbsolutePathTests
     [Fact]
     public void IsPrefixOfRequiresWholeSegmentRegardlessOfCase()
     {
-        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var root = Utils.SyntheticRoot;
         var a = root / "Foo";
         var b = root / "foobar";
 
@@ -199,7 +199,7 @@ public class AbsolutePathTests
     [InlineData("sub/folder", "sub", false)]
     public void IsPrefixOfRespectsPathSegmentBoundaries(string prefix, string other, bool expected)
     {
-        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var root = Utils.SyntheticRoot;
 
         Assert.Equal(expected, (root / prefix).IsPrefixOf(root / other));
     }
@@ -207,7 +207,7 @@ public class AbsolutePathTests
     [Fact]
     public void IsPrefixOfTreatsRootAsPrefixOfDescendants()
     {
-        var root = new AbsolutePath(OperatingSystem.IsWindows() ? @"A:\" : "/");
+        var root = Utils.SyntheticRoot;
 
         Assert.True(root.IsPrefixOf(root / "sub" / "a.txt"));
     }
@@ -275,6 +275,45 @@ public class AbsolutePathTests
     }
 
     [Theory]
+    [InlineData(@"\Windows")]
+    [InlineData("C:Windows")]
+    [InlineData("C:")]
+    public void ConstructorThrowsOnDriveRelativePathOnWindows(string path)
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var expectedMessage = $"Path \"{path}\" is not absolute.";
+        var ex = Assert.Throws<ArgumentException>(() => new AbsolutePath(path));
+        Assert.Equal(expectedMessage, ex.Message);
+
+        ex = Assert.Throws<ArgumentException>(() => new AbsolutePath(new LocalPath(path)));
+        Assert.Equal(expectedMessage, ex.Message);
+    }
+
+    [Theory]
+    [InlineData(@"\x", @"C:\x")]
+    [InlineData("C:x", @"C:\base\x")]
+    [InlineData("c:x", @"C:\base\x")]
+    [InlineData(@"D:\x", @"D:\x")]
+    public void AppendDriveRelativePathOnWindows(string appended, string expected)
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var basePath = new AbsolutePath(@"C:\base");
+        Assert.Equal(expected, (basePath / appended).Value);
+    }
+
+    [Fact]
+    public void AppendPathRelativeToAnotherDriveThrowsOnWindows()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var basePath = new AbsolutePath(@"C:\base");
+        var ex = Assert.Throws<ArgumentException>(() => basePath / "D:x");
+        Assert.Equal("Path \"D:x\" is not absolute.", ex.Message);
+    }
+
+    [Theory]
     [InlineData("/etc/bin", "/usr/bin", "../../usr/bin")]
     [InlineData("/usr/bin/log", "/usr/bin", "..")]
     [InlineData("/usr/bin", "/usr/bin/log", "log")]
@@ -291,12 +330,27 @@ public class AbsolutePathTests
     }
 
     [Theory]
+    [InlineData("a/c", "a/b", "../b")]
+    [InlineData("a", "a", ".")]
+    public void RelativeToReturnsCorrectRelativePathCrossPlatform(string from, string to, string expected)
+    {
+        var fromPath = Utils.SyntheticRoot / from;
+        var toPath = Utils.SyntheticRoot / to;
+
+        LocalPath relativePath = toPath.RelativeTo(fromPath);
+
+        Assert.Equal(new LocalPath(expected), relativePath);
+    }
+
+    [Theory]
     [InlineData(@"C:\bin", @"D:\bin", @"D:\bin")]
+    [InlineData(@"C:\bin", @"D:\bin\x", @"D:\bin\x")]
     [InlineData(@"C:\bin\debug", @"C:\bin", "..")]
     [InlineData(@"C:\bin", @"C:\bin\log", "log")]
+    [InlineData(@"c:\bin", @"C:\bin\log", "log")]
     public void RelativeToReturnsCorrectRelativePathForWindows(string from, string to, string expected)
     {
-        if (OperatingSystem.IsWindows() is false) return;
+        if (!OperatingSystem.IsWindows()) return;
 
         var fromPath = new AbsolutePath(from);
         var toPath = new AbsolutePath(to);

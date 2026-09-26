@@ -20,7 +20,7 @@ public class PathExtensionsTests
 
         if (!path.StartsWith('/')) return;
 
-        IPath a = new AbsolutePath(path);
+        IPath a = Utils.SyntheticRoot / path.Substring(1);
         Assert.Equal(expected, a.GetExtensionWithDot());
     }
 
@@ -39,7 +39,7 @@ public class PathExtensionsTests
 
         if (!path.StartsWith('/')) return;
 
-        IPath a = new AbsolutePath(path);
+        IPath a = Utils.SyntheticRoot / path.Substring(1);
         Assert.Equal(expected, a.GetExtensionWithoutDot());
     }
 
@@ -57,7 +57,7 @@ public class PathExtensionsTests
 
         if (!path.StartsWith('/')) return;
 
-        IPath a = new AbsolutePath(path);
+        IPath a = Utils.SyntheticRoot / path.Substring(1);
         Assert.Equal(expected, a.GetFilenameWithoutExtension());
     }
 
