@@ -35,7 +35,7 @@ public static class Utils
             : SyntheticRoot;
 
     internal static bool IsPlatformCaseInsensitive() =>
-        OperatingSystem.IsWindows() || OperatingSystem.IsMacOS();
+        OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() || OperatingSystem.IsIOS() || OperatingSystem.IsTvOS();
 
     internal static bool RunsOnCi()
     {

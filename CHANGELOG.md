@@ -25,11 +25,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Breaking:** `LocalPath.StartsWith` and `AbsolutePath.StartsWith` now compare whole path segments instead of raw strings, which makes them exact inverses of `IsPrefixOf` as originally intended in [#43](https://github.com/ForNeVeR/TruePath/issues/43). For example, `new LocalPath("/foo1").StartsWith(new LocalPath("/foo"))` is now `false`, where it used to be `true`.
 - `LocalPath.IsPrefixOf` now returns `false` whenever the two paths differ in absoluteness: an absolute path is never a prefix of a relative one, nor the other way round. Previously, the result depended on an incidental string comparison.
 - `LocalPath.IsPrefixOf` now treats an empty path — the normalized form of `""`, `"."` and `"a/.."`, and the parent of any single-segment relative path — as the current directory, so it is a prefix of every relative path that does not begin with a `..` reference.
+- The platform-default path comparers (`LocalPath.PlatformDefaultComparer`, `AbsolutePath.PlatformDefaultComparer`) are now case-insensitive on iOS and tvOS as well, matching the .NET runtime.
 
 ### Fixed
 - [#225](https://github.com/ForNeVeR/TruePath/issues/225): Make path prefix checks use the same platform-default case sensitivity as path equality.
 - `LocalPath.IsPrefixOf` and `StartsWith` now compare path strings ordinally. Previously they used the current culture, which ignores collation-ignorable characters, so a path could be reported as a prefix of an unrelated one.
 - `LocalPath.RelativeTo` no longer throws an exception when either path is empty (i.e. designates the current directory).
+- On .NET Standard 2.0 (e.g., .NET Framework), `LocalPath.RelativeTo` and `AbsolutePath.RelativeTo` now use a port of the .NET runtime's `Path.GetRelativePath`, and return the same results as on .NET 8+. Previously, the result was wrong for a destination equal to or above the base path, and for names containing `%XX` sequences.
 
 ## [1.12.0] - 2026-03-14
 ### Changed

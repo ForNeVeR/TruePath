@@ -91,7 +91,7 @@ TruePath allows the user to control certain aspects of how their paths are prese
 
 When comparing the path objects via either `==` operator or the standard `Equals(object)` method, the library uses the `AbsolutePath.PlatformDefaultComparer` or the `LocalPath.PlatformDefaultComparer`, meaning that
 - paths are compared as strings (no canonicalization performed),
-- paths are compared in either case-sensitive (Linux) or case-insensitive/ordinal mode (Windows, macOS).
+- paths are compared in either case-insensitive (Windows, macOS, iOS, tvOS) or case-sensitive (other systems, e.g. Linux).
 
 For cases when you want to always perform strict case-sensitive comparison (more performant yet not platform-aware), pass the `AbsolutePath.StrictStringComparer` or the `LocalPath.StrictStringComparer` to the overload of the `Equals` method:
 ```csharp
