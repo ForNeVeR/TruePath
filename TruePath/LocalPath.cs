@@ -397,12 +397,15 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     /// <para>
     /// On Windows, a path rooted without a drive letter (<c>\x</c>) is resolved against the drive of the current
     /// directory, and a path relative to the current directory of a drive (<c>D:x</c>) is resolved against the
-    /// current directory of that drive, as tracked by the process (see <see cref="Path.GetFullPath(string)"/>).
+    /// current directory of that drive, as tracked by the process (see <see cref="Path.GetFullPath(string)"/>), or
+    /// against the root of that drive if the process doesn't track one.
+    /// </para>
+    /// <para>
+    /// This is the same as <c>AbsolutePath.CurrentWorkingDirectory / this</c> (see
+    /// <see cref="AbsolutePath.op_Division(AbsolutePath, LocalPath)"/>), so the result is always absolute.
     /// </para>
     /// </remarks>
-    public AbsolutePath ResolveToCurrentDirectory() => Kind == PathKind.DriveCurrentDirectoryRelative
-        ? new AbsolutePath(Path.GetFullPath(Value))
-        : AbsolutePath.CurrentWorkingDirectory / this;
+    public AbsolutePath ResolveToCurrentDirectory() => AbsolutePath.CurrentWorkingDirectory / this;
 
     /// <summary>Converts an <see cref="AbsolutePath"/> to a <see cref="LocalPath"/>.</summary>
     public LocalPath(AbsolutePath path) : this(path.Value)

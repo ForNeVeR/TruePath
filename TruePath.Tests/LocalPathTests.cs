@@ -263,6 +263,8 @@ public class LocalPathTests
         Assert.Equal(new AbsolutePath(drive + @"\foo"), new LocalPath(@"\foo").ResolveToCurrentDirectory());
         Assert.Equal(currentDirectory / "foo", new LocalPath(drive + "foo").ResolveToCurrentDirectory());
         Assert.Equal(currentDirectory, new LocalPath(drive).ResolveToCurrentDirectory());
+        // Path.GetFullPath would trim the trailing dot and space.
+        Assert.Equal(currentDirectory / "foo. ", new LocalPath(drive + "foo. ").ResolveToCurrentDirectory());
     }
 
     [Theory]
