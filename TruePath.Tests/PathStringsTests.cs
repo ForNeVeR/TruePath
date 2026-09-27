@@ -71,6 +71,10 @@ public class PathStringsTests
     [InlineData(".../../...", "...")]
     [InlineData("foo/bar/../file.ext", "foo/file.ext")]
     [InlineData("N/", "N")]
+    [InlineData("/base/..", "/")]
+    [InlineData("/base/../", "/")]
+    [InlineData("/base/./..", "/")]
+    [InlineData("/a/b/../..", "/")]
     public void DotFoldersAreTraversedCorrectly(string input, string expected)
     {
         Assert.Equal(NormalizeSeparators(expected), PathStrings.Normalize(input));
@@ -96,6 +100,10 @@ public class PathStringsTests
     [InlineData("../../foo", "../../foo")]
     [InlineData("../../../foo", "../../../foo")]
     [InlineData("../foo/..", "..")]
+    [InlineData("/base/..", "/")]
+    [InlineData("/base/../", "/")]
+    [InlineData("/base/./..", "/")]
+    [InlineData("/a/b/../..", "/")]
     public void WindowsSpecificDotFoldersAreTraversed(string input, string expected)
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;

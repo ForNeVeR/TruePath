@@ -117,7 +117,8 @@ public static class PathStrings
                 }
                 else if (jump != -1)
                 {
-                    written = last ? jump : jump + 1;
+                    // Keep the separator if it is the root one (e.g. "/a/.." is normalized to "/", and "C:\a\.." to "C:\").
+                    written = last && jump != 0 ? jump : jump + 1;
                     buffer = normalized[written..];
                     skip = true;
                 }
