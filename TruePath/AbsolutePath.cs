@@ -14,7 +14,13 @@ namespace TruePath;
 /// This is a path on the local system that's guaranteed to be <b>absolute</b>: that is, path that is rooted and has a
 /// disk letter (on Windows).
 /// </summary>
-/// <remarks>For a path that's not guaranteed to be absolute, use the <see cref="LocalPath"/> type.</remarks>
+/// <remarks>
+/// <para>For a path that's not guaranteed to be absolute, use the <see cref="LocalPath"/> type.</para>
+/// <para>
+/// Uninitialized values of this structure (e.g. <c>default(AbsolutePath)</c>) will throw
+/// <see cref="NullReferenceException"/> from many of the APIs.
+/// </para>
+/// </remarks>
 public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<AbsolutePath>, IPath, IPath<AbsolutePath>
 {
     /// <summary>

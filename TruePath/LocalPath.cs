@@ -23,6 +23,10 @@ namespace TruePath;
 /// to know what form of normalization the path uses.
 /// </para>
 /// </summary>
+/// <remarks>
+/// Uninitialized values of this structure (e.g. <c>default(LocalPath)</c>) will throw
+/// <see cref="NullReferenceException"/> from many of the APIs.
+/// </remarks>
 public readonly struct LocalPath(string value) : IEquatable<LocalPath>, IComparable<LocalPath>, IPath, IPath<LocalPath>
 {
     /// <summary>
