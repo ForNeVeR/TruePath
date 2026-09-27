@@ -203,8 +203,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [0.0.0] - 2024-04-20
 This is the first published version of the package. It doesn't contain any features, and serves the purpose of kickstarting the publication system, and to be an anchor for further additions to the package.
 
-[docs.readme]: README.md
-
 [0.0.0]: https://github.com/ForNeVeR/TruePath/releases/tag/v0.0.0
 [1.0.0]: https://github.com/ForNeVeR/TruePath/compare/v0.0.0...v1.0.0
 [1.1.0]: https://github.com/ForNeVeR/TruePath/compare/v1.0.0...v1.1.0
