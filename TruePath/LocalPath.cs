@@ -134,6 +134,8 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
         {
             // For C:foo, the rest after the drive letter is a relative path, and follows the same rules.
             var relativePart = Kind == PathKind.DriveCurrentDirectoryRelative ? Value[2..] : Value;
+            // TODO[#95]: a rooted path ending with ".." (C:\..) gets here as well, so walking up its parents never
+            //            ends. This goes away once the normalization drops a ".." directly after the root.
             if (relativePart == "" || relativePart == ".." || relativePart.EndsWith($"{Separator}.."))
                 return this / "..";
             return Path.GetDirectoryName(Value) is { } parent ? new(parent) : null;

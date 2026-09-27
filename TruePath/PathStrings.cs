@@ -123,6 +123,8 @@ public static class PathStrings
                     skip = true;
                 }
                 else
+                    // TODO[#95]: this keeps a ".." directly after the root (C:\.., /.., \..). The root has no parent,
+                    //            so it should be dropped, the same way Path.GetFullPath does: C:\.. is C:\.
                     skip = false;
             }
             else
