@@ -63,6 +63,8 @@ internal static class PathPolyfills
 
         Debug.Assert(comparisonType == StringComparison.Ordinal || comparisonType == StringComparison.OrdinalIgnoreCase);
 
+        // TODO[#235]: on .NET Framework, Path.GetFullPath rejects the stream syntax (file.txt:stream) with
+        //             NotSupportedException, while .NET 8+ accepts it.
         relativeTo = Path.GetFullPath(relativeTo);
         path = Path.GetFullPath(path);
 

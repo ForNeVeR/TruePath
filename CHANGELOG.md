@@ -31,7 +31,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - `LocalPath.IsPrefixOf` and `StartsWith` now compare path strings ordinally. Previously they used the current culture, which ignores collation-ignorable characters, so a path could be reported as a prefix of an unrelated one.
 - Path normalization no longer drops the root separator when a rooted path ends with `..`: `C:\base\..` is now normalized to `C:\` (was `C:`, a path relative to the current directory of drive `C:`), and `/base/..` to `/` (was an empty path, i.e. the current directory). This affects `PathStrings.Normalize`, `LocalPath` and `AbsolutePath`.
 - `LocalPath.RelativeTo` no longer throws an exception when either path is empty (i.e. designates the current directory).
-- On .NET Standard 2.0 (e.g., .NET Framework), `LocalPath.RelativeTo` and `AbsolutePath.RelativeTo` now use a port of the .NET runtime's `Path.GetRelativePath`, and return the same results as on .NET 8+. Previously, the result was wrong for a destination equal to or above the base path, and for names containing `%XX` sequences.
+- On .NET Standard 2.0 (e.g., .NET Framework), `LocalPath.RelativeTo` and `AbsolutePath.RelativeTo` now use a port of the .NET runtime's `Path.GetRelativePath`, and return the same results as on .NET 8+ (except for the stream syntax, see [#235](https://github.com/ForNeVeR/TruePath/issues/235)). Previously, the result was wrong for a destination equal to or above the base path, and for names containing `%XX` sequences.
 
 ## [1.12.0] - 2026-03-14
 ### Changed
