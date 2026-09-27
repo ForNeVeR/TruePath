@@ -5,7 +5,7 @@
 using System.Runtime.InteropServices;
 using TruePath.Comparers;
 #if !NET8_0_OR_GREATER
-using TruePath.Extensions;
+using TruePath.Polyfills;
 #endif
 
 namespace TruePath;
@@ -286,7 +286,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
 #if NET8_0_OR_GREATER
         return new(Path.GetRelativePath(relativeTo, path));
 #else
-        return new(PathPolyfill.GetRelativePath(relativeTo, path));
+        return new(PathPolyfills.GetRelativePath(relativeTo, path));
 #endif
     }
 

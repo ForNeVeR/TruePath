@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using TruePath.Comparers;
 
-namespace TruePath.Extensions;
+namespace TruePath.Polyfills;
 
 /// <summary>
 /// Class that contains custom implementations methods of <see cref="Path"/> class presented in .NET 8 but missing in .NET Standard 2.0.
@@ -26,7 +26,7 @@ namespace TruePath.Extensions;
 /// </para>
 /// <para>The implementation is ported from the .NET runtime.</para>
 /// </remarks>
-internal static class PathPolyfill
+internal static class PathPolyfills
 {
     private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 

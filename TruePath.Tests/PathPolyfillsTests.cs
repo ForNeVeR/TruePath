@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-using TruePath.Extensions;
+using TruePath.Polyfills;
 
 namespace TruePath.Tests;
 
-public class PathPolyfillTests
+public class PathPolyfillsTests
 {
     [Theory]
     [InlineData("a", "a/b")]
@@ -75,14 +75,14 @@ public class PathPolyfillTests
     private static void AssertSameRelativePath(string relativeTo, string path)
     {
         var expected = Path.GetRelativePath(relativeTo, path);
-        var actual = PathPolyfill.GetRelativePath(relativeTo, path);
+        var actual = PathPolyfills.GetRelativePath(relativeTo, path);
         Assert.Equal(expected, actual);
     }
 
     private static void AssertSameException(string? relativeTo, string? path)
     {
         var expected = Assert.ThrowsAny<ArgumentException>(() => Path.GetRelativePath(relativeTo!, path!));
-        var actual = Assert.ThrowsAny<ArgumentException>(() => PathPolyfill.GetRelativePath(relativeTo!, path!));
+        var actual = Assert.ThrowsAny<ArgumentException>(() => PathPolyfills.GetRelativePath(relativeTo!, path!));
         Assert.Equal(expected.GetType(), actual.GetType());
         Assert.Equal(expected.ParamName, actual.ParamName);
     }
