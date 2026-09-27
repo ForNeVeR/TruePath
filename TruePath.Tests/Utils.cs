@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Xunit.v3;
+
 namespace TruePath.Tests;
 
 public static class Utils
@@ -40,5 +42,27 @@ public static class Utils
     internal static bool RunsOnCi()
     {
         return Environment.GetEnvironmentVariable("CI") is not null;
+    }
+
+    /// <summary>
+    /// Changes the current directory to <paramref name="newDirectory"/>, and restores the previous one on disposal.
+    /// </summary>
+    /// <remarks>Only allowed in tests of a collection with parallelization disabled, such as
+    /// <see cref="CurrentDirectoryCollection"/>.</remarks>
+    internal static IDisposable ChangeCurrentDirectory(AbsolutePath newDirectory)
+    {
+        if (TestContext.Current.TestCollection is not IXunitTestCollection { DisableParallelization: true })
+            throw new InvalidOperationException(
+                "Changing the current directory is only allowed in tests of a collection with parallelization " +
+                $"disabled, such as {nameof(CurrentDirectoryCollection)}.");
+
+        var previousDirectory = AbsolutePath.CurrentWorkingDirectory;
+        AbsolutePath.CurrentWorkingDirectory = newDirectory;
+        return new CurrentDirectoryRestorer(previousDirectory);
+    }
+
+    private sealed class CurrentDirectoryRestorer(AbsolutePath previousDirectory) : IDisposable
+    {
+        public void Dispose() => AbsolutePath.CurrentWorkingDirectory = previousDirectory;
     }
 }

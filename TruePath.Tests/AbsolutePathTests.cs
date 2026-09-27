@@ -236,22 +236,6 @@ public class AbsolutePathTests
     }
 
     [Fact]
-    public void CurrentWorkingDirectoryGetsChanged()
-    {
-        var prevPath = AbsolutePath.CurrentWorkingDirectory;
-        var path = new AbsolutePath(Environment.ProcessPath!).Parent!.Value;
-        try
-        {
-            AbsolutePath.CurrentWorkingDirectory = path;
-            Assert.Equal(path, new AbsolutePath(Environment.CurrentDirectory));
-        }
-        finally
-        {
-            AbsolutePath.CurrentWorkingDirectory = prevPath;
-        }
-    }
-
-    [Fact]
     public void PathIsNormalizedOnCreation()
     {
         if (!OperatingSystem.IsWindows()) return;
@@ -568,5 +552,17 @@ public class AbsolutePathTests
         p.WaitForExit();
 
         return p.ExitCode == 0;
+    }
+
+    [Collection(typeof(CurrentDirectoryCollection))]
+    public class CurrentDirectory
+    {
+        [Fact]
+        public void CurrentWorkingDirectoryGetsChanged()
+        {
+            var path = new AbsolutePath(Environment.ProcessPath!).Parent!.Value;
+            using var _ = Utils.ChangeCurrentDirectory(path);
+            Assert.Equal(path, new AbsolutePath(Environment.CurrentDirectory));
+        }
     }
 }
