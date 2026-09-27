@@ -108,11 +108,10 @@ let workflows = [
             step(name = "Verify encoding", shell = "pwsh", run = "scripts/Test-Encoding.ps1")
         ]
 
-        dotNetJob "nowarn-empty" [
+        dotNetJob "xml-doc" [
             runsOn ubuntu
-            checkOut
 
-            step(name = "Verify with NoWarn as empty", run = "dotnet build /p:NoWarn='' --no-incremental")
+            step(name = "Verify XML documentation", run = "dotnet build -p:CheckXmlDoc=true --no-incremental")
         ]
     ]
 

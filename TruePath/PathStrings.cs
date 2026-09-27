@@ -15,6 +15,9 @@ public static class PathStrings
 {
     private const char VolumeSeparatorChar = ':';
 
+    /// <summary>Whether the current platform uses drive letters in paths (i.e. is Windows).</summary>
+    internal static readonly bool IsDriveBasedSystem = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
     /// <summary>
     /// <para>
     /// Will convert a path string to a normalized path, using path separator specific for the current system.
@@ -50,7 +53,7 @@ public static class PathStrings
     /// </para>
     /// </summary>
     public static string Normalize(string path) =>
-        Normalize(path, driveBasedSystem: RuntimeInformation.IsOSPlatform(OSPlatform.Windows));
+        Normalize(path, driveBasedSystem: IsDriveBasedSystem);
 
 #if NET8_0_OR_GREATER
     [SkipLocalsInit] // is necessary to prevent the CLR from filling stackalloc with zeros.
@@ -117,11 +120,14 @@ public static class PathStrings
                 }
                 else if (jump != -1)
                 {
-                    written = last ? jump : jump + 1;
+                    // Keep the separator if it is the root one (e.g. "/a/.." is normalized to "/", and "C:\a\.." to "C:\").
+                    written = last && jump != 0 ? jump : jump + 1;
                     buffer = normalized[written..];
                     skip = true;
                 }
                 else
+                    // TODO[#95]: this keeps a ".." directly after the root (C:\.., /.., \..). The root has no parent,
+                    //            so it should be dropped, the same way Path.GetFullPath does: C:\.. is C:\.
                     skip = false;
             }
             else
@@ -139,6 +145,8 @@ public static class PathStrings
             }
 
             // skip the following / or \
+            // TODO[#24]: this also collapses the leading \\ of UNC and DOS device paths (\\server\share becomes
+            //            \server\share, and \\?\C:\x becomes \?\C:\x), which turns them into different paths.
             while (separator < source.Length && (source[separator] == Path.DirectorySeparatorChar || source[separator] == Path.AltDirectorySeparatorChar))
                 separator++;
 
@@ -193,7 +201,7 @@ public static class PathStrings
     /// <returns>
     ///   <c>true</c> if the source contains a drive letter (e.g., 'C:'); otherwise, <c>false</c>.
     /// </returns>
-    private static bool SourceContainsDriveLetter(ReadOnlySpan<char> source)
+    internal static bool SourceContainsDriveLetter(ReadOnlySpan<char> source)
     {
         if (source.Length < 2)
         {

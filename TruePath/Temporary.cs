@@ -1,6 +1,10 @@
-// SPDX-FileCopyrightText: 2024 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+// SPDX-FileCopyrightText: 2024-2026 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 //
 // SPDX-License-Identifier: MIT
+
+#if !NET8_0_OR_GREATER
+using TruePath.Polyfills;
+#endif
 
 namespace TruePath;
 
@@ -17,6 +21,7 @@ public static class Temporary
     public static AbsolutePath SystemTempDirectory()
     {
         var tempPath = Path.GetTempPath();
+        // On Unix, this is TMPDIR used verbatim, so it is relative if TMPDIR is relative (e.g. TMPDIR=./tmp).
         return AbsolutePath.CurrentWorkingDirectory / tempPath;
     }
 
@@ -27,6 +32,7 @@ public static class Temporary
     public static AbsolutePath CreateTempFile()
     {
         var tempPath = Path.GetTempFileName();
+        // Relative if TMPDIR is relative, see SystemTempDirectory.
         return AbsolutePath.CurrentWorkingDirectory / tempPath;
     }
 
@@ -40,8 +46,10 @@ public static class Temporary
 #if NET8_0_OR_GREATER
         var tempDirectoryInfo = Directory.CreateTempSubdirectory(prefix);
 #else
-        var tempDirectoryInfo = DirectoryEx.CreateTempSubdirectory(prefix);
+        var tempDirectoryInfo = DirectoryPolyfills.CreateTempSubdirectory(prefix);
 #endif
+        // Even FullName is relative if TMPDIR is relative: on Unix, .NET 8+ doesn't resolve it against the current
+        // directory.
         return AbsolutePath.CurrentWorkingDirectory / tempDirectoryInfo.FullName;
     }
 }

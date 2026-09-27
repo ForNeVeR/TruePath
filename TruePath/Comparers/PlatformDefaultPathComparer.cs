@@ -9,8 +9,8 @@ namespace TruePath.Comparers;
 /// <summary>
 /// <para>Provides a default comparer for comparing file paths, aware of the current platform.</para>
 /// <para>
-/// On <b>Windows</b> and <b>macOS</b>, this will perform <b>case-insensitive</b> string comparison, since the file
-/// systems are case-insensitive on these operating systems by default.
+/// On <b>Windows</b>, <b>macOS</b>, <b>iOS</b> and <b>tvOS</b>, this will perform <b>case-insensitive</b> string
+/// comparison, since the file systems are case-insensitive on these operating systems by default.
 /// </para>
 /// <para>On <b>Linux</b>, the comparison will be <b>case-sensitive</b>.</para>
 /// </summary>
@@ -21,14 +21,10 @@ namespace TruePath.Comparers;
 /// </remarks>
 internal class PlatformDefaultPathComparer<TPath> : IPathComparer<TPath> where TPath : IPath
 {
-    internal static readonly StringComparison DefaultStringComparison =
-        RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
-            ? StringComparison.OrdinalIgnoreCase
-            : StringComparison.Ordinal;
-
-    private readonly StringComparer _stringComparer = DefaultStringComparison == StringComparison.OrdinalIgnoreCase
-        ? StringComparer.OrdinalIgnoreCase
-        : StringComparer.Ordinal;
+    private readonly StringComparer _stringComparer =
+        PlatformDefaultPathComparer.DefaultStringComparison == StringComparison.OrdinalIgnoreCase
+            ? StringComparer.OrdinalIgnoreCase
+            : StringComparer.Ordinal;
 
     public bool Equals(TPath? x, TPath? y)
     {
@@ -44,4 +40,17 @@ internal class PlatformDefaultPathComparer<TPath> : IPathComparer<TPath> where T
     {
         return _stringComparer.Compare(x?.Value, y?.Value);
     }
+}
+
+internal static class PlatformDefaultPathComparer
+{
+    // Matches the .NET runtime's PathInternal.IsCaseSensitive:
+    // https://github.com/dotnet/runtime/blob/60629d14374c56f1cb51819049ad1fa529307f8d/src/libraries/Common/src/System/IO/PathInternal.CaseSensitivity.cs#L23-L29
+    internal static readonly StringComparison DefaultStringComparison =
+        RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+        || RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+        || RuntimeInformation.IsOSPlatform(OSPlatform.Create("IOS"))
+        || RuntimeInformation.IsOSPlatform(OSPlatform.Create("TVOS"))
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
 }

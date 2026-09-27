@@ -10,7 +10,7 @@ public class GenericInterfaceTests
     public void ParentTests()
     {
         IPath l = new LocalPath("foo/bar");
-        IPath a = new AbsolutePath("/foo/bar");
+        IPath a = Utils.SyntheticRoot / "foo/bar";
 
         Assert.Equal("foo", l.Parent?.FileName);
         Assert.Equal("foo", a.Parent?.FileName);
@@ -20,7 +20,7 @@ public class GenericInterfaceTests
     public void FileNameTests()
     {
         IPath l = new LocalPath("foo/bar");
-        IPath a = new AbsolutePath("/foo/bar");
+        IPath a = Utils.SyntheticRoot / "foo/bar";
 
         Assert.Equal("bar", l.FileName);
         Assert.Equal("bar", a.FileName);
@@ -30,7 +30,7 @@ public class GenericInterfaceTests
     public void OperatorTests()
     {
         var l = new LocalPath("foo/bar");
-        var a = new AbsolutePath("/foo/bar");
+        var a = Utils.SyntheticRoot / "foo/bar";
         var fragment = new LocalPath("frog1");
 
         Assert.Equal("frog1", AppendGeneric(l, fragment).FileName);

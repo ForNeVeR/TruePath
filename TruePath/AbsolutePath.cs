@@ -1,9 +1,12 @@
-// SPDX-FileCopyrightText: 2024 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+// SPDX-FileCopyrightText: 2024-2026 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 //
 // SPDX-License-Identifier: MIT
 
 using System.Runtime.InteropServices;
 using TruePath.Comparers;
+#if !NET8_0_OR_GREATER
+using TruePath.Polyfills;
+#endif
 
 namespace TruePath;
 
@@ -11,14 +14,20 @@ namespace TruePath;
 /// This is a path on the local system that's guaranteed to be <b>absolute</b>: that is, path that is rooted and has a
 /// disk letter (on Windows).
 /// </summary>
-/// <remarks>For a path that's not guaranteed to be absolute, use the <see cref="LocalPath"/> type.</remarks>
+/// <remarks>
+/// <para>For a path that's not guaranteed to be absolute, use the <see cref="LocalPath"/> type.</para>
+/// <para>
+/// Uninitialized values of this structure (e.g. <c>default(AbsolutePath)</c>) will throw
+/// <see cref="NullReferenceException"/> from many of the APIs.
+/// </para>
+/// </remarks>
 public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<AbsolutePath>, IPath, IPath<AbsolutePath>
 {
     /// <summary>
     /// <para>Provides a default comparer for comparing file paths, aware of the current platform.</para>
     /// <para>
-    /// On <b>Windows</b> and <b>macOS</b>, this will perform <b>case-insensitive</b> string comparison, since the
-    /// file systems are case-insensitive on these operating systems by default.
+    /// On <b>Windows</b>, <b>macOS</b>, <b>iOS</b> and <b>tvOS</b>, this will perform <b>case-insensitive</b> string
+    /// comparison, since the file systems are case-insensitive on these operating systems by default.
     /// </para>
     /// <para>On <b>Linux</b>, the comparison will be <b>case-sensitive</b>.</para>
     /// </summary>
@@ -46,7 +55,7 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// <param name="value">Path string to normalize.</param>
     /// <param name="checkAbsoluteness">Flag indicating whether absoluteness of path should be checked</param>
     /// <exception cref="ArgumentException">Thrown if the passed string does not represent an absolute path.</exception>>
-    private AbsolutePath(string value, bool checkAbsoluteness)
+    internal AbsolutePath(string value, bool checkAbsoluteness)
     {
         Underlying = new LocalPath(value);
 
@@ -74,9 +83,8 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// <inheritdoc cref="IPath.Parent"/>
     public AbsolutePath? Parent => Underlying.Parent is { } path ? new(path.Value, checkAbsoluteness: false) : null;
 
-    /// <summary>Gets the root of this path.</summary>
-    public AbsolutePath PathRoot() =>
-        new(Path.GetPathRoot(Value)!, checkAbsoluteness: false);
+    /// <summary>Gets the root of this path: e.g. <c>C:\</c> on Windows or <c>/</c> on Unix.</summary>
+    public AbsolutePath PathRoot => Underlying.PathRoot!.Value;
 
     /// <inheritdoc cref="IPath.Parent"/>
     IPath? IPath.Parent => Parent;
@@ -109,28 +117,71 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// Calculates the relative path from a base path to this path.
     /// </summary>
     /// <param name="basePath">The base path from which to calculate the relative path.</param>
-    /// <returns>The relative path from the base path to this path.</returns>
+    /// <returns>
+    /// The relative path from the base path to this path, or this path itself if the paths have different roots.
+    /// </returns>
+    /// <remarks>
+    /// If the paths have different roots (on Windows, e.g. paths on different drives), there's no relative path
+    /// between them, and this path is returned unchanged: <c>D:\x</c> relative to <c>C:\y</c> is <c>D:\x</c>. On
+    /// Unix, all paths share the same root, so this never happens.
+    /// </remarks>
 #if NET8_0_OR_GREATER
     public LocalPath RelativeTo(AbsolutePath basePath) => new(Path.GetRelativePath(basePath.Value, Value));
 #else
-    public LocalPath RelativeTo(AbsolutePath basePath) => new(PathEx.GetRelativePath(basePath.Value, Value));
+    public LocalPath RelativeTo(AbsolutePath basePath) => new(PathPolyfills.GetRelativePath(basePath.Value, Value));
 #endif
     /// <summary>Corrects the file name case on case-insensitive file systems, resolves symlinks.</summary>
     public AbsolutePath Canonicalize() => new(DiskUtils.GetRealPath(Value));
 
-    /// <summary>Appends another path to this one.</summary>
+    /// <summary>
+    /// <para>
+    /// Works the same way as <see cref="LocalPath.op_Division(LocalPath, LocalPath)"/> (read its documentation for
+    /// the details, including the differences from <see cref="Path.Combine(string, string)"/>), except that the
+    /// result is always absolute: a path relative to the current directory of another drive gets resolved (see the
+    /// remarks).
+    /// </para>
+    /// <para>
+    /// The result designates the same location as changing the current directory first to
+    /// <paramref name="basePath"/>, and then to <paramref name="b"/>: <c>a / b</c> means the same as
+    /// <c>cd /d a &amp;&amp; cd /d b</c> on Windows, or <c>cd a &amp;&amp; cd b</c> on Unix. This is the algorithm
+    /// of C++'s <c>std::filesystem::path::operator/</c>, except that the result is normalized, and that a path
+    /// relative to the current directory of another drive gets resolved.
+    /// </para>
+    /// </summary>
     /// <remarks>
-    /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the
-    /// <paramref name="basePath"/> will be ignored.
+    /// <para>
+    /// On Windows, a path relative to the current directory of <b>another</b> drive is resolved against the current
+    /// directory of that drive, as tracked by the process (see <see cref="Path.GetFullPath(string)"/>), or against the
+    /// root of that drive if the process doesn't track one. E.g. <c>C:\base / D:x</c> is <c>D:\x</c> if the current
+    /// directory of drive <c>D:</c> is its root. This is the only case when the result depends on the state of the
+    /// process: <see cref="LocalPath.op_Division(LocalPath, LocalPath)"/> returns <c>D:x</c> here.
+    /// </para>
+    /// <para>
+    /// On the same drive, such a path is resolved against the base path: <c>C:\base / C:x</c> is <c>C:\base\x</c>. A
+    /// path rooted without a drive letter keeps the drive of the base path: <c>C:\base / \x</c> is <c>C:\x</c>.
+    /// </para>
     /// </remarks>
-    public static AbsolutePath operator /(AbsolutePath basePath, LocalPath b) =>
-        new(Path.Combine(basePath.Value, b.Value), false);
+    /// <seealso href="https://eel.is/c++draft/fs.path.append">C++ standard: path appends (fs.path.append)</seealso>
+    public static AbsolutePath operator /(AbsolutePath basePath, LocalPath b)
+    {
+        var result = basePath.Underlying / b;
+        // Only a path relative to the current directory of another drive is left non-absolute: C:\base / D:x is D:x.
+        return result.Kind == PathKind.DriveCurrentDirectoryRelative
+            ? GetDriveCurrentDirectory(result.Value.Substring(0, 2)) / result.Value.Substring(2)
+            : new(result.Value, checkAbsoluteness: false);
+    }
 
-    /// <summary>Appends another path to this one.</summary>
-    /// <remarks>
-    /// Note that in case path <paramref name="b"/> is <b>absolute</b>, it will completely take over and the
-    /// <paramref name="basePath"/> will be ignored.
-    /// </remarks>
+    private static AbsolutePath GetDriveCurrentDirectory(string drive)
+    {
+        // TODO[#24]: This will get fancy when we support UNC and DOS Device paths.
+        // Only the drive gets resolved: Path.GetFullPath may throw for the rest of the path, or alter it (e.g. trim
+        // the trailing dots).
+        var directory = new LocalPath(Path.GetFullPath(drive));
+        var root = drive + Path.DirectorySeparatorChar;
+        return new(directory.IsAbsolute ? directory.Value : root, checkAbsoluteness: false);
+    }
+
+    /// <inheritdoc cref="op_Division(AbsolutePath, LocalPath)"/>
     public static AbsolutePath operator /(AbsolutePath basePath, string b) => basePath / new LocalPath(b);
 
     /// <returns>The normalized path string contained in this object.</returns>
