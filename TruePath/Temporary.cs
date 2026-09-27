@@ -21,6 +21,7 @@ public static class Temporary
     public static AbsolutePath SystemTempDirectory()
     {
         var tempPath = Path.GetTempPath();
+        // On Unix, this is TMPDIR used verbatim, so it is relative if TMPDIR is relative (e.g. TMPDIR=./tmp).
         return AbsolutePath.CurrentWorkingDirectory / tempPath;
     }
 
@@ -31,6 +32,7 @@ public static class Temporary
     public static AbsolutePath CreateTempFile()
     {
         var tempPath = Path.GetTempFileName();
+        // Relative if TMPDIR is relative, see SystemTempDirectory.
         return AbsolutePath.CurrentWorkingDirectory / tempPath;
     }
 
@@ -46,6 +48,8 @@ public static class Temporary
 #else
         var tempDirectoryInfo = DirectoryPolyfills.CreateTempSubdirectory(prefix);
 #endif
+        // Even FullName is relative if TMPDIR is relative: on Unix, .NET 8+ doesn't resolve it against the current
+        // directory.
         return AbsolutePath.CurrentWorkingDirectory / tempDirectoryInfo.FullName;
     }
 }
