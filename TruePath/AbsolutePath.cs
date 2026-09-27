@@ -136,26 +136,50 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// <summary>
     /// <para>
     /// Works the same way as <see cref="LocalPath.op_Division(LocalPath, LocalPath)"/> (read its documentation for
-    /// the details, including the differences from <see cref="Path.Combine(string, string)"/>), except that it throws
-    /// if the result is not absolute.
+    /// the details, including the differences from <see cref="Path.Combine(string, string)"/>), except that the
+    /// result is always absolute: a path relative to the current directory of another drive gets resolved (see the
+    /// remarks).
     /// </para>
     /// <para>
     /// The result designates the same location as changing the current directory first to
     /// <paramref name="basePath"/>, and then to <paramref name="b"/>: <c>a / b</c> means the same as
     /// <c>cd /d a &amp;&amp; cd /d b</c> on Windows, or <c>cd a &amp;&amp; cd b</c> on Unix. This is the algorithm
-    /// of C++'s <c>std::filesystem::path::operator/</c>, except that the drive letters are compared
-    /// case-insensitively, and that the result is normalized.
+    /// of C++'s <c>std::filesystem::path::operator/</c>, except that the result is normalized, and that a path
+    /// relative to the current directory of another drive gets resolved.
     /// </para>
     /// </summary>
     /// <remarks>
-    /// A result that is not absolute is only possible on Windows, when appending a path relative to the current
-    /// directory of <b>another</b> drive: e.g. <c>C:\base / D:x</c> would be <c>D:x</c>. On the same drive, such a
-    /// path is resolved against the base path: <c>C:\base / C:x</c> is <c>C:\base\x</c>. A path rooted without a
-    /// drive letter keeps the drive of the base path: <c>C:\base / \x</c> is <c>C:\x</c>.
+    /// <para>
+    /// On Windows, a path relative to the current directory of <b>another</b> drive is resolved against the current
+    /// directory of that drive, as tracked by the process (see <see cref="Path.GetFullPath(string)"/>), or against the
+    /// root of that drive if the process doesn't track one. E.g. <c>C:\base / D:x</c> is <c>D:\x</c> if the current
+    /// directory of drive <c>D:</c> is its root. This is the only case when the result depends on the state of the
+    /// process: <see cref="LocalPath.op_Division(LocalPath, LocalPath)"/> returns <c>D:x</c> here.
+    /// </para>
+    /// <para>
+    /// On the same drive, such a path is resolved against the base path: <c>C:\base / C:x</c> is <c>C:\base\x</c>. A
+    /// path rooted without a drive letter keeps the drive of the base path: <c>C:\base / \x</c> is <c>C:\x</c>.
+    /// </para>
     /// </remarks>
-    /// <exception cref="ArgumentException">Thrown if the resulting path is not absolute.</exception>
     /// <seealso href="https://eel.is/c++draft/fs.path.append">C++ standard: path appends (fs.path.append)</seealso>
-    public static AbsolutePath operator /(AbsolutePath basePath, LocalPath b) => new(basePath.Underlying / b);
+    public static AbsolutePath operator /(AbsolutePath basePath, LocalPath b)
+    {
+        var result = basePath.Underlying / b;
+        // Only a path relative to the current directory of another drive is left non-absolute: C:\base / D:x is D:x.
+        return result.Kind == PathKind.DriveCurrentDirectoryRelative
+            ? GetDriveCurrentDirectory(result.Value.Substring(0, 2)) / result.Value.Substring(2)
+            : new(result.Value, checkAbsoluteness: false);
+    }
+
+    private static AbsolutePath GetDriveCurrentDirectory(string drive)
+    {
+        // TODO[#24]: This will get fancy when we support UNC and DOS Device paths.
+        // Only the drive gets resolved: Path.GetFullPath may throw for the rest of the path, or alter it (e.g. trim
+        // the trailing dots).
+        var directory = new LocalPath(Path.GetFullPath(drive));
+        var root = drive + Path.DirectorySeparatorChar;
+        return new(directory.IsAbsolute ? directory.Value : root, checkAbsoluteness: false);
+    }
 
     /// <inheritdoc cref="op_Division(AbsolutePath, LocalPath)"/>
     public static AbsolutePath operator /(AbsolutePath basePath, string b) => basePath / new LocalPath(b);

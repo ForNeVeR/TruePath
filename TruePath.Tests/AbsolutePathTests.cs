@@ -275,6 +275,8 @@ public class AbsolutePathTests
     }
 
     [Theory]
+    [InlineData("x", @"C:\base\x")]
+    [InlineData("", @"C:\base")]
     [InlineData(@"\x", @"C:\x")]
     [InlineData("C:x", @"C:\base\x")]
     [InlineData("c:x", @"C:\base\x")]
@@ -288,13 +290,51 @@ public class AbsolutePathTests
     }
 
     [Fact]
-    public void AppendPathRelativeToAnotherDriveThrowsOnWindows()
+    public void AppendPathRelativeToAnotherDriveResolvesItOnWindows()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        // The current directory of the drive of the process current directory is the current directory itself.
+        var currentDirectory = AbsolutePath.CurrentWorkingDirectory;
+        var drive = currentDirectory.Value.Substring(0, 2);
+        var basePath = Utils.NonCurrentSyntheticRoot / "base";
+
+        Assert.Equal(currentDirectory / "x", basePath / (drive + "x"));
+        Assert.Equal(currentDirectory / "x", basePath / (drive.ToLowerInvariant() + "x"));
+        Assert.Equal(currentDirectory, basePath / drive);
+        // Path.GetFullPath would trim the trailing dot and space.
+        Assert.Equal(currentDirectory / "foo. ", basePath / (drive + "foo. "));
+    }
+
+    [Fact]
+    public void AppendPathRelativeToUnrelatedDriveOnWindows()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var drive = char.ToUpperInvariant(AbsolutePath.CurrentWorkingDirectory.Value[0]) == 'Q' ? "R:" : "Q:";
+        var basePath = Utils.NonCurrentSyntheticRoot / "base";
+
+        var result = basePath / (drive + "x");
+        Assert.True(result.Underlying.IsAbsolute);
+        Assert.Equal(new AbsolutePath(Path.GetFullPath(drive)) / "x", result);
+    }
+
+    [Theory]
+    [InlineData("x")]
+    [InlineData(@"\x")]
+    [InlineData(@"D:\x")]
+    [InlineData("D:x")]
+    [InlineData("C:x")]
+    [InlineData("c:x")]
+    [InlineData("")]
+    [InlineData("..")]
+    [InlineData(@"D:..\x")]
+    public void AppendAlwaysReturnsAbsolutePathOnWindows(string appended)
     {
         if (!OperatingSystem.IsWindows()) return;
 
         var basePath = new AbsolutePath(@"C:\base");
-        var ex = Assert.Throws<ArgumentException>(() => basePath / "D:x");
-        Assert.Equal("Path \"D:x\" is not absolute.", ex.Message);
+        Assert.True((basePath / appended).Underlying.IsAbsolute);
     }
 
     [Theory]
