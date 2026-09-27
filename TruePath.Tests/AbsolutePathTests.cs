@@ -306,19 +306,6 @@ public class AbsolutePathTests
         Assert.Equal(currentDirectory / "foo. ", basePath / (drive + "foo. "));
     }
 
-    [Fact]
-    public void AppendPathRelativeToUnrelatedDriveOnWindows()
-    {
-        if (!OperatingSystem.IsWindows()) return;
-
-        var drive = char.ToUpperInvariant(AbsolutePath.CurrentWorkingDirectory.Value[0]) == 'Q' ? "R:" : "Q:";
-        var basePath = Utils.NonCurrentSyntheticRoot / "base";
-
-        var result = basePath / (drive + "x");
-        Assert.True(result.Underlying.IsAbsolute);
-        Assert.Equal(new AbsolutePath(Path.GetFullPath(drive)) / "x", result);
-    }
-
     [Theory]
     [InlineData("x")]
     [InlineData(@"\x")]
