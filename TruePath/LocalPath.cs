@@ -322,9 +322,8 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     ///     </item>
     /// </list>
     /// <para>
-    /// This is the algorithm of C++'s <c>std::filesystem::path::operator/</c>, except that the drive letters are
-    /// compared case-insensitively, and that the result is normalized (e.g. <c>C:\base / ""</c> gets no trailing
-    /// separator after normalization).
+    /// This is the algorithm of C++'s <c>std::filesystem::path::operator/</c>, except that the result is normalized
+    /// (e.g. <c>C:\base / ""</c> gets no trailing separator after normalization).
     /// </para>
     /// <para>
     /// <b>Important:</b> this operator differs from <see cref="Path.Combine(string, string)"/>, which returns its
