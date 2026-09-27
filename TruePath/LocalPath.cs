@@ -72,6 +72,9 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
                     : PathKind.DriveCurrentDirectoryRelative;
             }
 
+            // TODO[#24]: UNC and DOS device paths lose their leading \\ during normalization, and get classified as
+            //            DriveRootRelative here. So AbsolutePath rejects them, including a current directory on a
+            //            network share, or a canonicalized path on a mapped network drive.
             return Value[0] == Separator ? PathKind.DriveRootRelative : PathKind.Relative;
         }
     }
@@ -351,6 +354,8 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
                     ? Join(basePath.Value, b.Value.Substring(2))
                     : b.Value;
             case PathKind.DriveRootRelative:
+                // TODO[#24]: a normalized UNC or DOS device path is also DriveRootRelative, and gets the drive of
+                //            the base path prepended: C:\work / \\server\share\x is C:\server\share\x.
                 return basePath.HasDriveLetter ? basePath.Value.Substring(0, 2) + b.Value : b.Value;
             default:
                 return Join(basePath.Value, b.Value);

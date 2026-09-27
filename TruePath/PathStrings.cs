@@ -140,6 +140,8 @@ public static class PathStrings
             }
 
             // skip the following / or \
+            // TODO[#24]: this also collapses the leading \\ of UNC and DOS device paths (\\server\share becomes
+            //            \server\share, and \\?\C:\x becomes \?\C:\x), which turns them into different paths.
             while (separator < source.Length && (source[separator] == Path.DirectorySeparatorChar || source[separator] == Path.AltDirectorySeparatorChar))
                 separator++;
 
