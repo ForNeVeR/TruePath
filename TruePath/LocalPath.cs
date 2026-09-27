@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Runtime.InteropServices;
 using TruePath.Comparers;
 #if !NET8_0_OR_GREATER
 using TruePath.Polyfills;
@@ -67,7 +66,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
         get
         {
             if (Value.Length == 0) return PathKind.Relative;
-            if (!IsDriveBasedSystem) return Value[0] == Separator ? PathKind.Absolute : PathKind.Relative;
+            if (!PathStrings.IsDriveBasedSystem) return Value[0] == Separator ? PathKind.Absolute : PathKind.Relative;
 
             if (HasDriveLetter)
             {
@@ -96,9 +95,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     /// <remarks>Equivalent to checking that <see cref="Kind"/> is <see cref="PathKind.Absolute"/>.</remarks>
     public bool IsAbsolute => Kind == PathKind.Absolute;
 
-    private static readonly bool IsDriveBasedSystem = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-
-    private bool HasDriveLetter => IsDriveBasedSystem && PathStrings.SourceContainsDriveLetter(Value.AsSpan());
+    private bool HasDriveLetter => PathStrings.IsDriveBasedSystem && PathStrings.SourceContainsDriveLetter(Value.AsSpan());
 
     /// <summary>
     /// <para>Gets the root of this path, if it can be determined without resolving against the current directory.</para>
@@ -357,28 +354,28 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
                 return b.Value;
             case PathKind.DriveCurrentDirectoryRelative:
                 return basePath.HasDriveLetter && IsSameDrive(basePath.Value, b.Value)
-                    ? Join(basePath.Value, b.Value.Substring(2))
+                    ? Join(basePath, b.Value.Substring(2))
                     : b.Value;
             case PathKind.DriveRootRelative:
                 // TODO[#24]: a normalized UNC or DOS device path is also DriveRootRelative, and gets the drive of
                 //            the base path prepended: C:\work / \\server\share\x is C:\server\share\x.
                 return basePath.HasDriveLetter ? basePath.Value.Substring(0, 2) + b.Value : b.Value;
             default:
-                return Join(basePath.Value, b.Value);
+                return Join(basePath, b.Value);
         }
     }
 
-    private static string Join(string basePath, string relativePath)
+    private static string Join(LocalPath basePath, string relativePath)
     {
-        if (relativePath.Length == 0) return basePath;
-        if (basePath.Length == 0) return relativePath;
+        var baseValue = basePath.Value;
+        if (relativePath.Length == 0) return baseValue;
+        if (baseValue.Length == 0) return relativePath;
 
         // A bare drive (C:) designates the current directory of the drive, and C:x is a path relative to it.
-        var isBareDrive = basePath.Length == 2 && IsDriveBasedSystem
-                          && PathStrings.SourceContainsDriveLetter(basePath.AsSpan());
-        return isBareDrive || basePath[^1] == Separator
-            ? basePath + relativePath
-            : basePath + Separator + relativePath;
+        var isBareDrive = baseValue.Length == 2 && basePath.HasDriveLetter;
+        return isBareDrive || baseValue[^1] == Separator
+            ? baseValue + relativePath
+            : baseValue + Separator + relativePath;
     }
 
     /// <summary>

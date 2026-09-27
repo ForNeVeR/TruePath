@@ -10,7 +10,6 @@
 // - https://github.com/dotnet/runtime/blob/60629d14374c56f1cb51819049ad1fa529307f8d/src/libraries/Common/src/System/IO/PathInternal.Unix.cs
 
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Text;
 using TruePath.Comparers;
 
@@ -28,7 +27,7 @@ namespace TruePath.Polyfills;
 /// </remarks>
 internal static class PathPolyfills
 {
-    private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+    private static bool IsWindows => PathStrings.IsDriveBasedSystem;
 
     // \\?\, \\.\, \??\
     private const int DevicePrefixLength = 4;

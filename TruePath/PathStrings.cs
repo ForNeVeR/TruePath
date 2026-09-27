@@ -15,6 +15,9 @@ public static class PathStrings
 {
     private const char VolumeSeparatorChar = ':';
 
+    /// <summary>Whether the current platform uses drive letters in paths (i.e. is Windows).</summary>
+    internal static readonly bool IsDriveBasedSystem = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
     /// <summary>
     /// <para>
     /// Will convert a path string to a normalized path, using path separator specific for the current system.
@@ -50,7 +53,7 @@ public static class PathStrings
     /// </para>
     /// </summary>
     public static string Normalize(string path) =>
-        Normalize(path, driveBasedSystem: RuntimeInformation.IsOSPlatform(OSPlatform.Windows));
+        Normalize(path, driveBasedSystem: IsDriveBasedSystem);
 
 #if NET8_0_OR_GREATER
     [SkipLocalsInit] // is necessary to prevent the CLR from filling stackalloc with zeros.
