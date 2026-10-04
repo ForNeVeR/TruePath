@@ -177,6 +177,16 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// path rooted without a drive letter keeps the drive of the base path: <c>C:\base / \x</c> is <c>C:\x</c>.
     /// </para>
     /// </remarks>
+    /// <exception cref="ArgumentException">
+    /// <para>
+    /// Thrown if the result has the dot-dot directory directly after root: e.g. when appending <c>..</c> to
+    /// <c>C:\</c> on Windows, or to <c>/</c> on Unix.
+    /// </para>
+    /// <para>
+    /// On Windows, in a rare corner case, this also depends on the state of the process: <c>C:\base / D:..\x</c>
+    /// throws if the current directory of drive <c>D:</c> is its root, or isn't tracked by the process.
+    /// </para>
+    /// </exception>
     /// <seealso href="https://eel.is/c++draft/fs.path.append">C++ standard: path appends (fs.path.append)</seealso>
     public static AbsolutePath operator /(AbsolutePath basePath, LocalPath b)
     {

@@ -440,6 +440,10 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     /// <see cref="AbsolutePath.op_Division(AbsolutePath, LocalPath)"/>), so the result is always absolute.
     /// </para>
     /// </remarks>
+    /// <exception cref="ArgumentException">
+    /// Thrown in the same cases as <see cref="AbsolutePath.op_Division(AbsolutePath, LocalPath)"/>: e.g. for
+    /// <c>D:..\x</c> on Windows if the current directory of drive <c>D:</c> is its root.
+    /// </exception>
     public AbsolutePath ResolveToCurrentDirectory() => AbsolutePath.CurrentWorkingDirectory / this;
 
     /// <summary>Converts an <see cref="AbsolutePath"/> to a <see cref="LocalPath"/>.</summary>

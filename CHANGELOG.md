@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - On Windows, `LocalPath.ResolveToCurrentDirectory` now resolves `\x` against the drive of the current directory, and `D:x` against the current directory of drive `D:`.
 - **Breaking:** `LocalPath.StartsWith` and `AbsolutePath.StartsWith` now compare whole path segments instead of raw strings, which makes them exact inverses of `IsPrefixOf` as originally intended in [#43](https://github.com/ForNeVeR/TruePath/issues/43). For example, `new LocalPath("/foo1").StartsWith(new LocalPath("/foo"))` is now `false`, where it used to be `true`.
 - `LocalPath.IsPrefixOf` now treats an empty path — the normalized form of `""`, `"."` and `"a/.."`, and the parent of any single-segment relative path — as the current directory, so it is a prefix of every path of kind `PathKind.Relative` that does not begin with a `..` reference.
+- **Breaking:** [#95](https://github.com/ForNeVeR/TruePath/issues/95): `AbsolutePath` now throws an `ArgumentException` for a path with `..` directly after the root, such as `C:\..` or `/..`. This includes the results of the `/` operator, e.g. `C:\ / ..`, or on Windows `C:\base / D:..\x` if the current directory of drive `D:` is its root.
 - The platform-default path comparers (`LocalPath.PlatformDefaultComparer`, `AbsolutePath.PlatformDefaultComparer`) are now case-insensitive on iOS and tvOS as well, matching the .NET runtime.
 
 ### Fixed

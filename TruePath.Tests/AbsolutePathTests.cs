@@ -411,7 +411,6 @@ public class AbsolutePathTests
     [InlineData("c:x")]
     [InlineData("")]
     [InlineData("..")]
-    [InlineData(@"D:..\x")]
     public void AppendAlwaysReturnsAbsolutePathOnWindows(string appended)
     {
         if (!OperatingSystem.IsWindows()) return;
@@ -686,6 +685,34 @@ public class AbsolutePathTests
             var path = new AbsolutePath(Environment.ProcessPath!).Parent!.Value;
             using var _ = Utils.ChangeCurrentDirectory(path);
             Assert.Equal(path, new AbsolutePath(Environment.CurrentDirectory));
+        }
+
+        [Fact]
+        public void AppendPathAboveRootOfAnotherDriveThrowsOnWindows()
+        {
+            if (!OperatingSystem.IsWindows()) return;
+
+            // The current directory of the drive of the process current directory is the current directory itself.
+            var root = AbsolutePath.CurrentWorkingDirectory.PathRoot;
+            using var _ = Utils.ChangeCurrentDirectory(root);
+            var drive = root.Value.Substring(0, 2);
+            var basePath = Utils.NonCurrentSyntheticRoot / "base";
+
+            Assert.Throws<ArgumentException>(() => basePath / (drive + @"..\x"));
+            Assert.Throws<ArgumentException>(() => basePath / (drive + ".."));
+        }
+
+        [Fact]
+        public void AppendPathAboveCurrentDirectoryOfAnotherDriveResolvesItOnWindows()
+        {
+            if (!OperatingSystem.IsWindows()) return;
+
+            var directory = new AbsolutePath(Path.GetTempPath()).Canonicalize();
+            using var _ = Utils.ChangeCurrentDirectory(directory);
+            var drive = directory.Value.Substring(0, 2);
+            var basePath = Utils.NonCurrentSyntheticRoot / "base";
+
+            Assert.Equal(directory.Parent!.Value / "x", basePath / (drive + @"..\x"));
         }
     }
 }
