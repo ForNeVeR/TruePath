@@ -55,22 +55,12 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// <param name="value">Path string to normalize.</param>
     /// <param name="checkAbsoluteness">Flag indicating whether absoluteness of path should be checked</param>
     /// <exception cref="ArgumentException">Thrown if the passed string does not represent an absolute path.</exception>
-    /// <exception cref="ArgumentException">
-    /// Thrown if the passed string matches the dot-dot directory directly after root (e.g. <c>C:\..</c> on Windows, or
-    /// <c>/..</c> on Unix).
-    /// </exception>
     internal AbsolutePath(string value, bool checkAbsoluteness)
     {
         Underlying = new LocalPath(value);
 
         if (checkAbsoluteness && Underlying.IsAbsolute is false)
             throw new ArgumentException($"Path \"{value}\" is not absolute.");
-
-        // An absolute path is rooted at "/" on Unix, or at a drive root like "C:\" on Windows (see LocalPath.Kind).
-        // TODO[#24]: UNC and DOS device paths have longer roots; this has to account for them once they are supported.
-        var rootLength = PathStrings.IsDriveBasedSystem ? 3 : 1;
-        if (LocalPath.StartsWithParentDirectoryReference(Value.AsSpan(rootLength)))
-            throw new ArgumentException($"Path \"{value}\" is not valid.");
     }
 
     /// <summary>
@@ -78,19 +68,13 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// rules stated in <see cref="LocalPath"/>.
     /// </summary>
     /// <param name="value">Path string to normalize.</param>
-    /// <exception cref="ArgumentException">
-    /// Thrown if the passed string does not represent an absolute path, or has the dot-dot directory directly after
-    /// root (e.g. <c>C:\..</c> on Windows, or <c>/..</c> on Unix).
-    /// </exception>
+    /// <exception cref="ArgumentException">Thrown if the passed string does not represent an absolute path.</exception>
     public AbsolutePath(string value) : this(value, checkAbsoluteness: true) { }
 
     /// <summary>
     /// Creates an <see cref="AbsolutePath"/> instance by converting a <paramref name="localPath"/> object.
     /// </summary>
-    /// <exception cref="ArgumentException">
-    /// Thrown if the passed path is not absolute, or has the dot-dot directory directly after root (e.g. <c>C:\..</c>
-    /// on Windows, or <c>/..</c> on Unix).
-    /// </exception>
+    /// <exception cref="ArgumentException">Thrown if the passed path is not absolute.</exception>
     public AbsolutePath(LocalPath localPath) : this(localPath.Value, checkAbsoluteness: true) { }
 
     /// <inheritdoc cref="IPath.Value"/>
@@ -177,16 +161,6 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// path rooted without a drive letter keeps the drive of the base path: <c>C:\base / \x</c> is <c>C:\x</c>.
     /// </para>
     /// </remarks>
-    /// <exception cref="ArgumentException">
-    /// <para>
-    /// Thrown if the result has the dot-dot directory directly after root: e.g. when appending <c>..</c> to
-    /// <c>C:\</c> on Windows, or to <c>/</c> on Unix.
-    /// </para>
-    /// <para>
-    /// On Windows, in a rare corner case, this also depends on the state of the process: <c>C:\base / D:..\x</c>
-    /// throws if the current directory of drive <c>D:</c> is its root, or isn't tracked by the process.
-    /// </para>
-    /// </exception>
     /// <seealso href="https://eel.is/c++draft/fs.path.append">C++ standard: path appends (fs.path.append)</seealso>
     public static AbsolutePath operator /(AbsolutePath basePath, LocalPath b)
     {

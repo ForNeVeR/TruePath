@@ -53,7 +53,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
 
     private static char Separator => Path.DirectorySeparatorChar;
 
-    internal static bool StartsWithParentDirectoryReference(ReadOnlySpan<char> value) =>
+    private static bool StartsWithParentDirectoryReference(ReadOnlySpan<char> value) =>
         value.Length >= 2 && value[0] == '.' && value[1] == '.'
         && (value.Length == 2 || value[2] == Separator);
 
@@ -150,8 +150,6 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
         {
             // For C:foo, the rest after the drive letter is a relative path, and follows the same rules.
             var relativePart = Kind == PathKind.DriveCurrentDirectoryRelative ? Value[2..] : Value;
-            // TODO[#95]: a rooted path ending with ".." (C:\..) gets here as well, so walking up its parents never
-            //            ends. This goes away once the normalization drops a ".." directly after the root.
             if (relativePart == "" || relativePart == ".." || relativePart.EndsWith($"{Separator}.."))
                 return this / "..";
             return Path.GetDirectoryName(Value) is { } parent ? new(parent) : null;
@@ -440,10 +438,6 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     /// <see cref="AbsolutePath.op_Division(AbsolutePath, LocalPath)"/>), so the result is always absolute.
     /// </para>
     /// </remarks>
-    /// <exception cref="ArgumentException">
-    /// Thrown in the same cases as <see cref="AbsolutePath.op_Division(AbsolutePath, LocalPath)"/>: e.g. for
-    /// <c>D:..\x</c> on Windows if the current directory of drive <c>D:</c> is its root.
-    /// </exception>
     public AbsolutePath ResolveToCurrentDirectory() => AbsolutePath.CurrentWorkingDirectory / this;
 
     /// <summary>Converts an <see cref="AbsolutePath"/> to a <see cref="LocalPath"/>.</summary>

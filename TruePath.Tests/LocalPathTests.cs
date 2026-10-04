@@ -10,12 +10,26 @@ public class LocalPathTests
     [InlineData("foo", ".")]
     [InlineData("foo/bar", "foo")]
     [InlineData("/", null)]
+    [InlineData("..", null)]
+    [InlineData("../foo", ".")]
     public void AbsolutePathParent(string relativePath, string? expectedRelativePath)
     {
         var root = Utils.SyntheticRoot;
         var parent = root / relativePath;
         AbsolutePath? expectedPath = expectedRelativePath == null ? null : new(root / expectedRelativePath);
         Assert.Equal(expectedPath, parent.Parent);
+    }
+
+    [Theory]
+    [InlineData("..")]
+    [InlineData("../..")]
+    [InlineData("../foo/..")]
+    public void RootedPathAboveRootHasNoParent(string relativePath)
+    {
+        var path = new LocalPath(Utils.SyntheticRootString + relativePath);
+
+        Assert.Equal(Utils.SyntheticRootString, path.Value);
+        Assert.Null(path.Parent);
     }
 
     [Theory]

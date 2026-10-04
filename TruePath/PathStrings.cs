@@ -39,7 +39,9 @@ public static class PathStrings
     ///         to the current directory is normalized to an <b>empty</b> path: both <c>.</c> and <c>a/..</c>
     ///         become <c>&quot;&quot;</c>. Parent directory references that cannot be resolved are preserved,
     ///         since there is nothing above them to fold into: <c>..</c> and <c>../..</c> are not affected by the
-    ///         normalization,
+    ///         normalization. The only exception is a parent directory reference directly after the root: the root
+    ///         has no parent, so such a reference is dropped (e.g. <c>/..</c> is normalized to <c>/</c>, and
+    ///         <c>C:\..\x</c> to <c>C:\x</c>),
     ///     </item>
     ///     <item>
     ///         trimming <b>all</b> trailing separators (e.g. <c>a/b/c/d////</c> is normalized to
@@ -126,9 +128,9 @@ public static class PathStrings
                     skip = true;
                 }
                 else
-                    // TODO[#95]: this keeps a ".." directly after the root (C:\.., /.., \..). The root has no parent,
-                    //            so it should be dropped, the same way Path.GetFullPath does: C:\.. is C:\.
-                    skip = false;
+                    // Only the root separator has been written (C:\.., /.., \..). The root has no parent, so the ".."
+                    // is dropped, the same way Path.GetFullPath does: C:\.. is C:\.
+                    skip = true;
             }
             else
                 skip = false;

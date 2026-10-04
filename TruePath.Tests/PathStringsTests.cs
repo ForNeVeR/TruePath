@@ -56,9 +56,11 @@ public class PathStringsTests
     [InlineData("foo/./bar/../var/./dar/..", "foo/var")]
     [InlineData("foo/.bar", "foo/.bar")]
     [InlineData("/.", "/")]
-    [InlineData("/..", "/..")]
-    [InlineData("/../..", "/../..")]
-    [InlineData("/../../foo/..", "/../..")]
+    [InlineData("/..", "/")]
+    [InlineData("/../..", "/")]
+    [InlineData("/../foo", "/foo")]
+    [InlineData("/../..foo", "/..foo")]
+    [InlineData("/../../foo/..", "/")]
     [InlineData("x/foo/bar/../..", "x")]
     [InlineData("x/foo/bar/.../.", "x/foo/bar/...")]
     [InlineData("x/foo/..bar/", "x/foo/..bar")]
@@ -91,9 +93,11 @@ public class PathStringsTests
     [InlineData("a/../../..", "../..")]
     [InlineData("foo/./bar/../var/./dar/..", "foo/var")]
     [InlineData("foo/.bar", "foo/.bar")]
-    [InlineData("/..", "/..")]
-    [InlineData("/../..", "/../..")]
-    [InlineData("/../../foo/..", "/../..")]
+    [InlineData("/..", "/")]
+    [InlineData("/../..", "/")]
+    [InlineData("/../foo", "/foo")]
+    [InlineData("/../..foo", "/..foo")]
+    [InlineData("/../../foo/..", "/")]
     [InlineData("x/foo/bar/../..", "x")]
     [InlineData("x/foo/bar/.../.", "x/foo/bar/...")]
     [InlineData("x/foo/..bar/", "x/foo/..bar")]
@@ -148,7 +152,7 @@ public class PathStringsTests
 
     [Theory]
     [InlineData("C:/", "C:/")]
-    [InlineData("C:/../file", "C:/../file")]
+    [InlineData("C:/../file", "C:/file")]
     public void Normalize_DriveLetterCheckEnabled_PreservesWindowsDrivePrefix(string input, string expected)
     {
         var actual = PathStrings.Normalize(input, driveBasedSystem: true);
@@ -156,11 +160,24 @@ public class PathStringsTests
         Assert.Equal(NormalizeSeparators(expected), actual);
     }
 
+    [Theory]
+    [InlineData("C:..", "C:..")]
+    [InlineData(@"C:..\x", @"C:..\x")]
+    [InlineData(@"C:..\..", @"C:..\..")]
+    [InlineData(@"\..", @"\")]
+    [InlineData(@"\..\x", @"\x")]
+    public void ParentReferenceIsOnlyDroppedAfterRootOnWindows(string input, string expected)
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
+
+        Assert.Equal(expected, PathStrings.Normalize(input));
+    }
+
     [Fact]
     public void Normalize_DriveLetterHandling_MatchesCurrentPlatform()
     {
         var actual = PathStrings.Normalize("C:/../file");
-        var expected = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "C:/../file" : "file";
+        var expected = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "C:/file" : "file";
 
         Assert.Equal(NormalizeSeparators(expected), actual);
     }

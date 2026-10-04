@@ -274,23 +274,22 @@ public class AbsolutePathTests
     }
 
     [Theory]
-    [InlineData(@"/../")]
-    [InlineData(@"/../..")]
-    [InlineData(@"/../../SomeFolder")]
-    [InlineData(@"/../.SomeFolder")]
-    [InlineData(@"/../SomeFolder")]
-    [InlineData(@"/../1123")]
-    [InlineData(@"/../()")]
-    [InlineData(@"/./..")]
-    [InlineData(@"/./../.")]
-    public void ConstructorThrowsOnInvalidPathInUnix(string path)
+    [InlineData(@"/../", @"/")]
+    [InlineData(@"/../..", @"/")]
+    [InlineData(@"/../../SomeFolder", @"/SomeFolder")]
+    [InlineData(@"/../.SomeFolder", @"/.SomeFolder")]
+    [InlineData(@"/../SomeFolder", @"/SomeFolder")]
+    [InlineData(@"/../1123", @"/1123")]
+    [InlineData(@"/../()", @"/()")]
+    [InlineData(@"/./..", @"/")]
+    [InlineData(@"/./../.", @"/")]
+    public void ConstructorDropsParentReferenceAfterRootInUnix(string path, string expectedPath)
     {
         if (OperatingSystem.IsWindows()) return;
-        string expectedMessage = $"Path \"{path}\" is not valid.";
 
-        var ex = Assert.Throws<ArgumentException>(() => new AbsolutePath(path));
+        var absolutePath = new AbsolutePath(path);
 
-        Assert.Equal(expectedMessage, ex.Message);
+        Assert.Equal(expectedPath, absolutePath.Value);
     }
 
     [Theory]
@@ -322,23 +321,34 @@ public class AbsolutePathTests
     }
 
     [Theory]
-    [InlineData(@"C:\..\")]
-    [InlineData(@"C:\..\..")]
-    [InlineData(@"C:\..\..SomeFolder")]
-    [InlineData(@"C:\..\.SomeFolder")]
-    [InlineData(@"C:\..\SomeFolder")]
-    [InlineData(@"C:\..\1123")]
-    [InlineData(@"C:\..\()")]
-    [InlineData(@"C:\.\..")]
-    [InlineData(@"C:\.\..\.")]
-    public void ConstructorThrowsOnInvalidPathInWindows(string path)
+    [InlineData(@"C:\..\", @"C:\")]
+    [InlineData(@"C:\..\..", @"C:\")]
+    [InlineData(@"C:\..\..SomeFolder", @"C:\..SomeFolder")]
+    [InlineData(@"C:\..\.SomeFolder", @"C:\.SomeFolder")]
+    [InlineData(@"C:\..\SomeFolder", @"C:\SomeFolder")]
+    [InlineData(@"C:\..\1123", @"C:\1123")]
+    [InlineData(@"C:\..\()", @"C:\()")]
+    [InlineData(@"C:\.\..", @"C:\")]
+    [InlineData(@"C:\.\..\.", @"C:\")]
+    [InlineData(@"C:/../SomeFolder", @"C:\SomeFolder")]
+    public void ConstructorDropsParentReferenceAfterRootInWindows(string path, string expectedPath)
     {
         if (OperatingSystem.IsWindows() is false) return;
-        string expectedMessage = $"Path \"{path}\" is not valid.";
 
-        var ex = Assert.Throws<ArgumentException>(() => new AbsolutePath(path));
+        var absolutePath = new AbsolutePath(path);
 
-        Assert.Equal(expectedMessage, ex.Message);
+        Assert.Equal(expectedPath, absolutePath.Value);
+    }
+
+    [Fact]
+    public void AppendParentReferenceToRootReturnsRoot()
+    {
+        var root = Utils.SyntheticRoot;
+
+        Assert.Equal(root, root / "..");
+        Assert.Equal(root, root / ".." / "..");
+        Assert.Equal(root / "x", root / ".." / "x");
+        Assert.Equal(root / "x", root / "../x");
     }
 
     [Fact]
@@ -411,6 +421,7 @@ public class AbsolutePathTests
     [InlineData("c:x")]
     [InlineData("")]
     [InlineData("..")]
+    [InlineData(@"D:..\x")]
     public void AppendAlwaysReturnsAbsolutePathOnWindows(string appended)
     {
         if (!OperatingSystem.IsWindows()) return;
@@ -688,7 +699,7 @@ public class AbsolutePathTests
         }
 
         [Fact]
-        public void AppendPathAboveRootOfAnotherDriveThrowsOnWindows()
+        public void AppendPathAboveRootOfAnotherDriveStaysAtRootOnWindows()
         {
             if (!OperatingSystem.IsWindows()) return;
 
@@ -698,8 +709,8 @@ public class AbsolutePathTests
             var drive = root.Value.Substring(0, 2);
             var basePath = Utils.NonCurrentSyntheticRoot / "base";
 
-            Assert.Throws<ArgumentException>(() => basePath / (drive + @"..\x"));
-            Assert.Throws<ArgumentException>(() => basePath / (drive + ".."));
+            Assert.Equal(root / "x", basePath / (drive + @"..\x"));
+            Assert.Equal(root, basePath / (drive + ".."));
         }
 
         [Fact]
