@@ -14,6 +14,8 @@ namespace TruePath;
 public static class PathStrings
 {
     private const char VolumeSeparatorChar = ':';
+    private static readonly string ParentReferenceWithSeparator = $"..{Path.DirectorySeparatorChar}";
+    private static readonly string ParentReferenceWithAltSeparator = $"..{Path.AltDirectorySeparatorChar}";
 
     /// <summary>Whether the current platform uses drive letters in paths (i.e. is Windows).</summary>
     internal static readonly bool IsDriveBasedSystem = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -98,8 +100,8 @@ public static class PathStrings
             else if (written != 0
                 && (
                     block is ".."
-                    || block.SequenceEqual($"..{Path.DirectorySeparatorChar}".AsSpan())
-                    || block.SequenceEqual($"..{Path.AltDirectorySeparatorChar}".AsSpan())
+                    || block.SequenceEqual(ParentReferenceWithSeparator.AsSpan())
+                    || block.SequenceEqual(ParentReferenceWithAltSeparator.AsSpan())
                 ))
             {
                 var alreadyWrittenPart = normalized[..(written - 1)];
@@ -163,14 +165,11 @@ public static class PathStrings
             }
         }
 
-        if (written == 0 && containsDriveLetter)
-        {
-            return path[..2];
-        }
-
         if (written == 0)
         {
-            return string.Empty;
+            if (array != null)
+                ArrayPool<char>.Shared.Return(array);
+            return containsDriveLetter ? path[..2] : string.Empty;
         }
 
         // remove / at the end of path
@@ -190,7 +189,6 @@ public static class PathStrings
             result = new string(normalized[..written].ToArray());
         }
 
-        normalized.Slice(0, written);
         if (array != null)
             ArrayPool<char>.Shared.Return(array);
         return result;
