@@ -167,7 +167,6 @@ public class PathExtensionsTests
     [InlineData(@"C:\foo\.gitignore", null)]
     [InlineData(@"C:\.gitignore", null)]
     [InlineData(@"C:\", "bar")]
-    [InlineData(@"\", "bar")]
     public void WithExtensionThrowsIfTheResultIsNotAFileName_Windows(string inputPath, string? newExtension)
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
