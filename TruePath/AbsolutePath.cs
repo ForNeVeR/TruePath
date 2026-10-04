@@ -56,9 +56,9 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// <param name="checkAbsoluteness">Flag indicating whether absoluteness of path should be checked</param>
     /// <exception cref="ArgumentException">Thrown if the passed string does not represent an absolute path.</exception>>
     /// <exception cref="ArgumentException">
-    /// Thrown if the passed string matches the dot-dot directory directly after root (e.g. C:/../ or /../)
+    /// Thrown if the passed string matches the dot-dot directory directly after root (e.g. <c>C:\..</c> on Windows, or
+    /// <c>/..</c> on Unix).
     /// </exception>>
-
     internal AbsolutePath(string value, bool checkAbsoluteness)
     {
         Underlying = new LocalPath(value);
@@ -68,8 +68,7 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
 
         var pathRoot = Path.GetPathRoot(Underlying.Value)!;
         var pathWithoutRoot = Underlying.Value[pathRoot.Length..];
-        if (pathWithoutRoot.StartsWith("../") || pathWithoutRoot.StartsWith("..\\") ||
-            pathWithoutRoot.Equals(".."))
+        if (pathWithoutRoot == ".." || pathWithoutRoot.StartsWith(".." + Path.DirectorySeparatorChar))
         {
             throw new ArgumentException($"Path \"{value}\" is not valid.");
         }
