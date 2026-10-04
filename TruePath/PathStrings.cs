@@ -156,7 +156,7 @@ public static class PathStrings
 
             // next iter
             source = source.Slice(separator);
-            // append everything else if there`s no more '\' or '/'
+            // append everything else if there's no more '\' or '/'
             if (last)
             {
                 source.CopyTo(buffer);
