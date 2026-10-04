@@ -3,7 +3,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Runtime.Versioning;
 using System.Text;
 
 namespace TruePath.SystemIo;
@@ -723,8 +722,15 @@ public static class PathIo
     ///     while <c>?ello.txt</c> matches only <c>hello.txt</c>.
     ///     </para>
     ///     <para>
-    ///     When running on .NET Framework, a three-character extension also matches longer ones, so
-    ///     <c>*.txt</c> additionally matches <c>hello.txtt</c>.
+    ///     When running on .NET Framework on Windows, the pattern is also matched against the short (8.3) name of
+    ///     each file, if it has one. Since a short name keeps at most three characters of the extension,
+    ///     <c>*.htm</c> may also return <c>index.html</c> (whose short name is <c>INDEX~1.HTM</c>), and a pattern
+    ///     such as <c>*1*</c> may match many files with no <c>1</c> in their long names, through the <c>~1</c>
+    ///     suffix of their short names. Whether a file has a short name depends on the volume settings at the time
+    ///     the file was created, so the results may differ between machines and even between files in the same
+    ///     directory. See
+    ///     <see href="https://devblogs.microsoft.com/oldnewthing/20140313-00/?p=1513">Raymond Chen's explanation</see>
+    ///     for details.
     ///     </para>
     ///     <para>
     ///     For the full pattern syntax and its caveats, see
@@ -772,8 +778,15 @@ public static class PathIo
     ///     while <c>?ello.txt</c> matches only <c>hello.txt</c>.
     ///     </para>
     ///     <para>
-    ///     When running on .NET Framework, a three-character extension also matches longer ones, so
-    ///     <c>*.txt</c> additionally matches <c>hello.txtt</c>.
+    ///     When running on .NET Framework on Windows, the pattern is also matched against the short (8.3) name of
+    ///     each file, if it has one. Since a short name keeps at most three characters of the extension,
+    ///     <c>*.htm</c> may also return <c>index.html</c> (whose short name is <c>INDEX~1.HTM</c>), and a pattern
+    ///     such as <c>*1*</c> may match many files with no <c>1</c> in their long names, through the <c>~1</c>
+    ///     suffix of their short names. Whether a file has a short name depends on the volume settings at the time
+    ///     the file was created, so the results may differ between machines and even between files in the same
+    ///     directory. See
+    ///     <see href="https://devblogs.microsoft.com/oldnewthing/20140313-00/?p=1513">Raymond Chen's explanation</see>
+    ///     for details.
     ///     </para>
     ///     <para>
     ///     For the full pattern syntax and its caveats, see
@@ -802,6 +815,16 @@ public static class PathIo
     ///     regular expressions. This overload matches with Win32 semantics, where <c>*</c> stands for zero or
     ///     more characters and <c>?</c> for exactly one, except immediately before a period or at the end of
     ///     the name, where it may also match none: <c>a?</c> matches both <c>ab</c> and <c>a</c>.
+    ///     </para>
+    ///     <para>
+    ///     When running on .NET Framework on Windows, the pattern is also matched against the short (8.3) name of
+    ///     each subdirectory, if it has one. So a pattern such as <c>*1*</c> may also return <c>Program Files</c>
+    ///     (whose short name is <c>PROGRA~1</c>), and <c>*.htm</c> may return <c>pages.html</c> (whose short name
+    ///     is <c>PAGES~1.HTM</c>). Whether a subdirectory has a short name depends on the volume settings at the time
+    ///     it was created, so the results may differ between machines and even between subdirectories of the same
+    ///     directory. See
+    ///     <see href="https://devblogs.microsoft.com/oldnewthing/20140313-00/?p=1513">Raymond Chen's explanation</see>
+    ///     for details.
     ///     </para>
     ///     <para>
     ///     For the full pattern syntax and its caveats, see
@@ -843,6 +866,16 @@ public static class PathIo
     ///     the name, where it may also match none: <c>a?</c> matches both <c>ab</c> and <c>a</c>.
     ///     </para>
     ///     <para>
+    ///     When running on .NET Framework on Windows, the pattern is also matched against the short (8.3) name of
+    ///     each subdirectory, if it has one. So a pattern such as <c>*1*</c> may also return <c>Program Files</c>
+    ///     (whose short name is <c>PROGRA~1</c>), and <c>*.htm</c> may return <c>pages.html</c> (whose short name
+    ///     is <c>PAGES~1.HTM</c>). Whether a subdirectory has a short name depends on the volume settings at the time
+    ///     it was created, so the results may differ between machines and even between subdirectories of the same
+    ///     directory. See
+    ///     <see href="https://devblogs.microsoft.com/oldnewthing/20140313-00/?p=1513">Raymond Chen's explanation</see>
+    ///     for details.
+    ///     </para>
+    ///     <para>
     ///     For the full pattern syntax and its caveats, see
     ///     <see href="https://learn.microsoft.com/dotnet/api/system.io.directory.getdirectories"/>.
     ///     </para>
@@ -876,8 +909,15 @@ public static class PathIo
     ///     while <c>?ello.txt</c> matches only <c>hello.txt</c>.
     ///     </para>
     ///     <para>
-    ///     When running on .NET Framework, a three-character extension also matches longer ones, so
-    ///     <c>*.txt</c> additionally matches <c>hello.txtt</c>.
+    ///     When running on .NET Framework on Windows, the pattern is also matched against the short (8.3) name of
+    ///     each file, if it has one. Since a short name keeps at most three characters of the extension,
+    ///     <c>*.htm</c> may also return <c>index.html</c> (whose short name is <c>INDEX~1.HTM</c>), and a pattern
+    ///     such as <c>*1*</c> may match many files with no <c>1</c> in their long names, through the <c>~1</c>
+    ///     suffix of their short names. Whether a file has a short name depends on the volume settings at the time
+    ///     the file was created, so the results may differ between machines and even between files in the same
+    ///     directory. See
+    ///     <see href="https://devblogs.microsoft.com/oldnewthing/20140313-00/?p=1513">Raymond Chen's explanation</see>
+    ///     for details.
     ///     </para>
     ///     <para>
     ///     For the full pattern syntax and its caveats, see
@@ -928,8 +968,15 @@ public static class PathIo
     ///     while <c>?ello.txt</c> matches only <c>hello.txt</c>.
     ///     </para>
     ///     <para>
-    ///     When running on .NET Framework, a three-character extension also matches longer ones, so
-    ///     <c>*.txt</c> additionally matches <c>hello.txtt</c>.
+    ///     When running on .NET Framework on Windows, the pattern is also matched against the short (8.3) name of
+    ///     each file, if it has one. Since a short name keeps at most three characters of the extension,
+    ///     <c>*.htm</c> may also return <c>index.html</c> (whose short name is <c>INDEX~1.HTM</c>), and a pattern
+    ///     such as <c>*1*</c> may match many files with no <c>1</c> in their long names, through the <c>~1</c>
+    ///     suffix of their short names. Whether a file has a short name depends on the volume settings at the time
+    ///     the file was created, so the results may differ between machines and even between files in the same
+    ///     directory. See
+    ///     <see href="https://devblogs.microsoft.com/oldnewthing/20140313-00/?p=1513">Raymond Chen's explanation</see>
+    ///     for details.
     ///     </para>
     ///     <para>
     ///     For the full pattern syntax and its caveats, see
