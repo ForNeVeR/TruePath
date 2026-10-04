@@ -245,99 +245,52 @@ public class AbsolutePathTests
         Assert.Equal(@"C:\Users\John Doe\Documents", absolutePath.Value);
     }
 
+    /// <summary>
+    /// Appends <paramref name="relativePath"/> (written with <c>/</c>) to <see cref="Utils.SyntheticRootString"/>, using
+    /// the separators of the current platform.
+    /// </summary>
+    private static string SyntheticRootedPath(string relativePath) =>
+        Utils.SyntheticRootString + relativePath.Replace('/', Path.DirectorySeparatorChar);
+
     [Theory]
-    [InlineData(@"/.")]
-    [InlineData(@"/./.")]
-    [InlineData(@"/././.")]
-    public void ConstructorCreatesValidPathWithDotInUnix(string path)
+    [InlineData(".")]
+    [InlineData("./.")]
+    [InlineData("././.")]
+    public void ConstructorDropsCurrentDirectoryReferenceAfterRoot(string relativePath)
     {
-        if (OperatingSystem.IsWindows()) return;
-        const string expectedPath = @"/";
+        var absolutePath = new AbsolutePath(Utils.SyntheticRootString + relativePath);
 
-        var absolutePath = new AbsolutePath(path);
-
-        Assert.Equal(expectedPath, absolutePath.Value);
+        Assert.Equal(Utils.SyntheticRootString, absolutePath.Value);
     }
 
     [Theory]
-    [InlineData(@"/...")]
-    [InlineData(@"/..SomeFolder")]
-    [InlineData(@"/..00")]
-    [InlineData(@"/..#")]
-    public void ConstructorCreatesValidPathCorrectlyInUnix(string path)
+    [InlineData("...")]
+    [InlineData("..SomeFolder")]
+    [InlineData("..00")]
+    [InlineData("..#")]
+    public void ConstructorKeepsNamesStartingWithDotsAfterRoot(string relativePath)
     {
-        if (OperatingSystem.IsWindows()) return;
+        var absolutePath = new AbsolutePath(Utils.SyntheticRootString + relativePath);
 
-        var absolutePath = new AbsolutePath(path);
-
-        Assert.Equal(path, absolutePath.Value);
+        Assert.Equal(SyntheticRootedPath(relativePath), absolutePath.Value);
     }
 
     [Theory]
-    [InlineData(@"/../", @"/")]
-    [InlineData(@"/../..", @"/")]
-    [InlineData(@"/../../SomeFolder", @"/SomeFolder")]
-    [InlineData(@"/../.SomeFolder", @"/.SomeFolder")]
-    [InlineData(@"/../SomeFolder", @"/SomeFolder")]
-    [InlineData(@"/../1123", @"/1123")]
-    [InlineData(@"/../()", @"/()")]
-    [InlineData(@"/./..", @"/")]
-    [InlineData(@"/./../.", @"/")]
-    public void ConstructorDropsParentReferenceAfterRootInUnix(string path, string expectedPath)
+    [InlineData("../", "")]
+    [InlineData("../..", "")]
+    [InlineData("../../SomeFolder", "SomeFolder")]
+    [InlineData("../..SomeFolder", "..SomeFolder")]
+    [InlineData("../.SomeFolder", ".SomeFolder")]
+    [InlineData("../SomeFolder", "SomeFolder")]
+    [InlineData("../1123", "1123")]
+    [InlineData("../()", "()")]
+    [InlineData("./..", "")]
+    [InlineData("./../.", "")]
+    public void ConstructorDropsParentReferenceAfterRoot(string relativePath, string expectedRelativePath)
     {
-        if (OperatingSystem.IsWindows()) return;
+        var absolutePath = new AbsolutePath(Utils.SyntheticRootString + relativePath);
 
-        var absolutePath = new AbsolutePath(path);
-
-        Assert.Equal(expectedPath, absolutePath.Value);
-    }
-
-    [Theory]
-    [InlineData(@"C:\.")]
-    [InlineData(@"C:\.\.")]
-    [InlineData(@"C:\.\.\.")]
-    public void ConstructorCreatesValidPathWithDotInWindows(string path)
-    {
-        if (OperatingSystem.IsWindows() is false) return;
-        const string expectedPath = @"C:\";
-
-        var absolutePath = new AbsolutePath(path);
-
-        Assert.Equal(expectedPath, absolutePath.Value);
-    }
-
-    [Theory]
-    [InlineData(@"C:\...")]
-    [InlineData(@"C:\..SomeFolder")]
-    [InlineData(@"C:\..00")]
-    [InlineData(@"C:\..#")]
-    public void ConstructorCreatesValidPathCorrectlyInWindows(string path)
-    {
-        if (OperatingSystem.IsWindows() is false) return;
-
-        var absolutePath = new AbsolutePath(path);
-
-        Assert.Equal(path, absolutePath.Value);
-    }
-
-    [Theory]
-    [InlineData(@"C:\..\", @"C:\")]
-    [InlineData(@"C:\..\..", @"C:\")]
-    [InlineData(@"C:\..\..SomeFolder", @"C:\..SomeFolder")]
-    [InlineData(@"C:\..\.SomeFolder", @"C:\.SomeFolder")]
-    [InlineData(@"C:\..\SomeFolder", @"C:\SomeFolder")]
-    [InlineData(@"C:\..\1123", @"C:\1123")]
-    [InlineData(@"C:\..\()", @"C:\()")]
-    [InlineData(@"C:\.\..", @"C:\")]
-    [InlineData(@"C:\.\..\.", @"C:\")]
-    [InlineData(@"C:/../SomeFolder", @"C:\SomeFolder")]
-    public void ConstructorDropsParentReferenceAfterRootInWindows(string path, string expectedPath)
-    {
-        if (OperatingSystem.IsWindows() is false) return;
-
-        var absolutePath = new AbsolutePath(path);
-
-        Assert.Equal(expectedPath, absolutePath.Value);
+        Assert.Equal(SyntheticRootedPath(expectedRelativePath), absolutePath.Value);
     }
 
     [Fact]
@@ -718,12 +671,22 @@ public class AbsolutePathTests
         {
             if (!OperatingSystem.IsWindows()) return;
 
-            var directory = new AbsolutePath(Path.GetTempPath()).Canonicalize();
-            using var _ = Utils.ChangeCurrentDirectory(directory);
-            var drive = directory.Value.Substring(0, 2);
-            var basePath = Utils.NonCurrentSyntheticRoot / "base";
+            // A subdirectory of the temporary directory always has a parent, even if the temporary directory is a root.
+            var directory = Temporary.CreateTempFolder().Canonicalize();
+            try
+            {
+                using (Utils.ChangeCurrentDirectory(directory))
+                {
+                    var drive = directory.Value.Substring(0, 2);
+                    var basePath = Utils.NonCurrentSyntheticRoot / "base";
 
-            Assert.Equal(directory.Parent!.Value / "x", basePath / (drive + @"..\x"));
+                    Assert.Equal(directory.Parent!.Value / "x", basePath / (drive + @"..\x"));
+                }
+            }
+            finally
+            {
+                Directory.Delete(directory.Value);
+            }
         }
     }
 }

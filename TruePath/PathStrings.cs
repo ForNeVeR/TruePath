@@ -106,8 +106,8 @@ public static class PathStrings
                 var jump = alreadyWrittenPart.LastIndexOf(Path.DirectorySeparatorChar);
 
                 // Check if the last entry in the normalized path is "..": in this case, no need to skip (we keep a
-                // train of ../../.. in the normalized path's root because they are impossible to get rid of during
-                // normalization).
+                // train of ../../.. at the start of a relative path, including C:..\.., because they are impossible
+                // to get rid of during normalization).
                 var lastEntryStartIndex = jump + 1;
                 var lastEntry = alreadyWrittenPart[lastEntryStartIndex..];
                 if (lastEntry is "..")

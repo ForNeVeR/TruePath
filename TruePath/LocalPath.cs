@@ -148,10 +148,16 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     {
         get
         {
-            // For C:foo, the rest after the drive letter is a relative path, and follows the same rules.
-            var relativePart = Kind == PathKind.DriveCurrentDirectoryRelative ? Value[2..] : Value;
-            if (relativePart == "" || relativePart == ".." || relativePart.EndsWith($"{Separator}.."))
-                return this / "..";
+            // Only a relative path can end with "..": the normalization drops a ".." directly after the root.
+            var kind = Kind;
+            if (kind is PathKind.Relative or PathKind.DriveCurrentDirectoryRelative)
+            {
+                // For C:foo, the rest after the drive letter is a relative path, and follows the same rules.
+                var relativePart = kind == PathKind.DriveCurrentDirectoryRelative ? Value[2..] : Value;
+                if (relativePart == "" || relativePart == ".." || relativePart.EndsWith($"{Separator}.."))
+                    return this / "..";
+            }
+
             return Path.GetDirectoryName(Value) is { } parent ? new(parent) : null;
         }
     }

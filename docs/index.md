@@ -49,9 +49,11 @@ The paths are stored in the **normalized form**.
 
 - All the `Path.AltDirectorySeparatorChar` are converted to `Path.DirectorySeparatorChar` (e.g. `/` to `\` on Windows).
 - Any repeated separators in the input are collapsed to only one separator (e.g. `//` to just `/` on Unix).
-- Any sequence of current and parent directory marks (subsequently, `.` and `..`) is resolved if possible (meaning they
-  will not be replaced if they are in the root position: paths such as `.` or `../..` will not be affected by the
-  normalization, while e.g. `foo/bar/../.` will be resolved to just `foo`).
+- Any sequence of current and parent directory marks (subsequently, `.` and `..`) is resolved if possible: e.g.
+  `foo/bar/../.` is resolved to just `foo`. A path that resolves to the current directory is normalized to an empty
+  path (both `.` and `a/..` become `""`). Parent directory marks at the start of a relative path cannot be resolved,
+  and are preserved: `..` and `../..` are not affected by the normalization. A parent directory mark directly after the
+  root is dropped, since the root has no parent: `/..` is normalized to `/`, and `C:\..\x` to `C:\x`.
 - All trailing separators are trimmed (e.g. `a/b/c/d////` is normalized to `a/b/c/d`), except for the case of the root folder: `/` (Unix) or `X:\` (Windows) keeps one final separator (because it would become an empty string or a reference to the current path on disk `X:` without the trailing separator).
 
 Note that the normalization operation will not perform any file IO, and is purely string manipulation.
