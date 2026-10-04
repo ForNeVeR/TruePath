@@ -53,7 +53,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
 
     private static char Separator => Path.DirectorySeparatorChar;
 
-    private static bool StartsWithParentDirectoryReference(ReadOnlySpan<char> value) =>
+    internal static bool StartsWithParentDirectoryReference(ReadOnlySpan<char> value) =>
         value.Length >= 2 && value[0] == '.' && value[1] == '.'
         && (value.Length == 2 || value[2] == Separator);
 
