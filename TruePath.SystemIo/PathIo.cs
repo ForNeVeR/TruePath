@@ -1,9 +1,12 @@
 // SPDX-FileCopyrightText: 2025 .NET Foundation and Contributors
-// SPDX-FileCopyrightText: 2025 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+// SPDX-FileCopyrightText: 2025-2026 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 //
 // SPDX-License-Identifier: MIT
 
 using System.Text;
+#if NET8_0_OR_GREATER
+using System.Runtime.Versioning;
+#endif
 
 namespace TruePath.SystemIo;
 
