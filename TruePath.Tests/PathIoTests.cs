@@ -40,6 +40,21 @@ public class PathIoTests
         });
     }
 
+    [Fact]
+    public void GetFilesByLocalPathPatternTest()
+    {
+        DoWithTempFolder(tempFolder =>
+        {
+            var matchingFile = tempFolder / "matching.txt";
+            matchingFile.WriteAllText("test");
+            (tempFolder / "other.log").WriteAllText("test");
+
+            var files = tempFolder.GetFiles(new LocalPathPattern("*.txt"));
+
+            Assert.Equal([matchingFile.Value], files);
+        });
+    }
+
     private static void DoWithTempFolder(Action<AbsolutePath> test)
     {
         var tempFolder = Temporary.CreateTempFolder();
