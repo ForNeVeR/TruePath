@@ -743,6 +743,14 @@ public static class PathIo
     /// <returns>An array of the full names (including paths) for the files in the specified directory that match the specified search pattern.</returns>
     public static string[] GetFiles(this AbsolutePath path, string searchPattern) => Directory.GetFiles(path.Value, searchPattern);
 
+    /// <summary>
+    /// Returns the names of files (including their paths) that match the specified search pattern in the specified directory.
+    /// </summary>
+    /// <param name="path">The directory to search.</param>
+    /// <param name="searchPattern">The search pattern to match against the names of files in <paramref name="path"/>.</param>
+    /// <returns>An array of the full names (including paths) for the files in the specified directory that match the specified search pattern.</returns>
+    public static string[] GetFiles(this AbsolutePath path, LocalPathPattern searchPattern) => Directory.GetFiles(path.Value, searchPattern.Value);
+
 #if NET8_0_OR_GREATER
     /// <summary>
     /// Returns the names of files (including their paths) that match the specified search pattern and enumeration options in the specified directory.
