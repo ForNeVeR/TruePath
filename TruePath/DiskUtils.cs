@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+// SPDX-FileCopyrightText: 2024-2026 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 //
 // SPDX-License-Identifier: MIT
 
@@ -116,16 +116,21 @@ internal static class DiskUtils
     /// <returns>The resolved absolute path, or the original path if resolution fails.</returns>
     private static string GetPosixRealPath(string path)
     {
-        using var ptr = Libc.RealPath(path, IntPtr.Zero);
+        var ptr = Libc.RealPath(path, IntPtr.Zero);
 
-        if (ptr.DangerousGetHandle() == IntPtr.Zero)
+        if (ptr == IntPtr.Zero)
         {
             return path;
         }
 
-        var result = Marshal.PtrToStringAnsi(ptr.DangerousGetHandle());
-
-        return result ?? path;
+        try
+        {
+            return Marshal.PtrToStringAnsi(ptr)!; // never returns null since ptr is not zero here
+        }
+        finally
+        {
+            Libc.Free(ptr);
+        }
     }
 
     /// <summary>
