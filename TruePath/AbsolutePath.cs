@@ -131,6 +131,10 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     public LocalPath RelativeTo(AbsolutePath basePath) => new(PathPolyfills.GetRelativePath(basePath.Value, Value));
 #endif
     /// <summary>Corrects the file name case on case-insensitive file systems, resolves symlinks.</summary>
+    /// <remarks>
+    /// If the path cannot be resolved (e.g. it or one of its parent directories doesn't exist, or access to it is
+    /// denied), this method doesn't throw and returns the path unchanged.
+    /// </remarks>
     public AbsolutePath Canonicalize() => new(DiskUtils.GetRealPath(Value));
 
     /// <summary>
