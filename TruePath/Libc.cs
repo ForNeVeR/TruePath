@@ -26,7 +26,6 @@ internal static class Libc
     /// </remarks>
     [DllImport("libc",
         EntryPoint = "realpath",
-        SetLastError = true,
         CharSet = CharSet.Ansi)]
     internal static extern IntPtr RealPath(string path, IntPtr buffer);
 
