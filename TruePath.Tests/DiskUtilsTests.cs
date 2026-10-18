@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using System.Text;
+using TruePath.SystemIo;
 using RuntimeInformation = System.Runtime.InteropServices.RuntimeInformation;
 
 namespace TruePath.Tests;
@@ -42,6 +43,42 @@ public class DiskUtilsTests
         // Assert
         Assert.Equal(expected.Value, actual);
     }
+
+    [Fact]
+    public void DiskUtils_PassNonExistentPath_KeepFileDescriptorZeroOpen()
+    {
+        // Arrange
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
+
+        var placeholderPath = Temporary.CreateTempFile();
+        try
+        {
+            // File descriptor 0 (normally the standard input) may be closed in the test process: then the next opened
+            // file takes it.
+            using var placeholder = IsFileDescriptorOpen(0) ? null : File.OpenHandle(placeholderPath.Value);
+            Assert.True(IsFileDescriptorOpen(0), "File descriptor 0 should be open before the test.");
+            var nonExistentPath = Temporary.SystemTempDirectory() / Guid.NewGuid().ToString() / "file.txt";
+
+            // Act
+            var actual = DiskUtils.GetRealPath(nonExistentPath.Value);
+
+            // Assert
+            Assert.Equal(nonExistentPath, new AbsolutePath(actual));
+            Assert.True(IsFileDescriptorOpen(0), "File descriptor 0 should stay open.");
+        }
+        finally
+        {
+            placeholderPath.Delete();
+        }
+    }
+
+    // ReSharper disable once InconsistentNaming
+    private const int F_GETFD = 1; // The same on Linux and macOS.
+
+    [DllImport("libc", EntryPoint = "fcntl", SetLastError = true)]
+    private static extern int FCntl(int fd, int cmd);
+
+    private static bool IsFileDescriptorOpen(int fd) => FCntl(fd, F_GETFD) != -1;
 
     private static string InvertCase(string path)
     {
