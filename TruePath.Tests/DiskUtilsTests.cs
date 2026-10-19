@@ -11,6 +11,25 @@ namespace TruePath.Tests;
 public class DiskUtilsTests
 {
     [Fact]
+    public void ReadKind_OnDirectory_DoesNotAllocateTheReparseBufferOnEveryCall()
+    {
+        // Arrange
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
+
+        var directory = new AbsolutePath(Path.GetTempPath());
+        const int iterations = 1000;
+        for (var i = 0; i < 100; i++) directory.ReadKind(); // warm up the pool
+
+        // Act
+        var before = GC.GetAllocatedBytesForCurrentThread();
+        for (var i = 0; i < iterations; i++) directory.ReadKind();
+        var perCall = (GC.GetAllocatedBytesForCurrentThread() - before) / iterations;
+
+        // Assert: a rented buffer is 16 KiB, so a leak shows up as at least that much per call.
+        Assert.True(perCall < 1024, $"ReadKind allocated {perCall} bytes per call on a directory.");
+    }
+
+    [Fact]
     public void DiskUtils_PassBackPath_ReturnCanonicalPath()
     {
         var tempPath = new AbsolutePath(Path.GetTempPath()).Canonicalize();
