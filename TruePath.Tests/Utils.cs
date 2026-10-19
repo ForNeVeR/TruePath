@@ -8,6 +8,8 @@ namespace TruePath.Tests;
 
 public static class Utils
 {
+    private const int ErrorPrivilegeNotHeldHResult = unchecked((int)0x80070522);
+
     internal static string ToNonCanonicalCase(this string path)
     {
         var result = new char[path.Length];
@@ -42,6 +44,23 @@ public static class Utils
     internal static bool RunsOnCi()
     {
         return Environment.GetEnvironmentVariable("CI") is not null;
+    }
+
+    internal static void CreateSymbolicLinkOrSkip(Action createSymbolicLink)
+    {
+        try
+        {
+            createSymbolicLink();
+        }
+        catch (IOException e) when (OperatingSystem.IsWindows() && e.HResult == ErrorPrivilegeNotHeldHResult)
+        {
+            Assert.False(
+                RunsOnCi(),
+                "CI runners must allow symbolic link creation so these tests are not skipped silently.");
+            Assert.Skip(
+                "Creating symbolic links on Windows requires Developer Mode or an elevated process. " +
+                "See CONTRIBUTING.md for setup instructions.");
+        }
     }
 
     /// <summary>

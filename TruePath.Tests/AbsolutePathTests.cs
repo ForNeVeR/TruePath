@@ -135,18 +135,7 @@ public class AbsolutePathTests
 
         var tempDirectoryInfo = Path.GetTempPath();
 
-        try
-        {
-            Directory.CreateSymbolicLink(currentDirectory, tempDirectoryInfo);
-        }
-        catch (IOException e) when (OperatingSystem.IsWindows() && !Utils.RunsOnCi())
-        {
-            if (e.Message.Contains("privilege") && (e.StackTrace?.Contains("CreateSymbolicLink") ?? false))
-            {
-                Assert.Skip("Tests involving symlink creation require elevated privileges on Windows, as this is enforced at the OS level.");
-            }
-            else throw;
-        }
+        Utils.CreateSymbolicLinkOrSkip(() => Directory.CreateSymbolicLink(currentDirectory, tempDirectoryInfo));
 
         // Act
         var kind = localPath.ReadKind();
