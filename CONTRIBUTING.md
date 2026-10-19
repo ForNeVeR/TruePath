@@ -26,7 +26,11 @@ Use the following shell command:
 ```console
 $ dotnet test
 ```
-Tests involving symlink creation require elevated privileges on Windows, as this is enforced at the OS level.
+
+On Windows, tests that create symbolic links require either [Developer Mode][windows-developer-mode] or an elevated
+process. Developer Mode lets an unelevated process create symbolic links, as documented for the
+[`CreateSymbolicLinkW`][create-symbolic-link] API. When neither is available, these tests are skipped locally; CI
+runners fail instead, ensuring that the tests are not silently skipped in automation.
 
 Test Documentation
 ------------------
@@ -74,5 +78,7 @@ $ dotnet fsi scripts/github-actions.fsx
 ```
 
 [dotnet-sdk]: https://dotnet.microsoft.com/en-us/download
+[create-symbolic-link]: https://learn.microsoft.com/windows/win32/api/winbase/nf-winbase-createsymboliclinkw
 [powershell]: https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell
 [reuse]: https://reuse.software/
+[windows-developer-mode]: https://learn.microsoft.com/windows/apps/get-started/enable-your-device-for-development
