@@ -31,6 +31,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 - [#239](https://github.com/ForNeVeR/TruePath/issues/239): on Unix, `AbsolutePath.Canonicalize()` no longer closes the file descriptor 0 when the path doesn't exist. This used to close the standard input of the process, or any file or socket that later took this descriptor number. Also, it no longer leaks the memory allocated for the resolved path.
+- [#240](https://github.com/ForNeVeR/TruePath/issues/240): On Windows, `AbsolutePath.ReadKind` no longer leaks the pooled 16 KiB reparse-data buffer when the path is not a reparse point (i.e. for almost every directory): the buffer is now always returned to `ArrayPool`, so reading the kind of a directory no longer allocates a fresh 16 KiB array per call.
 - [#226](https://github.com/ForNeVeR/TruePath/issues/226): `LocalPath.IsPrefixOf` and `StartsWith` now take leading `..` references of relative paths into account instead of comparing them as strings. For example, `new LocalPath("..").IsPrefixOf(new LocalPath("foo"))` is now `true`, and `new LocalPath("..").IsPrefixOf(new LocalPath("../.."))` is now `false`.
 - [#225](https://github.com/ForNeVeR/TruePath/issues/225): Make path prefix checks use the same platform-default case sensitivity as path equality.
 - `LocalPath.IsPrefixOf` and `StartsWith` now compare path strings ordinally. Previously they used the current culture, which ignores collation-ignorable characters, so a path could be reported as a prefix of an unrelated one.
