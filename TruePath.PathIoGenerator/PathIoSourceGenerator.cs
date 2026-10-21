@@ -62,18 +62,12 @@ public sealed class PathIoSourceGenerator : IIncrementalGenerator
 
                 if (result.Source is { } source)
                 {
-                    var hintName = SanitizeHintName(typeInfo.TypeName) + ".Generated.g.cs";
+                    // Nested marked types are rejected with TPG004, so the simple type name is unambiguous here.
+                    // Should two same-named top-level types ever be marked, AddSource fails loudly.
+                    var hintName = typeInfo.TypeName.Substring(typeInfo.TypeName.LastIndexOf('.') + 1) + ".Generated.g.cs";
                     productionContext.AddSource(hintName, SourceText.From(source, Encoding.UTF8));
                 }
             }
         });
-    }
-
-    private static string SanitizeHintName(string typeName)
-    {
-        var characters = new char[typeName.Length];
-        for (var index = 0; index < typeName.Length; index++)
-            characters[index] = char.IsLetterOrDigit(typeName[index]) ? typeName[index] : '_';
-        return new string(characters);
     }
 }
