@@ -7,7 +7,6 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
-using TruePath.PathIoGenerator;
 using Xunit;
 
 namespace TruePath.PathIoGenerator.Tests;
@@ -15,7 +14,7 @@ namespace TruePath.PathIoGenerator.Tests;
 public sealed class InMemoryAdditionalText(string path, string text) : AdditionalText
 {
     public override string Path { get; } = path;
-    public override SourceText? GetText(CancellationToken cancellationToken = default) => SourceText.From(text, Encoding.UTF8);
+    public override SourceText GetText(CancellationToken cancellationToken = default) => SourceText.From(text, Encoding.UTF8);
 }
 
 public static class TestHelper
@@ -127,8 +126,8 @@ public sealed class PathIoGeneratorTests
         var index = BclDocIndex.Build(
             ImmutableArray.Create<AdditionalText>(new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)));
 
-        Assert.True(index.TryGetMethodXml("M:System.IO.File.ReadAllText(System.String)", out var memberXml));
-        Assert.Contains("OPENS A TEXT FILE, READS ALL THE TEXT IN THE FILE.", memberXml);
+        Assert.True(index.TryGetMethodMember("M:System.IO.File.ReadAllText(System.String)", out var member));
+        Assert.Contains("OPENS A TEXT FILE, READS ALL THE TEXT IN THE FILE.", member.ToString());
     }
 
     [Fact]
@@ -266,10 +265,10 @@ public sealed class PathIoGeneratorTests
         GeneratorDriver driver = CSharpGeneratorDriver.Create(
             new[] { new PathIoSourceGenerator().AsSourceGenerator() },
             ImmutableArray<AdditionalText>.Empty);
-        driver = driver.RunGenerators(compilation, Xunit.TestContext.Current.CancellationToken);
+        driver = driver.RunGenerators(compilation, TestContext.Current.CancellationToken);
         var updated = compilation.AddSyntaxTrees(driver.GetRunResult().GeneratedTrees);
 
-        Assert.Empty(updated.GetDiagnostics(Xunit.TestContext.Current.CancellationToken)
+        Assert.Empty(updated.GetDiagnostics(TestContext.Current.CancellationToken)
             .Where(d => d.Severity == DiagnosticSeverity.Error));
     }
 
@@ -280,17 +279,5 @@ public sealed class PathIoGeneratorTests
 
         Assert.Contains("M:System.IO.Directory.GetCurrentDirectory", source);
         Assert.Contains("M:System.IO.Directory.GetLogicalDrives", source);
-    }
-
-    private static int CountOccurrences(string text, string pattern)
-    {
-        var count = 0;
-        var position = 0;
-        while ((position = text.IndexOf(pattern, position, StringComparison.Ordinal)) >= 0)
-        {
-            count++;
-            position += pattern.Length;
-        }
-        return count;
     }
 }

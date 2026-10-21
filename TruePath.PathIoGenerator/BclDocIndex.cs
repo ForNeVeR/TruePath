@@ -19,17 +19,17 @@ namespace TruePath.PathIoGenerator;
 public sealed class BclDocIndex
 {
     private readonly ImmutableArray<AdditionalText> _files;
-    private readonly ImmutableDictionary<string, string> _memberXml;
+    private readonly ImmutableDictionary<string, XElement> _members;
 
-    private BclDocIndex(ImmutableArray<AdditionalText> files, ImmutableDictionary<string, string> memberXml)
+    private BclDocIndex(ImmutableArray<AdditionalText> files, ImmutableDictionary<string, XElement> members)
     {
         _files = files;
-        _memberXml = memberXml;
+        _members = members;
     }
 
-    public bool TryGetMethodXml(string docId, out string memberXml)
+    public bool TryGetMethodMember(string docId, out XElement member)
     {
-        return _memberXml.TryGetValue(docId, out memberXml!);
+        return _members.TryGetValue(docId, out member!);
     }
 
     public static BclDocIndex Build(ImmutableArray<AdditionalText> files)
@@ -39,7 +39,7 @@ public sealed class BclDocIndex
             .Where(file => file.Path.EndsWith(".xml", StringComparison.Ordinal))
             .OrderBy(file => Path.GetFileName(file.Path) == "netstandard.xml" ? 0 : 1);
 
-        var builder = ImmutableDictionary.CreateBuilder<string, string>();
+        var builder = ImmutableDictionary.CreateBuilder<string, XElement>();
         foreach (var file in orderedFiles)
         {
             var text = file.GetText()?.ToString();
@@ -73,13 +73,11 @@ public sealed class BclDocIndex
                     current.Append('\n').Append(line);
                 }
 
-                if (trimmed.TrimEnd().EndsWith("</member>", StringComparison.Ordinal) && currentName != null)
+                if (trimmed.TrimEnd().EndsWith("</member>", StringComparison.Ordinal))
                 {
-                    var memberXml = current.ToString();
                     try
                     {
-                        XElement.Parse(memberXml);
-                        builder[currentName] = memberXml;
+                        builder[currentName] = XElement.Parse(current.ToString());
                     }
                     catch (System.Xml.XmlException)
                     {
