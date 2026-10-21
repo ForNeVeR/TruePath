@@ -290,13 +290,22 @@ internal static class Kernel32
     }
 
     /// <summary>
-    /// Represents a symbolic link reparse buffer.
+    /// The header of a reparse data buffer, common to all reparse tags.
     /// </summary>
     /// <remarks>
+    /// <para>
+    /// The data following this header depends on <see cref="ReparseTag"/>. For example, symbolic links
+    /// (<see cref="IOReparseOptions.IO_REPARSE_TAG_SYMLINK"/>) are followed by the symbolic link data, which includes a
+    /// <c>Flags</c> field, while mount points (<see cref="IOReparseOptions.IO_REPARSE_TAG_MOUNT_POINT"/>) are followed by
+    /// the mount point data, which has no <c>Flags</c> field. Do not interpret the tag-specific part without checking the
+    /// tag, and do not read past the number of bytes returned by the driver.
+    /// </para>
+    /// <para>
     /// For more information, see <see href="https://msdn.microsoft.com/library/windows/hardware/ff552012.aspx"/>.
+    /// </para>
     /// </remarks>
     [StructLayout(LayoutKind.Sequential)]
-    internal struct SymbolicLinkReparseBuffer
+    internal struct ReparseDataBufferHeader
     {
         /// <summary>
         /// The reparse tag.
@@ -312,31 +321,6 @@ internal static class Kernel32
         /// Reserved; do not use.
         /// </summary>
         internal ushort Reserved;
-
-        /// <summary>
-        /// The offset, in bytes, to the substitute name string in the PathBuffer array.
-        /// </summary>
-        internal ushort SubstituteNameOffset;
-
-        /// <summary>
-        /// The length, in bytes, of the substitute name string. If this string is null-terminated, SubstituteNameLength does not include space for the null character.
-        /// </summary>
-        internal ushort SubstituteNameLength;
-
-        /// <summary>
-        /// The offset, in bytes, to the print name string in the PathBuffer array.
-        /// </summary>
-        internal ushort PrintNameOffset;
-
-        /// <summary>
-        /// The length, in bytes, of the print name string. If this string is null-terminated, PrintNameLength does not include space for the null character.
-        /// </summary>
-        internal ushort PrintNameLength;
-
-        /// <summary>
-        /// Flags that control the behavior of the symbolic link.
-        /// </summary>
-        internal uint Flags;
     }
 
 }
