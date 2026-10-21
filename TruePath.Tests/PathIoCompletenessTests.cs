@@ -4,6 +4,7 @@
 
 using System.Reflection;
 using System.Runtime.Versioning;
+using System.Text.RegularExpressions;
 using TruePath.PathIoGenerator;
 using TruePath.SystemIo;
 
@@ -31,6 +32,7 @@ public class PathIoCompletenessTests
         }
 
         var exclusions = LoadExclusions();
+        var forwardedCalls = LoadForwardedCalls();
         var pathIoMethods = typeof(PathIo)
             .GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
             .ToList();
@@ -50,6 +52,10 @@ public class PathIoCompletenessTests
 
             var docId = DocId(bclMethod);
             if (exclusions.Contains(docId)) continue;
+            // Hand-written members that forward to a BCL overload with `path.Value` as the first argument
+            // suppress its generation. The generator detects this semantically; here it is approximated on the
+            // hand-written source text (see PathIoGeneratorCore.CollectHandWrittenInfo).
+            if (forwardedCalls.Contains((bclMethod.DeclaringType!.Name, bclMethod.Name, parameters.Length))) continue;
 
             var expectedParameterTypes = parameters
                 .Select((parameter, index) => pathOrdinals.Contains(index)
@@ -77,16 +83,39 @@ public class PathIoCompletenessTests
 
     private static HashSet<string> LoadExclusions()
     {
+        return File.ReadAllLines(Path.Combine(RepositoryRoot(), "TruePath.SystemIo", "path-io-exclusions.txt"))
+            .Select(line => line.Trim())
+            .Where(line => line.Length > 0 && !line.StartsWith("#", StringComparison.Ordinal))
+            .ToHashSet();
+    }
+
+    /// <summary>
+    ///     (type, method, argument count) triples of the BCL calls the hand-written PathIo members forward to with
+    ///     `path.Value` as the first argument.
+    /// </summary>
+    private static HashSet<(string TypeName, string MethodName, int ArgumentCount)> LoadForwardedCalls()
+    {
+        var source = File.ReadAllText(Path.Combine(RepositoryRoot(), "TruePath.SystemIo", "PathIo.cs"));
+        var calls = new HashSet<(string, string, int)>();
+        foreach (Match match in Regex.Matches(source, @"\b(?<type>File|Directory)\.(?<method>\w+)\((?<args>[^()]*)\)"))
+        {
+            var arguments = match.Groups["args"].Value.Split(',');
+            if (arguments.Length == 0
+                || !arguments[0].Trim().StartsWith("path.Value", StringComparison.Ordinal)) continue;
+            calls.Add((match.Groups["type"].Value, match.Groups["method"].Value, arguments.Length));
+        }
+
+        return calls;
+    }
+
+    private static string RepositoryRoot()
+    {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory != null && !File.Exists(Path.Combine(directory.FullName, "TruePath.sln")))
             directory = directory.Parent;
 
         if (directory == null) Assert.Skip("Repository root with TruePath.sln not found.");
-
-        return File.ReadAllLines(Path.Combine(directory.FullName, "TruePath.SystemIo", "path-io-exclusions.txt"))
-            .Select(line => line.Trim())
-            .Where(line => line.Length > 0 && !line.StartsWith("#", StringComparison.Ordinal))
-            .ToHashSet();
+        return directory!.FullName;
     }
 
     private static string DocId(MethodInfo method)
