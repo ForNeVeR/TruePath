@@ -61,23 +61,12 @@ public static class TestHelper
 
     public static CSharpCompilation CreateCompilation(string sources)
     {
-        // Reference the .NET reference pack (the same contract assemblies a real build uses). Runtime-directory
-        // assemblies cannot be used instead: most public types are implemented in System.Private.CoreLib, whose
-        // members are not visible when it is referenced directly.
-        var coreLibPath = typeof(object).Assembly.Location;
-        var dotnetRoot = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(coreLibPath)!, "..", "..", ".."));
-        var refDirectory = Directory.GetDirectories(Path.Combine(dotnetRoot, "packs", "Microsoft.NETCore.App.Ref"))
-            .SelectMany(versionDirectory => Directory.GetDirectories(Path.Combine(versionDirectory, "ref")))
-            .SelectMany(tfmDirectory => Directory.EnumerateFiles(tfmDirectory, "*.dll"))
-            .ToArray();
-        var references = refDirectory
-            .Select(path => MetadataReference.CreateFromFile(path))
-            .ToArray();
-
+        // Pinned .NET reference assemblies from a NuGet package: discovering them in the local SDK layout is not
+        // reliable on CI, where the test host runtime and the SDK with the packs may live in different roots.
         return CSharpCompilation.Create(
             "TestAssembly",
             new[] { CSharpSyntaxTree.ParseText(sources, new CSharpParseOptions(LanguageVersion.Latest)) },
-            references,
+            Basic.Reference.Assemblies.Net100.References.All,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
     }
 
@@ -87,9 +76,13 @@ public static class TestHelper
             new[] { new PathIoSourceGenerator().AsSourceGenerator() },
             additionalTexts.ToImmutableArray());
         driver = driver.RunGenerators(compilation);
-        return driver.GetRunResult().GeneratedTrees
-            .Single(tree => tree.FilePath.Contains("PathIo.Generated"))
-            .GetText().ToString();
+        var runResult = driver.GetRunResult();
+        var tree = runResult.GeneratedTrees.FirstOrDefault(generated => generated.FilePath.Contains("PathIo.Generated"));
+        Assert.True(
+            tree != null,
+            "The generator produced no PathIo.Generated source. Driver diagnostics: "
+            + string.Join("; ", runResult.Diagnostics.Select(diagnostic => diagnostic.ToString())));
+        return tree!.GetText().ToString();
     }
 }
 

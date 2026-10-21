@@ -15,6 +15,7 @@ SPDX-License-Identifier: MIT
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Basic.Reference.Assemblies.Net100" Version="1.8.12" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
         <PackageReference Include="xunit.v3" Version="4.0.2" />
     </ItemGroup>
