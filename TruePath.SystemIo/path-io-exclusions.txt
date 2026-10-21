@@ -1,0 +1,13 @@
+# BCL methods that must not be exposed as PathIo extension methods.
+#
+# One XML documentation ID per line, e.g.:
+#     M:System.IO.Directory.Delete(System.String,System.Boolean)
+#
+# Methods covered by handwritten PathIo members are excluded automatically and
+# must not be listed here. This holds both for handwritten members occupying
+# the same rewritten signature (e.g. CreateDirectory), and for handwritten
+# members whose body forwards to the BCL method with `path.Value` as the first
+# argument (e.g. DeleteEmptyDirectory/DeleteDirectoryRecursively forwarding to
+# Directory.Delete(string, bool)).
+#
+# (No entries yet.)

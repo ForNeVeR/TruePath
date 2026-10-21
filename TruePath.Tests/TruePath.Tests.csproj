@@ -24,6 +24,8 @@ SPDX-License-Identifier: MIT
     <ItemGroup>
       <ProjectReference Include="..\TruePath.SystemIo\TruePath.SystemIo.csproj" />
       <ProjectReference Include="..\TruePath\TruePath.csproj" />
+      <!-- A plain reference (not an analyzer reference): lets the completeness test reuse the generator's rules. -->
+      <ProjectReference Include="..\TruePath.PathIoGenerator\TruePath.PathIoGenerator.csproj" />
     </ItemGroup>
 
 </Project>
