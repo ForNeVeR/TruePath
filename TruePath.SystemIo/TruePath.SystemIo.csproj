@@ -19,5 +19,22 @@ SPDX-License-Identifier: MIT
 
     <ItemGroup>
       <ProjectReference Include="..\TruePath\TruePath.csproj" />
+      <!-- The generator must never flow into the NuGet package: it is a build-time tool only. -->
+      <ProjectReference Include="..\TruePath.PathIoGenerator\TruePath.PathIoGenerator.csproj"
+                        OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
     </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="path-io-exclusions.txt" />
+    </ItemGroup>
+
+    <!-- The command-line compiler does not attach XML documentation to referenced assemblies, so hand the BCL
+         documentation files to the TruePath.PathIoGenerator explicitly. -->
+    <Target Name="AddBclDocumentationForPathIoGenerator" AfterTargets="ResolveReferences">
+        <ItemGroup>
+            <AdditionalFiles KeepDuplicates="false"
+                             Include="@(ReferencePath->'%(RootDir)%(Directory)%(Filename).xml')"
+                             Condition="('%(Filename)' == 'System.Runtime' or '%(Filename)' == 'netstandard') and Exists('%(RootDir)%(Directory)%(Filename).xml')" />
+        </ItemGroup>
+    </Target>
 </Project>
