@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
         <OutputType>Exe</OutputType>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
@@ -24,6 +24,8 @@ SPDX-License-Identifier: MIT
     <ItemGroup>
       <ProjectReference Include="..\TruePath.SystemIo\TruePath.SystemIo.csproj" />
       <ProjectReference Include="..\TruePath\TruePath.csproj" />
+      <!-- A plain reference (not an analyzer reference): lets the completeness test reuse the generator's rules. -->
+      <ProjectReference Include="..\TruePath.PathIoGenerator\TruePath.PathIoGenerator.csproj" />
     </ItemGroup>
 
 </Project>
