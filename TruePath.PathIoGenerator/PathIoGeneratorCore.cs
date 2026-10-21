@@ -45,10 +45,18 @@ public static class PathIoGeneratorCore
     public static GenerationResult Generate(
         Compilation compilation,
         string markedTypeMetadataName,
+        bool markedTypeIsNested,
+        HandWrittenInfo handWritten,
         ImmutableHashSet<string> excludedDocIds,
         BclDocIndex docIndex)
     {
         var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
+
+        if (markedTypeIsNested)
+        {
+            diagnostics.Add(Diagnostic.Create(GeneratorDiagnostics.MarkedClassIsNested, Location.None, markedTypeMetadataName));
+            return new GenerationResult(null, diagnostics.ToImmutable());
+        }
 
         var fileType = compilation.GetTypeByMetadataName("System.IO.File");
         var directoryType = compilation.GetTypeByMetadataName("System.IO.Directory");
@@ -77,7 +85,6 @@ public static class PathIoGeneratorCore
         }
 
         var renderer = TypeRenderer.Create(compilation);
-        var handWritten = CollectHandWrittenInfo(compilation, markedType!, fileType!, directoryType!, absolutePathType!, renderer);
         var generatedMethods = new List<GeneratedMethod>();
         var generatedKeys = new HashSet<string>();
         var skippedWithoutPath = new SortedSet<string>();
@@ -124,14 +131,19 @@ public static class PathIoGeneratorCore
             .Any(syntax => syntax.Modifiers.Any(SyntaxKind.PartialKeyword));
     }
 
-    private static HandWrittenInfo CollectHandWrittenInfo(
-        Compilation compilation,
-        INamedTypeSymbol markedType,
-        INamedTypeSymbol fileType,
-        INamedTypeSymbol directoryType,
-        INamedTypeSymbol absolutePathType,
-        TypeRenderer renderer)
+    /// <summary>
+    ///     Collects the exclusion-relevant facts about the hand-written members of the marked type: their rewritten
+    ///     signatures, and the IDs of the BCL overloads they forward to. Called from the syntax-anchored part of
+    ///     the incremental pipeline, so it only re-runs when the marked type's syntax changes.
+    /// </summary>
+    public static HandWrittenInfo CollectHandWrittenInfo(Compilation compilation, INamedTypeSymbol markedType)
     {
+        var fileType = compilation.GetTypeByMetadataName("System.IO.File");
+        var directoryType = compilation.GetTypeByMetadataName("System.IO.Directory");
+        var absolutePathType = compilation.GetTypeByMetadataName(PathIoRules.AbsolutePathTypeName);
+        if (fileType == null || directoryType == null || absolutePathType == null) return HandWrittenInfo.Empty;
+
+        var renderer = TypeRenderer.Create(compilation);
         var signatures = new HashSet<string>();
         var forwardedDocIds = new HashSet<string>();
         var comparer = SymbolEqualityComparer.Default;
@@ -161,7 +173,9 @@ public static class PathIoGeneratorCore
             }
         }
 
-        return new HandWrittenInfo(signatures, forwardedDocIds);
+        return new HandWrittenInfo(
+            signatures.OrderBy(signature => signature, StringComparer.Ordinal).ToImmutableArray(),
+            forwardedDocIds.OrderBy(docId => docId, StringComparer.Ordinal).ToImmutableArray());
     }
 
     /// <summary>
@@ -265,8 +279,7 @@ public static class PathIoGeneratorCore
         ImmutableArray<string> parameterNames)
     {
         if (docIndex.TryGetMethodMember(DocId.ForMethod(method), out var cachedMember))
-            // The cached element is cloned because ToDocLines renames its param elements in place.
-            return DocFormatting.ToDocLines(new XElement(cachedMember), parameterNames);
+            return DocFormatting.ToDocLines(cachedMember, parameterNames);
 
         var xml = method.GetDocumentationCommentXml();
         if (!string.IsNullOrWhiteSpace(xml))
@@ -371,10 +384,26 @@ public static class PathIoGeneratorCore
     }
 }
 
-internal sealed class HandWrittenInfo(HashSet<string> signatures, HashSet<string> forwardedDocIds)
+public sealed class HandWrittenInfo(
+    ImmutableArray<string> signatures,
+    ImmutableArray<string> forwardedDocIds)
 {
-    public HashSet<string> Signatures { get; } = signatures;
-    public HashSet<string> ForwardedDocIds { get; } = forwardedDocIds;
+    public static HandWrittenInfo Empty { get; } = new(ImmutableArray<string>.Empty, ImmutableArray<string>.Empty);
+
+    public ImmutableArray<string> Signatures { get; } = signatures;
+    public ImmutableArray<string> ForwardedDocIds { get; } = forwardedDocIds;
+
+    public override bool Equals(object? obj)
+    {
+        return obj is HandWrittenInfo other
+               && Signatures.SequenceEqual(other.Signatures)
+               && ForwardedDocIds.SequenceEqual(other.ForwardedDocIds);
+    }
+
+    public override int GetHashCode()
+    {
+        return Signatures.Length;
+    }
 }
 
 internal sealed class GeneratedMethod(

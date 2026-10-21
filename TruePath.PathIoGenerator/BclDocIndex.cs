@@ -35,23 +35,22 @@ public sealed class BclDocIndex
     public static BclDocIndex Build(ImmutableArray<AdditionalText> files)
     {
         // netstandard.xml is processed first, so that the framework-specific System.Runtime.xml wins on conflicts.
-        var orderedFiles = files
-            .Where(file => file.Path.EndsWith(".xml", StringComparison.Ordinal))
-            .OrderBy(file => Path.GetFileName(file.Path) == "netstandard.xml" ? 0 : 1);
+        var orderedFiles = files.OrderBy(file => Path.GetFileName(file.Path) == "netstandard.xml" ? 0 : 1);
 
         var builder = ImmutableDictionary.CreateBuilder<string, XElement>();
         foreach (var file in orderedFiles)
         {
-            var text = file.GetText()?.ToString();
-            if (string.IsNullOrEmpty(text)) continue;
+            var text = file.GetText();
+            if (text == null) continue;
 
             // Some of the BCL documentation files (netstandard.xml in particular) contain invalid XML, so member
             // elements are extracted line by line and parsed one by one: a broken member is then skipped instead
             // of failing the whole file.
             var current = new StringBuilder();
             string? currentName = null;
-            foreach (var line in text!.Replace("\r\n", "\n").Split('\n'))
+            foreach (var textLine in text.Lines)
             {
+                var line = textLine.ToString();
                 var trimmed = line.TrimStart();
                 if (currentName == null)
                 {
@@ -126,6 +125,10 @@ internal static class DocFormatting
     /// </summary>
     public static ImmutableArray<string> ToDocLines(XElement member, ImmutableArray<string> parameterNames)
     {
+        // Work on a copy: the element may be a cached BclDocIndex entry shared across runs, and this method
+        // renames its param elements in place.
+        member = new XElement(member);
+
         var documentedParameters = new HashSet<string>(StringComparer.Ordinal);
         var elements = new List<string>();
         foreach (var element in member.Elements())

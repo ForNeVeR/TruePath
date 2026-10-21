@@ -115,7 +115,7 @@ public class PathIoCompletenessTests
             directory = directory.Parent;
 
         if (directory == null) Assert.Skip("Repository root with TruePath.sln not found.");
-        return directory!.FullName;
+        return directory.FullName;
     }
 
     private static string DocId(MethodInfo method)
