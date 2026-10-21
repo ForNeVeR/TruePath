@@ -19,40 +19,61 @@ public sealed class PathIoSourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var markedTypes = context.SyntaxProvider.ForAttributeWithMetadataName<string>(
+        // The expensive per-type analysis runs in the syntax-anchored transform, so it is cached across edits in
+        // unrelated files; everything else that is independent of the compilation (exclusion texts, the XML
+        // documentation index) is also computed in nodes of its own instead of inside the output stage.
+        var markedTypes = context.SyntaxProvider.ForAttributeWithMetadataName<MarkedType>(
             PathIoRules.MarkerAttributeName,
             static (node, _) => node is ClassDeclarationSyntax,
-            static (attributeContext, _) => attributeContext.TargetSymbol.ToDisplayString());
+            static (attributeContext, _) => new MarkedType(
+                attributeContext.TargetSymbol.ToDisplayString(),
+                attributeContext.TargetSymbol.ContainingType != null,
+                PathIoGeneratorCore.CollectHandWrittenInfo(
+                    attributeContext.SemanticModel.Compilation,
+                    (INamedTypeSymbol)attributeContext.TargetSymbol)));
 
-        var additionalTexts = context.AdditionalTextsProvider.Collect();
-        var docIndex = additionalTexts.Select(static (files, _) => BclDocIndex.Build(files));
+        var exclusionTexts = context.AdditionalTextsProvider
+            .Where(static file => Path.GetFileName(file.Path) == PathIoRules.ExclusionFileName)
+            .Select(static (file, _) => file.GetText()?.ToString() ?? string.Empty)
+            .Collect();
+
+        var docIndex = context.AdditionalTextsProvider
+            .Where(static file => file.Path.EndsWith(".xml", StringComparison.Ordinal))
+            .Collect()
+            .Select(static (files, _) => BclDocIndex.Build(files));
 
         var input = markedTypes.Collect()
+            .Combine(exclusionTexts)
             .Combine(docIndex)
-            .Combine(additionalTexts)
             .Combine(context.CompilationProvider);
 
         context.RegisterSourceOutput(input, static (productionContext, tuple) =>
         {
-            var (((typeNames, docIndex), additionalTexts), compilation) = tuple;
+            var (((typeInfos, exclusionTexts), docIndex), compilation) = tuple;
 
-            var exclusions = Exclusions.Parse(additionalTexts
-                .Where(file => file.Path.EndsWith(PathIoRules.ExclusionFileName, StringComparison.Ordinal))
-                .Select(file => file.GetText()?.ToString() ?? string.Empty)
-                .ToImmutableArray());
+            var exclusions = Exclusions.Parse(exclusionTexts);
             foreach (var diagnostic in exclusions.Diagnostics) productionContext.ReportDiagnostic(diagnostic);
 
-            foreach (var typeName in typeNames.Sort(StringComparer.Ordinal))
+            foreach (var typeInfo in typeInfos.Sort((left, right) => string.CompareOrdinal(left.TypeName, right.TypeName)))
             {
-                var result = PathIoGeneratorCore.Generate(compilation, typeName, exclusions.DocIds, docIndex);
+                var result = PathIoGeneratorCore.Generate(
+                    compilation, typeInfo.TypeName, typeInfo.IsNested, typeInfo.HandWritten, exclusions.DocIds, docIndex);
                 foreach (var diagnostic in result.Diagnostics) productionContext.ReportDiagnostic(diagnostic);
 
                 if (result.Source is { } source)
                 {
-                    var hintName = typeName.Substring(typeName.LastIndexOf('.') + 1) + ".Generated.g.cs";
+                    var hintName = SanitizeHintName(typeInfo.TypeName) + ".Generated.g.cs";
                     productionContext.AddSource(hintName, SourceText.From(source, Encoding.UTF8));
                 }
             }
         });
+    }
+
+    private static string SanitizeHintName(string typeName)
+    {
+        var characters = new char[typeName.Length];
+        for (var index = 0; index < typeName.Length; index++)
+            characters[index] = char.IsLetterOrDigit(typeName[index]) ? typeName[index] : '_';
+        return new string(characters);
     }
 }

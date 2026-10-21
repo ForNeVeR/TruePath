@@ -26,6 +26,14 @@ internal static class GeneratorDiagnostics
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
+    public static readonly DiagnosticDescriptor MarkedClassIsNested = new(
+        id: "TPG004",
+        title: "Marked class is nested",
+        messageFormat: "The class '{0}' is marked with GenerateSystemIoExtensionsAttribute, but it is nested inside another type, which is not supported",
+        category: Category,
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
+
     public static readonly DiagnosticDescriptor InvalidExclusionEntry = new(
         id: "TPG003",
         title: "Invalid exclusion list entry",
