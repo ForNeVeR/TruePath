@@ -51,7 +51,7 @@ public class PathIoTests
 
             var files = tempFolder.GetFiles(new LocalPathPattern("*.txt"));
 
-            Assert.Equal([matchingFile.Value], files);
+            Assert.Equal([matchingFile], files);
         });
     }
 
