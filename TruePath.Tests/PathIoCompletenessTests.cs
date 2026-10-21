@@ -83,7 +83,7 @@ public class PathIoCompletenessTests
 
         if (directory == null) Assert.Skip("Repository root with TruePath.sln not found.");
 
-        return File.ReadAllLines(Path.Combine(directory!.FullName, "TruePath.SystemIo", "path-io-exclusions.txt"))
+        return File.ReadAllLines(Path.Combine(directory.FullName, "TruePath.SystemIo", "path-io-exclusions.txt"))
             .Select(line => line.Trim())
             .Where(line => line.Length > 0 && !line.StartsWith("#", StringComparison.Ordinal))
             .ToHashSet();
@@ -103,7 +103,6 @@ public class PathIoCompletenessTests
         {
             var definition = type.GetGenericTypeDefinition();
             var name = definition.FullName!;
-            var arity = definition.GetGenericArguments().Length;
             name = name.Substring(0, name.IndexOf('`'));
             return name + "{" + string.Join(",", type.GetGenericArguments().Select(DocIdType)) + "}";
         }
