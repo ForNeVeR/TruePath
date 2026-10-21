@@ -82,7 +82,7 @@ public static class TestHelper
             tree != null,
             "The generator produced no PathIo.Generated source. Driver diagnostics: "
             + string.Join("; ", runResult.Diagnostics.Select(diagnostic => diagnostic.ToString())));
-        return tree!.GetText().ToString();
+        return tree.GetText().ToString();
     }
 }
 
@@ -131,9 +131,48 @@ public sealed class PathIoGeneratorTests
             ImmutableArray.Create<AdditionalText>(new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)));
 
         var result = PathIoGeneratorCore.Generate(
-            compilation, "TruePath.SystemIo.PathIo", ImmutableHashSet<string>.Empty, index);
+            compilation, "TruePath.SystemIo.PathIo", markedTypeIsNested: false, HandWrittenInfo.Empty,
+            ImmutableHashSet<string>.Empty, index);
 
         Assert.Contains("/// <summary>OPENS A TEXT FILE, READS ALL THE TEXT IN THE FILE.</summary>", result.Source);
+    }
+
+    [Fact]
+    public void NestedMarkedClassIsRejected()
+    {
+        const string sources = """
+            using System;
+            #nullable enable
+            namespace TruePath
+            {
+                public readonly struct AbsolutePath
+                {
+                    public AbsolutePath(string value) { }
+                    public string Value => "";
+                }
+            }
+
+            namespace TruePath.SystemIo
+            {
+                [AttributeUsage(AttributeTargets.Class)]
+                internal sealed class GenerateSystemIoExtensionsAttribute : Attribute { }
+
+                public static class Outer
+                {
+                    [GenerateSystemIoExtensions]
+                    public static partial class PathIo { }
+                }
+            }
+            """;
+        var compilation = TestHelper.CreateCompilation(sources);
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(
+            new[] { new PathIoSourceGenerator().AsSourceGenerator() },
+            ImmutableArray<AdditionalText>.Empty);
+        driver = driver.RunGenerators(compilation, TestContext.Current.CancellationToken);
+
+        var runResult = driver.GetRunResult();
+        Assert.Contains(runResult.Diagnostics, diagnostic => diagnostic.Id == "TPG004");
+        Assert.DoesNotContain(runResult.GeneratedTrees, tree => tree.FilePath.Contains("PathIo.Generated"));
     }
 
     [Fact]
