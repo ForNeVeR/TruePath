@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - `LocalPath.PathRoot`, returning the root of an absolute path, or the drive root of a drive-relative path (e.g. `C:foo`, which only exists on Windows), or `null` when the root can't be determined.
 - `AbsolutePath.PathRoot` property.
 - [#224](https://github.com/ForNeVeR/TruePath/issues/224): `PathKind` enumeration and `LocalPath.Kind` property, telling an absolute path from a relative one, and on Windows also from a path rooted without a drive letter (`\Windows`) and from a path relative to the current directory of a drive (`C:Windows`). These are **experimental** (diagnostic `TRUEPATH001`): more kinds may be added later, e.g. for UNC paths.
+- [#202: `path.GetFiles(LocalPathPattern)`](https://github.com/ForNeVeR/TruePath/issues/202).
 
 ### Changed
 - **Breaking:** on Windows, `LocalPath.IsAbsolute` now only returns `true` for fully qualified paths, such as `C:\Windows`. Paths rooted without a drive letter (`\Windows`), and paths relative to the current directory of a drive (`C:Windows`, `C:`) are not absolute anymore, and `AbsolutePath` now rejects them. Previously, this was following the `Path.IsPathRooted` API.
