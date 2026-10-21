@@ -112,7 +112,7 @@ public static class PathIoGeneratorCore
             generatedMethods.Add(BuildMethod(owner, method, pathOrdinals, absolutePathType!, docIndex, renderer));
         }
 
-        var source = RenderFile(compilation, markedType!, generatedMethods, skippedWithoutPath, renderer);
+        var source = RenderFile(markedType!, generatedMethods, skippedWithoutPath, renderer);
         return new GenerationResult(source, diagnostics.ToImmutable());
     }
 
@@ -264,15 +264,9 @@ public static class PathIoGeneratorCore
         BclDocIndex docIndex,
         ImmutableArray<string> parameterNames)
     {
-        if (docIndex.TryGetMethodXml(DocId.ForMethod(method), out var memberXml))
-            try
-            {
-                return DocFormatting.ToDocLines(XElement.Parse(memberXml), parameterNames);
-            }
-            catch (Exception)
-            {
-                // Malformed documentation falls through to the next source below.
-            }
+        if (docIndex.TryGetMethodMember(DocId.ForMethod(method), out var cachedMember))
+            // The cached element is cloned because ToDocLines renames its param elements in place.
+            return DocFormatting.ToDocLines(new XElement(cachedMember), parameterNames);
 
         var xml = method.GetDocumentationCommentXml();
         if (!string.IsNullOrWhiteSpace(xml))
@@ -313,9 +307,7 @@ public static class PathIoGeneratorCore
         return name + "(" + string.Join(", ", parameterTypes) + ")";
     }
 
-    private static string RenderFile(
-        Compilation compilation,
-        INamedTypeSymbol markedType,
+    private static string RenderFile(INamedTypeSymbol markedType,
         List<GeneratedMethod> methods,
         SortedSet<string> skippedWithoutPath,
         TypeRenderer renderer)
