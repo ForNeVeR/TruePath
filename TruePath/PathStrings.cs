@@ -38,8 +38,9 @@ public static class PathStrings
     ///     <item>
     ///         resolving any sequence of current and parent directory references (subsequently, <c>.</c> and
     ///         <c>..</c>) if possible (e.g. <c>foo/../.</c> is resolved to just <c>foo</c>). A path that resolves
-    ///         to the current directory is normalized to an <b>empty</b> path: both <c>.</c> and <c>a/..</c>
-    ///         become <c>&quot;&quot;</c>. Parent directory references that cannot be resolved are preserved,
+    ///         to the current directory is normalized to <c>.</c>: an empty string, <c>.</c>, <c>./.</c> and
+    ///         <c>a/..</c> all become <c>.</c> (on Windows, a bare drive such as <c>C:</c> or <c>C:.</c> is
+    ///         normalized to <c>C:</c>, though). Parent directory references that cannot be resolved are preserved,
     ///         since there is nothing above them to fold into: <c>..</c> and <c>../..</c> are not affected by the
     ///         normalization. The only exception is a parent directory reference directly after the root: the root
     ///         has no parent, so such a reference is dropped (e.g. <c>/..</c> is normalized to <c>/</c>, and
@@ -169,7 +170,7 @@ public static class PathStrings
         {
             if (array != null)
                 ArrayPool<char>.Shared.Return(array);
-            return containsDriveLetter ? path[..2] : string.Empty;
+            return containsDriveLetter ? path[..2] : ".";
         }
 
         // remove / at the end of path

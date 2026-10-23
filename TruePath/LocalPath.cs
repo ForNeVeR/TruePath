@@ -13,7 +13,7 @@ namespace TruePath;
 /// <para>A path pointing to a place in the local file system.</para>
 /// <para>It may be either absolute or relative.</para>
 /// <para>
-/// An <b>empty</b> path designates the <b>current directory</b>. Normalizing an empty string, <c>.</c> or
+/// The path <c>.</c> designates the <b>current directory</b>. Normalizing an empty string, <c>.</c> or
 /// <c>a/..</c> produces it, and so does <see cref="Parent"/> of a relative path consisting of a single segment
 /// (e.g. the parent of <c>foo</c>).
 /// </para>
@@ -80,7 +80,6 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     {
         get
         {
-            if (Value.Length == 0) return PathKind.Relative;
             if (!PathStrings.IsDriveBasedSystem) return Value[0] == Separator ? PathKind.Absolute : PathKind.Relative;
 
             if (HasDriveLetter)
@@ -140,8 +139,8 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
 
     /// <inheritdoc cref="IPath.Parent"/>
     /// <remarks>
-    /// The parent of a relative path consisting of a single segment is the <b>empty</b> path (the current
-    /// directory), not <see langword="null"/>. Similarly, on Windows, the parent of a bare drive (<c>C:</c>, the
+    /// The parent of a relative path consisting of a single segment is <c>.</c> (the current directory), not
+    /// <see langword="null"/>. Similarly, on Windows, the parent of a bare drive (<c>C:</c>, the
     /// current directory of that drive) is <c>C:..</c>.
     /// </remarks>
     public LocalPath? Parent
@@ -154,7 +153,9 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
             {
                 // For C:foo, the rest after the drive letter is a relative path, and follows the same rules.
                 var relativePart = kind == PathKind.DriveCurrentDirectoryRelative ? Value[2..] : Value;
-                if (relativePart == "" || relativePart == ".." || relativePart.EndsWith($"{Separator}.."))
+                if (IsCurrentDirectory(relativePart.AsSpan())
+                    || relativePart == ".."
+                    || relativePart.EndsWith($"{Separator}.."))
                     return this / "..";
             }
 
@@ -219,7 +220,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     /// <inheritdoc cref="IPath{TPath}.IsPrefixOf(TPath)"/>
     /// <remarks>
     /// <para>
-    /// An <b>empty</b> path designates the current directory. It is a prefix of every relative path that stays
+    /// The path <c>.</c> designates the current directory. It is a prefix of every relative path that stays
     /// at or below that directory, which means every relative path that does not begin with a <c>..</c>
     /// reference.
     /// </para>
@@ -237,7 +238,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     /// <para>
     /// On Windows, paths relative to the current directory of a drive (such as <c>C:Windows</c>) are only related
     /// if they have the same drive letter. A bare drive (<c>C:</c>) designates that drive's current directory, and
-    /// behaves the same way as the empty path does for relative paths.
+    /// behaves the same way as <c>.</c> does for relative paths.
     /// </para>
     /// <para>
     /// Note that <c>C:\</c> will <i>not</i> be considered as a prefix of <c>C:Folder</c>, even though they
@@ -280,10 +281,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
 
     private static bool IsSegmentPrefix(ReadOnlySpan<char> prefix, ReadOnlySpan<char> path)
     {
-        // The empty path is the current directory, so every path at or below it has it as a prefix - but one
-        // starting with a ".." reference points outside it. Normalization only ever keeps such references at the
-        // very start of a path, so testing the first segment is enough.
-        if (prefix.Length == 0) return !StartsWithParentDirectoryReference(path);
+        if (IsCurrentDirectory(prefix)) return !StartsWithParentDirectoryReference(path);
 
         if (!path.StartsWith(prefix, PlatformDefaultPathComparer.DefaultStringComparison))
             return false;
@@ -291,6 +289,13 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
                prefix[^1] == Separator ||
                path[prefix.Length] == Separator;
     }
+
+    /// <summary>
+    /// Whether a normalized relative path (or its part left after stripping a drive letter or the leading <c>..</c>
+    /// references) designates the directory it is relative to.
+    /// </summary>
+    private static bool IsCurrentDirectory(ReadOnlySpan<char> value) =>
+        value.Length == 0 || value is ".";
 
     private static bool IsSameDrive(string a, string b) => char.ToUpperInvariant(a[0]) == char.ToUpperInvariant(b[0]);
 
@@ -307,7 +312,7 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     /// If either path is not absolute, it is first <b>resolved</b> against the current directory, the same way
     /// <see cref="ResolveToCurrentDirectory"/> does, so the result may depend on the current directory (or a
     /// drive-specific current directory on Windows). Two relative paths are resolved against the same directory, so
-    /// <c>a/b</c> relative to <c>a</c> is <c>b</c>. An empty path designates the current directory.
+    /// <c>a/b</c> relative to <c>a</c> is <c>b</c>. The path <c>.</c> designates the current directory.
     /// </para>
     /// <para>
     /// If the resolved paths have different roots (on Windows, e.g. paths on different drives), there's no relative
@@ -317,13 +322,10 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     /// </remarks>
     public LocalPath RelativeTo(LocalPath basePath)
     {
-        // An empty value means the current directory, but GetRelativePath doesn't work for empty strings.
-        var relativeTo = basePath.Value.Length == 0 ? "." : basePath.Value;
-        var path = Value.Length == 0 ? "." : Value;
 #if NET8_0_OR_GREATER
-        return new(Path.GetRelativePath(relativeTo, path));
+        return new(Path.GetRelativePath(basePath.Value, Value));
 #else
-        return new(PathPolyfills.GetRelativePath(relativeTo, path));
+        return new(PathPolyfills.GetRelativePath(basePath.Value, Value));
 #endif
     }
 
@@ -346,8 +348,8 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     ///     <item>
     ///         <see cref="PathKind.Relative"/> (<c>x</c>): <paramref name="b"/> is appended after a separator, so
     ///         <c>C:\base / x</c> is <c>C:\base\x</c>. No separator is added after a bare drive: <c>C: / x</c> is
-    ///         <c>C:x</c>. Appending an empty path returns the base path unchanged, and appending to an empty path
-    ///         returns <paramref name="b"/>.
+    ///         <c>C:x</c>. Appending <c>.</c> (the current directory) returns the base path unchanged, and appending
+    ///         to <c>.</c> returns <paramref name="b"/>.
     ///     </item>
     ///     <item>
     ///         <see cref="PathKind.DriveRootRelative"/> (<c>\x</c>): the drive of the base path is kept, if there is
@@ -408,8 +410,8 @@ public readonly struct LocalPath(string value) : IEquatable<LocalPath>, ICompara
     private static string Join(LocalPath basePath, string relativePath)
     {
         var baseValue = basePath.Value;
-        if (relativePath.Length == 0) return baseValue;
-        if (baseValue.Length == 0) return relativePath;
+        if (IsCurrentDirectory(relativePath.AsSpan())) return baseValue;
+        if (baseValue == ".") return relativePath;
 
         // A bare drive (C:) designates the current directory of the drive, and C:x is a path relative to it.
         var isBareDrive = baseValue.Length == 2 && basePath.HasDriveLetter;

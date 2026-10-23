@@ -20,7 +20,7 @@ public class NormalizationTests(ITestOutputHelper testOutputHelper)
         var normalizedPath = PathStrings.Normalize(sourcePath);
 
         testOutputHelper.WriteLine($"{sourcePath} => {normalizedPath}");
-        Assert.True(normalizedPath == ""
+        Assert.True(normalizedPath == "."
             || normalizedPath == Path.DirectorySeparatorChar.ToString()
             || normalizedPath is [_, ':', _]
             || normalizedPath[^1] != Path.DirectorySeparatorChar);

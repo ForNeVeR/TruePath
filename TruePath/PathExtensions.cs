@@ -78,8 +78,8 @@ public static class PathExtensions
     /// </returns>
     /// <exception cref="ArgumentException">
     ///     <para>
-    ///         Thrown if the <paramref name="path"/> has no file name to change: it is empty (which designates the
-    ///         current directory), it consists of a root or a drive designator (Windows) alone, such as <c>C:\</c>,
+    ///         Thrown if the <paramref name="path"/> has no file name to change: it designates the current directory
+    ///         (<c>.</c>), it consists of a root or a drive designator (Windows) alone, such as <c>C:\</c>,
     ///         <c>/</c> or <c>C:</c>, or its last segment is a parent directory reference (<c>..</c>).
     ///     </para>
     ///     <para>
@@ -139,8 +139,8 @@ public static class PathExtensions
     /// </returns>
     /// <exception cref="ArgumentException">
     ///     <para>
-    ///     Thrown if the <paramref name="path"/> has no file name to change: it is empty (which designates the
-    ///     current directory), it consists of a root or a drive designator alone, such as <c>C:\</c>, <c>/</c>
+    ///     Thrown if the <paramref name="path"/> has no file name to change: it designates the current directory
+    ///     (<c>.</c>), it consists of a root or a drive designator alone, such as <c>C:\</c>, <c>/</c>
     ///     or <c>C:</c>, or its last segment is a parent directory reference (<c>..</c>).
     ///     </para>
     ///     <para>
@@ -197,8 +197,8 @@ public static class PathExtensions
     /// </returns>
     /// <exception cref="ArgumentException">
     ///     <para>
-    ///     Thrown if the <paramref name="path"/> has no file name to change: it is empty (which designates the
-    ///     current directory), it consists of a root or a drive designator alone, such as <c>C:\</c>, <c>/</c>
+    ///     Thrown if the <paramref name="path"/> has no file name to change: it designates the current directory
+    ///     (<c>.</c>), it consists of a root or a drive designator alone, such as <c>C:\</c>, <c>/</c>
     ///     or <c>C:</c>, or its last segment is a parent directory reference (<c>..</c>).
     ///     </para>
     ///     <para>

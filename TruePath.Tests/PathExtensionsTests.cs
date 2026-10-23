@@ -7,6 +7,7 @@ namespace TruePath.Tests;
 public class PathExtensionsTests
 {
     [Theory]
+    [InlineData(".", ".")]
     [InlineData("..", ".")]
     [InlineData("foo/bar.txt", ".txt")]
     [InlineData("/foo/bar.txt", ".txt")]
@@ -44,6 +45,7 @@ public class PathExtensionsTests
     }
 
     [Theory]
+    [InlineData(".", "")]
     [InlineData("..", ".")]
     [InlineData("foo/bar.txt", "bar")]
     [InlineData("/foo/bar.txt", "bar")]
@@ -62,6 +64,7 @@ public class PathExtensionsTests
     }
 
     [Theory]
+    [InlineData(".")]
     [InlineData("..")]
     [InlineData("file.txt")]
     [InlineData("file..txt")]

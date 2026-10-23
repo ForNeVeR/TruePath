@@ -29,8 +29,8 @@ public enum PathKind
     Absolute,
 
     /// <summary>
-    /// A path relative to the current directory: e.g. <c>Windows</c>, <c>..\Windows</c>, or the empty path (the
-    /// current directory itself).
+    /// A path relative to the current directory: e.g. <c>Windows</c>, <c>..\Windows</c>, or <c>.</c> (the current
+    /// directory itself).
     /// </summary>
     /// <remarks>
     /// On Unix, every path not starting with <c>/</c> is of this kind, including <c>C:foo</c> and <c>\foo</c>.

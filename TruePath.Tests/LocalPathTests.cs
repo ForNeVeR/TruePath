@@ -33,11 +33,13 @@ public class LocalPathTests
     }
 
     [Theory]
-    [InlineData(".", "")]
+    [InlineData("", ".")]
+    [InlineData(".", ".")]
+    [InlineData("a/..", ".")]
     [InlineData("..", "..")]
     [InlineData("../..", "../..")]
     [InlineData(".../...", ".../...")]
-    [InlineData(".../..", "")]
+    [InlineData(".../..", ".")]
     public void ConstructionTest(string pathString, string expectedValue)
     {
         var path = new LocalPath(pathString);
@@ -45,6 +47,22 @@ public class LocalPathTests
     }
 
     [Theory]
+    [InlineData("")]
+    [InlineData(".")]
+    [InlineData("./.")]
+    [InlineData("a/..")]
+    public void CurrentDirectoryValue(string pathString)
+    {
+        var path = new LocalPath(pathString);
+
+        Assert.Equal(".", path.Value);
+        Assert.Equal(".", path.ToString());
+        Assert.Equal(PathKind.Relative, path.Kind);
+        Assert.Equal(".", path.FileName);
+    }
+
+    [Theory]
+    [InlineData("", "..")]
     [InlineData(".", "..")]
     [InlineData("..", "../..")]
     [InlineData("../..", "../../..")]
@@ -187,16 +205,16 @@ public class LocalPathTests
     }
 
     [Fact]
-    public void EmptyParentIsPrefixOfDescendantPath()
+    public void CurrentDirectoryParentIsPrefixOfDescendantPath()
     {
         var parent = new LocalPath("foo").Parent;
         Assert.NotNull(parent);
-        Assert.Equal("", parent.Value.Value);
+        Assert.Equal(".", parent.Value.Value);
         Assert.True(parent.Value.IsPrefixOf(new LocalPath("bar")));
     }
 
     [Fact]
-    public void EmptyParentIsNotPrefixOfPathEscapingUpwards()
+    public void CurrentDirectoryParentIsNotPrefixOfPathEscapingUpwards()
     {
         var parent = new LocalPath("foo").Parent;
         Assert.NotNull(parent);
@@ -296,7 +314,10 @@ public class LocalPathTests
     [InlineData("a", "a/b", "b")]
     [InlineData("a/b", "a", "..")]
     [InlineData("a/c", "a/b", "../b")]
-    [InlineData("a", "a", "")]
+    [InlineData("a", "a", ".")]
+    [InlineData("", "a", "a")]
+    [InlineData("a", "", "..")]
+    [InlineData("", "", ".")]
     public void RelativeToForRelativePaths(string from, string to, string expected)
     {
         var relativePath = new LocalPath(to).RelativeTo(new LocalPath(from));
@@ -513,7 +534,10 @@ public class LocalPathTests
             ("", "D:x", "D:x", "D:x"),
             ("", "C:x", "C:x", "C:x"),
             ("", "c:x", "c:x", "c:x"),
-            ("", "", "", ""),
+            ("", "", ".", ""),
+            (".", "x", "x", @".\x"),
+            ("x", ".", "x", @"x\."),
+            ("C:", ".", "C:", @"C:\."),
         ];
 
         var failures = new List<string>();
@@ -548,6 +572,9 @@ public class LocalPathTests
             ("base", "C:x", "base/C:x"),
             ("C:", "x", "C:/x"),
             ("", "x", "x"),
+            ("", "", "."),
+            (".", "x", "x"),
+            ("x", ".", "x"),
         ];
 
         var failures = new List<string>();
