@@ -72,6 +72,83 @@ public class DiskUtilsTests
         }
     }
 
+    [Fact]
+    public void ParseReparseDataBuffer_EmptyBuffer_ReturnsNull()
+    {
+        Assert.Null(DiskUtils.ParseReparseDataBuffer(ReadOnlySpan<byte>.Empty));
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(4)]
+    [InlineData(7)]
+    public void ParseReparseDataBuffer_BufferShorterThanHeader_ReturnsNull(int length)
+    {
+        Assert.Null(DiskUtils.ParseReparseDataBuffer(new byte[length]));
+    }
+
+    [Fact]
+    public void ParseReparseDataBuffer_ReturnsCommonHeaderFields()
+    {
+        // Arrange
+        var expected = new Kernel32.ReparseDataBufferHeader
+        {
+            ReparseTag = Kernel32.IOReparseOptions.IO_REPARSE_TAG_MOUNT_POINT,
+            ReparseDataLength = 0x18,
+            Reserved = 0
+        };
+        var buffer = new byte[Marshal.SizeOf<Kernel32.ReparseDataBufferHeader>()];
+        MemoryMarshal.Write(buffer, in expected);
+
+        // Act
+        var actual = DiskUtils.ParseReparseDataBuffer(buffer);
+
+        // Assert
+        Assert.NotNull(actual);
+        Assert.Equal(expected.ReparseTag, actual.Value.ReparseTag);
+        Assert.Equal(expected.ReparseDataLength, actual.Value.ReparseDataLength);
+        Assert.Equal(expected.Reserved, actual.Value.Reserved);
+    }
+
+    [Fact]
+    public void ParseReparseDataBuffer_IgnoresTagSpecificDataAfterHeader()
+    {
+        // Arrange: a mount point response has no symbolic-link fields, only the common header is valid.
+        var headerSize = Marshal.SizeOf<Kernel32.ReparseDataBufferHeader>();
+        var expectedTag = Kernel32.IOReparseOptions.IO_REPARSE_TAG_MOUNT_POINT;
+        var buffer = new byte[headerSize + 12];
+        MemoryMarshal.Write(buffer.AsSpan(0, sizeof(uint)), in expectedTag);
+        buffer.AsSpan(headerSize).Fill(0xFF);
+
+        // Act
+        var actual = DiskUtils.ParseReparseDataBuffer(buffer);
+
+        // Assert
+        Assert.NotNull(actual);
+        Assert.Equal(expectedTag, actual.Value.ReparseTag);
+    }
+
+    [Fact]
+    public void TryGetReparseDataBuffer_OnNonReparsePoint_ReturnsNull()
+    {
+        // Arrange
+        if (!OperatingSystem.IsWindows()) return;
+
+        var directory = Temporary.CreateTempFolder();
+        try
+        {
+            // Act
+            var actual = DiskUtils.TryGetReparseDataBuffer(directory.Value);
+
+            // Assert
+            Assert.Null(actual);
+        }
+        finally
+        {
+            directory.DeleteEmptyDirectory();
+        }
+    }
+
     // ReSharper disable once InconsistentNaming
     private const int F_GETFD = 1; // The same on Linux and macOS.
 

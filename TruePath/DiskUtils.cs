@@ -38,13 +38,18 @@ internal static class DiskUtils
     }
 
     /// <summary>
-    /// Tries to get the reparse data buffer for the specified path.
+    /// Tries to get the reparse data buffer header for the specified path.
     /// </summary>
     /// <param name="path">The path to check.</param>
     /// <returns>
-    /// A <see cref="SymbolicLinkReparseBuffer"/> containing the reparse data if successful; otherwise, <see langword="null"/>.
+    /// A <see cref="ReparseDataBufferHeader"/> containing the common reparse data header if successful; otherwise,
+    /// <see langword="null"/>.
     /// </returns>
-    internal static unsafe SymbolicLinkReparseBuffer? TryGetReparseDataBuffer(string path)
+    /// <remarks>
+    /// Only the header common to all reparse tags is returned. The layout of the data following it depends on the tag,
+    /// so it must not be interpreted without checking <see cref="ReparseDataBufferHeader.ReparseTag"/> first.
+    /// </remarks>
+    internal static unsafe ReparseDataBufferHeader? TryGetReparseDataBuffer(string path)
     {
         using SafeFileHandle output = CreateFile(
             path,
@@ -61,37 +66,59 @@ internal static class DiskUtils
         }
 
         byte[] buffer = ArrayPool<byte>.Shared.Rent(MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
-
-        bool success;
-        fixed (byte* pBuffer = buffer)
+        try
         {
-            success = DeviceIoControl(
-                output,
-                dwIoControlCode: FSCTL_GET_REPARSE_POINT,
-                lpInBuffer: null,
-                nInBufferSize: 0,
-                lpOutBuffer: pBuffer,
-                nOutBufferSize: MAXIMUM_REPARSE_DATA_BUFFER_SIZE,
-                out _,
-                IntPtr.Zero);
+            // Pooled arrays are not zeroed, so clear the part of the buffer we may read. The driver may return no data
+            // at all (e.g. when the path is not a reparse point), and the response may also be shorter than the header.
+            buffer.AsSpan(0, sizeof(ReparseDataBufferHeader)).Clear();
+
+            bool success;
+            uint bytesReturned;
+            fixed (byte* pBuffer = buffer)
+            {
+                success = DeviceIoControl(
+                    output,
+                    dwIoControlCode: FSCTL_GET_REPARSE_POINT,
+                    lpInBuffer: null,
+                    nInBufferSize: 0,
+                    lpOutBuffer: pBuffer,
+                    nOutBufferSize: MAXIMUM_REPARSE_DATA_BUFFER_SIZE,
+                    out bytesReturned,
+                    IntPtr.Zero);
+            }
 
             if (!success)
             {
                 return null;
             }
+
+            // The rented array may be larger than the requested buffer, and the driver may return less data than the
+            // buffer can hold: never inspect bytes the driver did not write.
+            if (bytesReturned > (uint)buffer.Length)
+            {
+                return null;
+            }
+
+            return ParseReparseDataBuffer(new ReadOnlySpan<byte>(buffer, 0, (int)bytesReturned));
         }
-
-        Span<byte> bufferSpan = new(buffer);
-        success = MemoryMarshal.TryRead(bufferSpan, out SymbolicLinkReparseBuffer reparseDataBuffer);
-
-        ArrayPool<byte>.Shared.Return(buffer);
-
-        if (success)
+        finally
         {
-            return reparseDataBuffer;
+            ArrayPool<byte>.Shared.Return(buffer);
         }
+    }
 
-        return null;
+    /// <summary>
+    /// Parses the common header of a reparse data buffer.
+    /// </summary>
+    /// <param name="buffer">The bytes returned by the driver.</param>
+    /// <returns>
+    /// The parsed header, or <see langword="null"/> if <paramref name="buffer"/> is shorter than the header.
+    /// </returns>
+    internal static ReparseDataBufferHeader? ParseReparseDataBuffer(ReadOnlySpan<byte> buffer)
+    {
+        return MemoryMarshal.TryRead(buffer, out ReparseDataBufferHeader reparseDataBuffer)
+            ? reparseDataBuffer
+            : null;
     }
 
     /// <summary>
