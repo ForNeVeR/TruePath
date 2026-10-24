@@ -2,14 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Windows.Win32;
+using Windows.Win32.Foundation;
 using Xunit.v3;
 
 namespace TruePath.Tests;
 
 public static class Utils
 {
-    private const int ErrorPrivilegeNotHeldHResult = unchecked((int)0x80070522);
-
     internal static string ToNonCanonicalCase(this string path)
     {
         var result = new char[path.Length];
@@ -52,7 +52,8 @@ public static class Utils
         {
             createSymbolicLink();
         }
-        catch (IOException e) when (OperatingSystem.IsWindows() && e.HResult == ErrorPrivilegeNotHeldHResult)
+        catch (IOException e) when (OperatingSystem.IsWindows()
+                                    && e.HResult == PInvoke.HRESULT_FROM_WIN32(WIN32_ERROR.ERROR_PRIVILEGE_NOT_HELD).Value)
         {
             Assert.False(
                 RunsOnCi(),
