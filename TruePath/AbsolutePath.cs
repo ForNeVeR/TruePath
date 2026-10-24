@@ -257,17 +257,10 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            if (DiskUtils.IsJunction(Value))
+            if (attributes.HasFlag(FileAttributes.ReparsePoint) && DiskUtils.IsJunction(Value))
             {
                 return FileEntryKind.Junction;
             }
-
-            if (attributes.HasFlag(FileAttributes.ReparsePoint))
-            {
-                return FileEntryKind.Symlink;
-            }
-
-            return FileEntryKind.Directory;
         }
 
         if (attributes.HasFlag(FileAttributes.ReparsePoint))
