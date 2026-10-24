@@ -5,7 +5,6 @@
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using Windows.Wdk.Storage.FileSystem;
 using Windows.Win32;
 using Windows.Win32.Storage.FileSystem;
 using Microsoft.Win32.SafeHandles;
@@ -58,32 +57,23 @@ internal static class DiskUtils
             return null;
         }
 
-        const int bufferSize = (int)PInvoke.MAXIMUM_REPARSE_DATA_BUFFER_SIZE;
-        var rentedBuffer = ArrayPool<byte>.Shared.Rent(bufferSize);
-        try
+        FILE_ATTRIBUTE_TAG_INFO info;
+        bool success = PInvoke.GetFileInformationByHandleEx(
+            output,
+            FILE_INFO_BY_HANDLE_CLASS.FileAttributeTagInfo,
+            new Span<byte>(&info, sizeof(FILE_ATTRIBUTE_TAG_INFO)));
+
+        if (!success)
         {
-            var buffer = rentedBuffer.AsSpan(0, bufferSize);
-            bool success = PInvoke.DeviceIoControl(
-                output,
-                PInvoke.FSCTL_GET_REPARSE_POINT,
-                lpInBuffer: default,
-                lpOutBuffer: buffer,
-                out _,
-                lpOverlapped: null);
-
-            if (!success)
-            {
-                return null;
-            }
-
-            success = MemoryMarshal.TryRead(buffer, out REPARSE_DATA_BUFFER reparseDataBuffer);
-
-            return success ? reparseDataBuffer.ReparseTag : null;
+            return null;
         }
-        finally
+
+        if ((info.FileAttributes & (uint)FILE_FLAGS_AND_ATTRIBUTES.FILE_ATTRIBUTE_REPARSE_POINT) == 0)
         {
-            ArrayPool<byte>.Shared.Return(rentedBuffer);
+            return null;
         }
+
+        return info.ReparseTag;
     }
 
     /// <summary>
