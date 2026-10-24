@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using System.Diagnostics;
+using TruePath.SystemIo;
 
 namespace TruePath.Tests;
 
@@ -36,15 +37,41 @@ public class AbsolutePathTests
     [Fact]
     public void ReadKind_NonExistent()
     {
-        // Arrange
-        var currentDirectory = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid().ToString());
-        var localPath = new AbsolutePath(currentDirectory);
-
-        // Act
-        var kind = localPath.ReadKind();
-
-        // Assert
+        var path = AbsolutePath.CurrentWorkingDirectory / Guid.NewGuid().ToString();
+        var kind = path.ReadKind();
         Assert.Null(kind);
+    }
+
+    [Fact]
+    public void ReadKind_NonExistentParent()
+    {
+        var path = AbsolutePath.CurrentWorkingDirectory / Guid.NewGuid().ToString() / "child";
+        var kind = path.ReadKind();
+        Assert.Null(kind);
+    }
+
+    [Fact]
+    public void ReadKind_ChildOfFile()
+    {
+        var tempFile = Temporary.CreateTempFile();
+        try
+        {
+            var kind = (tempFile / "child").ReadKind();
+            Assert.Null(kind);
+        }
+        finally
+        {
+            tempFile.Delete();
+        }
+    }
+
+    [Fact]
+    public void OnWindows_ReadKind_InvalidName_Throws()
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
+
+        var localPath = AbsolutePath.CurrentWorkingDirectory / "a|b";
+        Assert.ThrowsAny<IOException>(() => localPath.ReadKind());
     }
 
     [Fact]
