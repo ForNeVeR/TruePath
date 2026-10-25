@@ -145,6 +145,23 @@ public sealed class IncrementalityTests
         Assert.DoesNotContain("<summary>framework</summary>", Source(driver));
     }
 
+    [Theory]
+    [InlineData("<!-- first -->", "<!-- second -->")]
+    [InlineData("<?example first?>", "<?example second?>")]
+    public void CommentsAndProcessingInstructionsInsideDocumentationInvalidateOutput(string before, string after)
+    {
+        var compilation = TestHelper.CreateCompilation(TestHelper.DefaultSources);
+        var original = new InMemoryAdditionalText("System.Runtime.xml", Docs("text " + before));
+        var driver = CreateDriver(original).RunGenerators(compilation, TestContext.Current.CancellationToken);
+
+        driver = driver.ReplaceAdditionalText(original,
+                new InMemoryAdditionalText(original.Path, Docs("text " + after)))
+            .RunGenerators(compilation, TestContext.Current.CancellationToken);
+
+        Assert.Contains(after, Source(driver));
+        Assert.DoesNotContain(before, Source(driver));
+    }
+
     [Fact]
     public void SymbolDocumentationChangesInvalidateTemplatesEvenWhenApiSignaturesAreUnchanged()
     {
