@@ -48,8 +48,10 @@ public static class PathIoGeneratorCore
         bool markedTypeIsNested,
         HandWrittenInfo handWritten,
         ImmutableHashSet<string> excludedDocIds,
-        BclDocIndex docIndex)
+        BclDocIndex docIndex,
+        CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
 
         if (markedTypeIsNested)
@@ -75,7 +77,7 @@ public static class PathIoGeneratorCore
         if (diagnostics.Count > 0)
             return new GenerationResult(null, diagnostics.ToImmutable());
 
-        if (!IsDeclaredPartial(markedType!))
+        if (!IsDeclaredPartial(markedType!, cancellationToken))
         {
             diagnostics.Add(Diagnostic.Create(
                 GeneratorDiagnostics.MarkedClassNotPartial,
@@ -92,6 +94,7 @@ public static class PathIoGeneratorCore
         foreach (var owner in new[] { fileType!, directoryType! }) // File first, so File wins on duplicate signatures
         foreach (var method in owner.GetMembers().OfType<IMethodSymbol>())
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (method.MethodKind != MethodKind.Ordinary
                 || !method.IsStatic
                 || method.DeclaredAccessibility != Accessibility.Public
@@ -116,17 +119,17 @@ public static class PathIoGeneratorCore
             if (handWritten.Signatures.Contains(key)) continue;
             if (!generatedKeys.Add(key)) continue;
 
-            generatedMethods.Add(BuildMethod(owner, method, pathOrdinals, absolutePathType!, docIndex, renderer));
+            generatedMethods.Add(BuildMethod(owner, method, pathOrdinals, absolutePathType!, docIndex, renderer, cancellationToken));
         }
 
-        var source = RenderFile(markedType!, generatedMethods, skippedWithoutPath, renderer);
+        var source = RenderFile(markedType!, generatedMethods, skippedWithoutPath, renderer, cancellationToken);
         return new GenerationResult(source, diagnostics.ToImmutable());
     }
 
-    private static bool IsDeclaredPartial(INamedTypeSymbol type)
+    private static bool IsDeclaredPartial(INamedTypeSymbol type, CancellationToken cancellationToken)
     {
         return type.DeclaringSyntaxReferences
-            .Select(reference => reference.GetSyntax())
+            .Select(reference => reference.GetSyntax(cancellationToken))
             .OfType<TypeDeclarationSyntax>()
             .Any(syntax => syntax.Modifiers.Any(SyntaxKind.PartialKeyword));
     }
@@ -134,10 +137,11 @@ public static class PathIoGeneratorCore
     /// <summary>
     ///     Collects the exclusion-relevant facts about the hand-written members of the marked type: their rewritten
     ///     signatures, and the IDs of the BCL overloads they forward to. Called from the syntax-anchored part of
-    ///     the incremental pipeline, so it only re-runs when the marked type's syntax changes.
+    ///     the incremental pipeline; semantic changes in other files can also cause it to re-run.
     /// </summary>
-    public static HandWrittenInfo CollectHandWrittenInfo(Compilation compilation, INamedTypeSymbol markedType)
+    public static HandWrittenInfo CollectHandWrittenInfo(Compilation compilation, INamedTypeSymbol markedType, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var fileType = compilation.GetTypeByMetadataName("System.IO.File");
         var directoryType = compilation.GetTypeByMetadataName("System.IO.Directory");
         var absolutePathType = compilation.GetTypeByMetadataName(PathIoRules.AbsolutePathTypeName);
@@ -150,16 +154,18 @@ public static class PathIoGeneratorCore
 
         foreach (var member in markedType.GetMembers().OfType<IMethodSymbol>())
         {
+            cancellationToken.ThrowIfCancellationRequested();
             signatures.Add(SignatureKey(member.Name, member.Parameters.Select(p => SignatureTypeDisplay(p, null, absolutePathType, renderer))));
 
             foreach (var reference in member.DeclaringSyntaxReferences)
             {
-                var syntax = reference.GetSyntax();
+                var syntax = reference.GetSyntax(cancellationToken);
                 var model = compilation.GetSemanticModel(syntax.SyntaxTree);
                 foreach (var invocation in syntax.DescendantNodes().OfType<InvocationExpressionSyntax>())
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     if (invocation.ArgumentList.Arguments.Count == 0) continue;
-                    if (model.GetSymbolInfo(invocation).Symbol is not IMethodSymbol target) continue;
+                    if (model.GetSymbolInfo(invocation, cancellationToken).Symbol is not IMethodSymbol target) continue;
 
                     var owner = target.ContainingType?.OriginalDefinition;
                     if (!comparer.Equals(owner, fileType.OriginalDefinition)
@@ -244,7 +250,8 @@ public static class PathIoGeneratorCore
         ImmutableHashSet<int> pathOrdinals,
         INamedTypeSymbol absolutePathType,
         BclDocIndex docIndex,
-        TypeRenderer renderer)
+        TypeRenderer renderer,
+        CancellationToken cancellationToken)
     {
         var parameterNames = method.Parameters
             .Select(p => pathOrdinals.Contains(p.Ordinal)
@@ -266,7 +273,7 @@ public static class PathIoGeneratorCore
                 .Where(a => a.AttributeClass != null && ForwardedAttributes.Contains(a.AttributeClass.ToDisplayString()))
                 .Select(attribute => RenderAttribute(attribute, renderer))
                 .ToImmutableArray(),
-            BuildDocLines(method, docIndex, parameterNames));
+            BuildDocLines(method, docIndex, parameterNames, cancellationToken));
     }
 
     private static string? RenderDefaultValue(IParameterSymbol parameter, TypeRenderer renderer)
@@ -318,20 +325,22 @@ public static class PathIoGeneratorCore
     private static ImmutableArray<string> BuildDocLines(
         IMethodSymbol method,
         BclDocIndex docIndex,
-        ImmutableArray<string> parameterNames)
+        ImmutableArray<string> parameterNames,
+        CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (docIndex.TryGetMethodMember(DocId.ForMethod(method), out var cachedMember))
-            return DocFormatting.ToDocLines(cachedMember, parameterNames);
+            return DocFormatting.ToDocLines(cachedMember, parameterNames, cancellationToken);
 
-        var xml = method.GetDocumentationCommentXml();
+        var xml = method.GetDocumentationCommentXml(cancellationToken: cancellationToken);
         if (!string.IsNullOrWhiteSpace(xml))
             try
             {
                 var root = XElement.Parse("<root>" + xml!.Trim() + "</root>");
                 if (root.Element("member") is { } member)
-                    return DocFormatting.ToDocLines(member, parameterNames);
+                    return DocFormatting.ToDocLines(member, parameterNames, cancellationToken);
             }
-            catch (Exception)
+            catch (System.Xml.XmlException)
             {
                 // Malformed documentation falls back to the generated summary below.
             }
@@ -381,8 +390,10 @@ public static class PathIoGeneratorCore
     private static string RenderFile(INamedTypeSymbol markedType,
         List<GeneratedMethod> methods,
         SortedSet<string> skippedWithoutPath,
-        TypeRenderer renderer)
+        TypeRenderer renderer,
+        CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var orderedMethods = methods
             .OrderBy(m => m.Name, StringComparer.Ordinal)
             .ThenBy(m => m.Parameters.Length)
@@ -414,6 +425,7 @@ public static class PathIoGeneratorCore
 
         for (var memberIndex = 0; memberIndex < orderedMethods.Count; memberIndex++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var method = orderedMethods[memberIndex];
             if (memberIndex > 0) sb.AppendLine();
 

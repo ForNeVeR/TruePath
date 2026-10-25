@@ -32,15 +32,17 @@ public sealed class BclDocIndex
         return _members.TryGetValue(docId, out member!);
     }
 
-    public static BclDocIndex Build(ImmutableArray<AdditionalText> files)
+    public static BclDocIndex Build(ImmutableArray<AdditionalText> files, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         // netstandard.xml is processed first, so that the framework-specific System.Runtime.xml wins on conflicts.
         var orderedFiles = files.OrderBy(file => Path.GetFileName(file.Path) == "netstandard.xml" ? 0 : 1);
 
         var builder = ImmutableDictionary.CreateBuilder<string, XElement>();
         foreach (var file in orderedFiles)
         {
-            var text = file.GetText();
+            cancellationToken.ThrowIfCancellationRequested();
+            var text = file.GetText(cancellationToken);
             if (text == null) continue;
 
             // Some of the BCL documentation files (netstandard.xml in particular) contain invalid XML, so member
@@ -50,6 +52,7 @@ public sealed class BclDocIndex
             string? currentName = null;
             foreach (var textLine in text.Lines)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var line = textLine.ToString();
                 var trimmed = line.TrimStart();
                 if (currentName == null)
@@ -123,8 +126,9 @@ internal static class DocFormatting
     ///     normalized against the actual parameter names of the generated method: the BCL documentation sometimes
     ///     mismatches them (in casing or entirely), which would break XML documentation checks.
     /// </summary>
-    public static ImmutableArray<string> ToDocLines(XElement member, ImmutableArray<string> parameterNames)
+    public static ImmutableArray<string> ToDocLines(XElement member, ImmutableArray<string> parameterNames, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         // Work on a copy: the element may be a cached BclDocIndex entry shared across runs, and this method
         // renames its param elements in place.
         member = new XElement(member);
@@ -133,6 +137,7 @@ internal static class DocFormatting
         var elements = new List<string>();
         foreach (var element in member.Elements())
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (element.Name.LocalName == "param")
             {
                 var name = element.Attribute("name")?.Value;
