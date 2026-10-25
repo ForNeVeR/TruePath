@@ -52,78 +52,118 @@ public static class PathIoGeneratorCore
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        var symbol = compilation.GetTypeByMetadataName(markedTypeMetadataName);
+        var type = new MarkedType(markedTypeMetadataName, symbol?.Name ?? markedTypeMetadataName,
+            symbol?.ContainingNamespace.ToDisplayString() ?? string.Empty, markedTypeIsNested,
+            symbol != null && IsDeclaredPartial(symbol, cancellationToken), symbol != null, handWritten);
+        var analysis = new MarkedTypeAnalysis(type, symbol?.Locations.FirstOrDefault() ?? Location.None);
+        var api = ExtractBclApi(compilation, cancellationToken);
+        var diagnostics = GetTypeDiagnostics(analysis, api);
+        if (diagnostics.Length > 0) return new GenerationResult(null, diagnostics);
+        return new GenerationResult(Render(type, AddDocumentation(api, docIndex, cancellationToken), excludedDocIds, cancellationToken), diagnostics);
+    }
+
+    internal static MarkedTypeAnalysis AnalyzeMarkedType(
+        Compilation compilation, INamedTypeSymbol symbol, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var name = symbol.ToDisplayString();
+        var type = new MarkedType(name, symbol.Name, symbol.ContainingNamespace.ToDisplayString(),
+            symbol.ContainingType != null, IsDeclaredPartial(symbol, cancellationToken),
+            compilation.GetTypeByMetadataName(name) != null,
+            CollectHandWrittenInfo(compilation, symbol, cancellationToken));
+        return new MarkedTypeAnalysis(type, symbol.Locations.FirstOrDefault() ?? Location.None);
+    }
+
+    internal static ImmutableArray<Diagnostic> GetTypeDiagnostics(MarkedTypeAnalysis analysis, BclApiModel api)
+    {
+        var type = analysis.Type;
+        if (type.IsNested)
+            return [Diagnostic.Create(GeneratorDiagnostics.MarkedClassIsNested, Location.None, type.TypeName)];
+
         var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
+        foreach (var missing in api.MissingTypes)
+            diagnostics.Add(Diagnostic.Create(GeneratorDiagnostics.RequiredTypeNotFound, Location.None, missing));
+        if (!type.Resolves)
+            diagnostics.Add(Diagnostic.Create(GeneratorDiagnostics.RequiredTypeNotFound, Location.None, type.TypeName));
+        if (diagnostics.Count == 0 && !type.IsPartial)
+            diagnostics.Add(Diagnostic.Create(GeneratorDiagnostics.MarkedClassNotPartial, analysis.Location, type.SimpleName));
+        return diagnostics.ToImmutable();
+    }
 
-        if (markedTypeIsNested)
-        {
-            diagnostics.Add(Diagnostic.Create(GeneratorDiagnostics.MarkedClassIsNested, Location.None, markedTypeMetadataName));
-            return new GenerationResult(null, diagnostics.ToImmutable());
-        }
-
+    internal static BclApiModel ExtractBclApi(Compilation compilation, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
         var fileType = compilation.GetTypeByMetadataName("System.IO.File");
         var directoryType = compilation.GetTypeByMetadataName("System.IO.Directory");
         var absolutePathType = compilation.GetTypeByMetadataName(PathIoRules.AbsolutePathTypeName);
-        var markedType = compilation.GetTypeByMetadataName(markedTypeMetadataName);
-
-        foreach (var (name, symbol) in new[]
-                 {
-                     ("System.IO.File", fileType),
-                     ("System.IO.Directory", directoryType),
-                     (PathIoRules.AbsolutePathTypeName, absolutePathType),
-                     (markedTypeMetadataName, markedType),
-                 })
-            if (symbol == null)
-                diagnostics.Add(Diagnostic.Create(GeneratorDiagnostics.RequiredTypeNotFound, Location.None, name));
-        if (diagnostics.Count > 0)
-            return new GenerationResult(null, diagnostics.ToImmutable());
-
-        if (!IsDeclaredPartial(markedType!, cancellationToken))
-        {
-            diagnostics.Add(Diagnostic.Create(
-                GeneratorDiagnostics.MarkedClassNotPartial,
-                markedType!.Locations.FirstOrDefault() ?? Location.None,
-                markedType.Name));
-            return new GenerationResult(null, diagnostics.ToImmutable());
-        }
+        var missing = ImmutableArray.CreateBuilder<string>();
+        if (fileType == null) missing.Add("System.IO.File");
+        if (directoryType == null) missing.Add("System.IO.Directory");
+        if (absolutePathType == null) missing.Add(PathIoRules.AbsolutePathTypeName);
+        if (missing.Count > 0)
+            return new BclApiModel([], [], missing.ToImmutable());
 
         var renderer = TypeRenderer.Create(compilation);
-        var generatedMethods = new List<GeneratedMethod>();
-        var generatedKeys = new HashSet<string>();
-        var skippedWithoutPath = new SortedSet<string>();
-
-        foreach (var owner in new[] { fileType!, directoryType! }) // File first, so File wins on duplicate signatures
+        var methods = ImmutableArray.CreateBuilder<MethodCandidate>();
+        foreach (var owner in new[] { fileType!, directoryType! }) // Preserve File-before-Directory selection order.
         foreach (var method in owner.GetMembers().OfType<IMethodSymbol>())
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (method.MethodKind != MethodKind.Ordinary
-                || !method.IsStatic
-                || method.DeclaredAccessibility != Accessibility.Public
-                || method.IsGenericMethod
-                || method.Parameters.Any(p => p.RefKind != RefKind.None))
-                continue;
+            if (method.MethodKind != MethodKind.Ordinary || !method.IsStatic
+                || method.DeclaredAccessibility != Accessibility.Public || method.IsGenericMethod
+                || method.Parameters.Any(p => p.RefKind != RefKind.None)) continue;
 
             var docId = DocId.ForMethod(method);
-            if (excludedDocIds.Contains(docId) || handWritten.ForwardedDocIds.Contains(docId)) continue;
-
-            var pathOrdinals = method.Parameters
-                .Where(p => p.Type.SpecialType == SpecialType.System_String && PathIoRules.IsPathParameterName(p.Name))
-                .Select(p => p.Ordinal)
-                .ToImmutableHashSet();
-            if (pathOrdinals.Count == 0 || !pathOrdinals.Contains(0))
+            var pathOrdinals = PathParameterOrdinals(method);
+            if (!pathOrdinals.Contains(0))
             {
-                skippedWithoutPath.Add(docId);
+                methods.Add(new MethodCandidate(docId, string.Empty, null, null));
                 continue;
             }
 
-            var key = SignatureKey(method.Name, method.Parameters.Select(p => SignatureTypeDisplay(p, pathOrdinals, absolutePathType!, renderer)));
-            if (handWritten.Signatures.Contains(key)) continue;
-            if (!generatedKeys.Add(key)) continue;
-
-            generatedMethods.Add(BuildMethod(owner, method, pathOrdinals, absolutePathType!, docIndex, renderer, cancellationToken));
+            var template = BuildMethod(owner, method, pathOrdinals, absolutePathType!, renderer);
+            methods.Add(new MethodCandidate(docId,
+                SignatureKey(method.Name, method.Parameters.Select(p => SignatureTypeDisplay(p, pathOrdinals, absolutePathType!, renderer))), template,
+                method.GetDocumentationCommentXml(cancellationToken: cancellationToken)));
         }
 
-        var source = RenderFile(markedType!, generatedMethods, skippedWithoutPath, renderer, cancellationToken);
-        return new GenerationResult(source, diagnostics.ToImmutable());
+        return new BclApiModel(methods.ToImmutable(),
+            renderer.ImportedNamespaces.OrderBy(name => name, StringComparer.Ordinal).ToImmutableArray(), []);
+    }
+
+    internal static BclApiModel AddDocumentation(BclApiModel api, BclDocIndex docIndex, CancellationToken cancellationToken)
+    {
+        var methods = ImmutableArray.CreateBuilder<MethodCandidate>();
+        foreach (var candidate in api.Methods)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var method = candidate.Method;
+            if (method == null) { methods.Add(candidate); continue; }
+            var names = method.Parameters.Select(p => p.Name).ToImmutableArray();
+            var documented = new GeneratedMethod(method.Name, method.ReturnType, method.Parameters, method.BclCall,
+                method.Attributes, BuildDocLines(candidate, docIndex, names, cancellationToken));
+            methods.Add(new MethodCandidate(candidate.DocId, candidate.Signature, documented, candidate.FallbackXml));
+        }
+        return new BclApiModel(methods.ToImmutable(), api.ImportedNamespaces, api.MissingTypes);
+    }
+
+    internal static string? Render(MarkedType type, BclApiModel api, ImmutableHashSet<string> exclusions, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!type.CanGenerate || api.MissingTypes.Length > 0) return null;
+        var generatedMethods = new List<GeneratedMethod>();
+        var keys = new HashSet<string>();
+        var skipped = new SortedSet<string>();
+        foreach (var candidate in api.Methods)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (exclusions.Contains(candidate.DocId) || type.HandWritten.ForwardedDocIds.Contains(candidate.DocId)) continue;
+            if (candidate.Method == null) { skipped.Add(candidate.DocId); continue; }
+            if (type.HandWritten.Signatures.Contains(candidate.Signature) || !keys.Add(candidate.Signature)) continue;
+            generatedMethods.Add(candidate.Method);
+        }
+        return RenderFile(type, generatedMethods, skipped, api.ImportedNamespaces, cancellationToken);
     }
 
     private static bool IsDeclaredPartial(INamedTypeSymbol type, CancellationToken cancellationToken)
@@ -249,9 +289,7 @@ public static class PathIoGeneratorCore
         IMethodSymbol method,
         ImmutableHashSet<int> pathOrdinals,
         INamedTypeSymbol absolutePathType,
-        BclDocIndex docIndex,
-        TypeRenderer renderer,
-        CancellationToken cancellationToken)
+        TypeRenderer renderer)
     {
         var parameterNames = method.Parameters
             .Select(p => pathOrdinals.Contains(p.Ordinal)
@@ -273,7 +311,7 @@ public static class PathIoGeneratorCore
                 .Where(a => a.AttributeClass != null && ForwardedAttributes.Contains(a.AttributeClass.ToDisplayString()))
                 .Select(attribute => RenderAttribute(attribute, renderer))
                 .ToImmutableArray(),
-            BuildDocLines(method, docIndex, parameterNames, cancellationToken));
+            ImmutableArray<string>.Empty);
     }
 
     private static string? RenderDefaultValue(IParameterSymbol parameter, TypeRenderer renderer)
@@ -323,16 +361,16 @@ public static class PathIoGeneratorCore
         return "[" + name + (arguments.Length == 0 ? "" : "(" + arguments + ")") + "]";
     }
     private static ImmutableArray<string> BuildDocLines(
-        IMethodSymbol method,
+        MethodCandidate candidate,
         BclDocIndex docIndex,
         ImmutableArray<string> parameterNames,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (docIndex.TryGetMethodMember(DocId.ForMethod(method), out var cachedMember))
+        if (docIndex.GetMethodMember(candidate.DocId) is { } cachedMember)
             return DocFormatting.ToDocLines(cachedMember, parameterNames, cancellationToken);
 
-        var xml = method.GetDocumentationCommentXml(cancellationToken: cancellationToken);
+        var xml = candidate.FallbackXml;
         if (!string.IsNullOrWhiteSpace(xml))
             try
             {
@@ -345,7 +383,7 @@ public static class PathIoGeneratorCore
                 // Malformed documentation falls back to the generated summary below.
             }
 
-        var cref = DocId.ForCref(method);
+        var cref = candidate.DocId.Substring(2);
         return
         [
             $"<summary>Equivalent to <see cref=\"{cref}\"/>.</summary>",
@@ -387,10 +425,10 @@ public static class PathIoGeneratorCore
         return name + "(" + string.Join(", ", parameterTypes) + ")";
     }
 
-    private static string RenderFile(INamedTypeSymbol markedType,
+    private static string RenderFile(MarkedType markedType,
         List<GeneratedMethod> methods,
         SortedSet<string> skippedWithoutPath,
-        TypeRenderer renderer,
+        ImmutableArray<string> importedNamespaces,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -414,13 +452,13 @@ public static class PathIoGeneratorCore
         sb.AppendLine();
         sb.AppendLine("#nullable enable");
         sb.AppendLine();
-        foreach (var importedNamespace in renderer.ImportedNamespaces.OrderBy(namespaceName => namespaceName, StringComparer.Ordinal))
+        foreach (var importedNamespace in importedNamespaces)
             sb.AppendLine("using " + importedNamespace + ";");
         sb.AppendLine();
-        sb.AppendLine("namespace " + markedType.ContainingNamespace.ToDisplayString() + ";");
+        sb.AppendLine("namespace " + markedType.NamespaceName + ";");
         sb.AppendLine();
         sb.AppendLine("[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"" + GeneratorName + "\", \"" + GeneratorVersion + "\")]");
-        sb.AppendLine("public static partial class " + markedType.Name);
+        sb.AppendLine("public static partial class " + markedType.SimpleName);
         sb.AppendLine("{");
 
         for (var memberIndex = 0; memberIndex < orderedMethods.Count; memberIndex++)
@@ -490,6 +528,13 @@ internal sealed class GeneratedMethod(
     public string BclCall { get; } = bclCall;
     public ImmutableArray<string> Attributes { get; } = attributes;
     public ImmutableArray<string> DocLines { get; } = docLines;
+
+    public override bool Equals(object? obj) => obj is GeneratedMethod other
+        && Name == other.Name && ReturnType == other.ReturnType && BclCall == other.BclCall
+        && Parameters.SequenceEqual(other.Parameters) && Attributes.SequenceEqual(other.Attributes)
+        && DocLines.SequenceEqual(other.DocLines);
+
+    public override int GetHashCode() => Name.GetHashCode();
 }
 
 internal sealed class GeneratedParameter(string type, string name, bool isPath, string? defaultValue)
@@ -498,4 +543,9 @@ internal sealed class GeneratedParameter(string type, string name, bool isPath, 
     public string Name { get; } = name;
     public bool IsPath { get; } = isPath;
     public string? DefaultValue { get; } = defaultValue;
+
+    public override bool Equals(object? obj) => obj is GeneratedParameter other
+        && Type == other.Type && Name == other.Name && IsPath == other.IsPath && DefaultValue == other.DefaultValue;
+
+    public override int GetHashCode() => Name.GetHashCode();
 }

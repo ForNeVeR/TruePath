@@ -18,18 +18,39 @@ namespace TruePath.PathIoGenerator;
 /// </summary>
 public sealed class BclDocIndex
 {
-    private readonly ImmutableArray<AdditionalText> _files;
+    private readonly bool _isNetstandard;
     private readonly ImmutableDictionary<string, XElement> _members;
 
     private BclDocIndex(ImmutableArray<AdditionalText> files, ImmutableDictionary<string, XElement> members)
     {
-        _files = files;
+        _isNetstandard = files.All(file => Path.GetFileName(file.Path) == "netstandard.xml");
         _members = members;
     }
 
     public bool TryGetMethodMember(string docId, out XElement member)
     {
-        return _members.TryGetValue(docId, out member!);
+        if (_members.TryGetValue(docId, out var stored))
+        {
+            member = new XElement(stored);
+            return true;
+        }
+        member = null!;
+        return false;
+    }
+
+    // Only DocFormatting reads the shared instance, and it clones before normalizing parameters.
+    internal XElement? GetMethodMember(string docId) => _members.TryGetValue(docId, out var member) ? member : null;
+
+    internal static BclDocIndex Merge(ImmutableArray<BclDocIndex> indexes, CancellationToken cancellationToken)
+    {
+        var members = ImmutableDictionary.CreateBuilder<string, XElement>();
+        foreach (var index in indexes.OrderBy(index => index._isNetstandard ? 0 : 1))
+        foreach (var pair in index._members)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            members[pair.Key] = pair.Value;
+        }
+        return new BclDocIndex(ImmutableArray<AdditionalText>.Empty, members.ToImmutable());
     }
 
     public static BclDocIndex Build(ImmutableArray<AdditionalText> files, CancellationToken cancellationToken = default)
@@ -96,12 +117,14 @@ public sealed class BclDocIndex
 
     public override bool Equals(object? obj)
     {
-        return obj is BclDocIndex other && _files.SequenceEqual(other._files);
+        return obj is BclDocIndex other && _isNetstandard == other._isNetstandard
+            && _members.Count == other._members.Count
+            && _members.All(pair => other._members.TryGetValue(pair.Key, out var member) && XNode.DeepEquals(pair.Value, member));
     }
 
     public override int GetHashCode()
     {
-        return _files.Length;
+        return _members.Count;
     }
 }
 
