@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -45,6 +46,7 @@ public sealed class BclDocIndex
 
     internal static BclDocIndex Merge(ImmutableArray<BclDocIndex> indexes, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var members = ImmutableDictionary.CreateBuilder<string, XElement>();
         foreach (var index in indexes.OrderBy(index => index._isNetstandard ? 0 : 1))
         foreach (var pair in index._members)
@@ -66,6 +68,7 @@ public sealed class BclDocIndex
         {
             cancellationToken.ThrowIfCancellationRequested();
             var text = file.GetText(cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
             if (text == null) continue;
 
             if (IsNetStandardDoc(file))
@@ -84,27 +87,12 @@ public sealed class BclDocIndex
         return Path.GetFileName(file.Path) == NetStandardDocFileName;
     }
 
-    private static bool IsIndexedMember(string name)
-    {
-        return name.StartsWith("M:System.IO.File.", StringComparison.Ordinal)
-               || name.StartsWith("M:System.IO.Directory.", StringComparison.Ordinal);
-    }
-
     private static void ExtractMembers(
         SourceText text,
         ImmutableDictionary<string, XElement>.Builder builder,
         CancellationToken cancellationToken)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-        var document = XDocument.Parse(text.ToString());
-        foreach (var member in document.Descendants("member"))
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var name = member.Attribute("name")?.Value;
-            if (name == null || !IsIndexedMember(name)) continue;
-
-            builder[name] = member;
-        }
+        ExtractMembers(text, builder, skipMalformedMembers: false, cancellationToken);
     }
 
     private static void ExtractMembersLeniently(
@@ -112,50 +100,89 @@ public sealed class BclDocIndex
         ImmutableDictionary<string, XElement>.Builder builder,
         CancellationToken cancellationToken)
     {
-        // netstandard.xml contains invalid XML, so member elements are extracted line by line and parsed one by one:
-        // a broken member is then skipped instead of failing the whole file.
-        //
-        // See https://github.com/dotnet/standard/issues/1527 on the topic of the broken XML doc.
-        var current = new StringBuilder();
+        ExtractMembers(text, builder, skipMalformedMembers: true, cancellationToken);
+    }
+
+    /// <summary>
+    ///     Scans the documentation line by line and materializes only the member elements the index needs, instead of
+    ///     allocating the whole file through <c>SourceText.ToString()</c> first.
+    /// </summary>
+    /// <param name="skipMalformedMembers">
+    ///     netstandard.xml is known to contain invalid XML (see https://github.com/dotnet/standard/issues/1527), so
+    ///     its malformed members are skipped; in every other file a malformed member surfaces the parse error.
+    /// </param>
+    private static void ExtractMembers(
+        SourceText text,
+        ImmutableDictionary<string, XElement>.Builder builder,
+        bool skipMalformedMembers,
+        CancellationToken cancellationToken)
+    {
+        var prefix = new char[64];
+        var memberStart = 0;
         string? currentName = null;
         foreach (var textLine in text.Lines)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var line = textLine.ToString();
-            var trimmed = line.TrimStart();
+            var span = textLine.Span;
             if (currentName == null)
             {
-                if (!trimmed.StartsWith("<member ", StringComparison.Ordinal)) continue;
+                if (!StartsMember(text, span, prefix, out var start)) continue;
+                var nameStart = start;
+                while (nameStart < span.End && text[nameStart] != '"') nameStart++;
+                if (nameStart == span.End) continue;
+                nameStart++;
+                var nameEnd = nameStart;
+                while (nameEnd < span.End && text[nameEnd] != '"') nameEnd++;
+                if (nameEnd == span.End) continue;
+                if (!Matches(text, nameStart, nameEnd, "M:System.IO.File.")
+                    && !Matches(text, nameStart, nameEnd, "M:System.IO.Directory.")) continue;
 
-                var nameStart = trimmed.IndexOf('"');
-                var nameEnd = nameStart < 0 ? -1 : trimmed.IndexOf('"', nameStart + 1);
-                if (nameEnd < 0) continue;
-
-                var name = trimmed.Substring(nameStart + 1, nameEnd - nameStart - 1);
-                if (!IsIndexedMember(name)) continue;
-
-                currentName = name;
-                current.Clear().Append(line);
+                currentName = text.ToString(TextSpan.FromBounds(nameStart, nameEnd));
+                memberStart = span.Start;
             }
-            else
+
+            var end = span.End;
+            while (end > span.Start && char.IsWhiteSpace(text[end - 1])) end--;
+            if (!Matches(text, end - "</member>".Length, end, "</member>")) continue;
+            try
             {
-                current.Append('\n').Append(line);
+                builder[currentName] = XElement.Parse(text.ToString(TextSpan.FromBounds(memberStart, span.End)));
             }
-
-            if (trimmed.TrimEnd().EndsWith("</member>", StringComparison.Ordinal))
+            catch (XmlException) when (skipMalformedMembers)
             {
-                try
-                {
-                    builder[currentName] = XElement.Parse(current.ToString());
-                }
-                catch (XmlException)
-                {
-                    // Skip a malformed member.
-                }
-
-                currentName = null;
+                // Skip a malformed member without hiding other valid entries.
             }
+
+            currentName = null;
         }
+    }
+
+    private static bool StartsMember(SourceText text, TextSpan line, char[] prefix, out int start)
+    {
+        // Bulk copying avoids virtual SourceText indexer calls for every character of every unrelated line.
+        var length = Math.Min(prefix.Length, line.Length);
+        text.CopyTo(line.Start, prefix, 0, length);
+        var offset = 0;
+        while (offset < length && char.IsWhiteSpace(prefix[offset])) offset++;
+        start = line.Start + offset;
+        const string opening = "<member ";
+        if (offset + opening.Length <= length)
+        {
+            for (var i = 0; i < opening.Length; i++)
+                if (prefix[offset + i] != opening[i]) return false;
+            return true;
+        }
+        // Unusually deep indentation or a tag straddling the prefix still uses the full line.
+        while (start < line.End && char.IsWhiteSpace(text[start])) start++;
+        return Matches(text, start, line.End, opening);
+    }
+
+    private static bool Matches(SourceText text, int start, int end, string value)
+    {
+        if (start < 0 || end - start < value.Length) return false;
+        for (var i = 0; i < value.Length; i++)
+            if (text[start + i] != value[i]) return false;
+        return true;
     }
 
     public override bool Equals(object? obj)
@@ -201,6 +228,14 @@ internal static class DocFormatting
 
         var documentedParameters = new HashSet<string>(StringComparer.Ordinal);
         var elements = new List<string>();
+        // A writer allocates a sizable buffer. Reuse it across this member's independent XML fragments.
+        var buffer = new StringBuilder();
+        using var textWriter = new StringWriter(buffer, CultureInfo.InvariantCulture);
+        using var xmlWriter = XmlWriter.Create(textWriter, new XmlWriterSettings
+        {
+            OmitXmlDeclaration = true,
+            ConformanceLevel = ConformanceLevel.Fragment,
+        });
         foreach (var element in member.Elements())
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -216,7 +251,10 @@ internal static class DocFormatting
                 documentedParameters.Add(actual);
             }
 
-            elements.Add(element.ToString(SaveOptions.DisableFormatting));
+            element.WriteTo(xmlWriter);
+            xmlWriter.Flush();
+            elements.Add(buffer.ToString());
+            buffer.Clear();
         }
 
         foreach (var missing in parameterNames.Where(p => !documentedParameters.Contains(p)))
@@ -243,7 +281,8 @@ internal static class DocFormatting
     }
 
     private static string Rewrite(string line, ImmutableArray<string> parameterNames)
-    {        line = ParamRefRegex.Replace(line, match =>
+    {
+        line = ParamRefRegex.Replace(line, match =>
         {
             var actual = MatchParameter(match.Groups["name"].Value, parameterNames);
             var inner = match.Groups["inner"].Success ? match.Groups["inner"].Value : null;

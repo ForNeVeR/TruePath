@@ -134,6 +134,7 @@ public static class PathIoGeneratorCore
 
     internal static BclApiModel AddDocumentation(BclApiModel api, BclDocIndex docIndex, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var methods = ImmutableArray.CreateBuilder<MethodCandidate>();
         foreach (var candidate in api.Methods)
         {
