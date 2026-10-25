@@ -10,37 +10,51 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html), with one exception: the behavior of the members and types marked as `[System.Diagnostics.CodeAnalysis.ExperimentalAttribute]` may change without a major version bump (see [Versioning](README.md#versioning)).
 
-## [Unreleased]
-### Added
-- `LocalPath.PathRoot`, returning the root of an absolute path, or the drive root of a drive-relative path (e.g. `C:foo`, which only exists on Windows), or `null` when the root can't be determined.
-- `AbsolutePath.PathRoot` property.
-- [#224](https://github.com/ForNeVeR/TruePath/issues/224): `PathKind` enumeration and `LocalPath.Kind` property, telling an absolute path from a relative one, and on Windows also from a path rooted without a drive letter (`\Windows`) and from a path relative to the current directory of a drive (`C:Windows`). These are **experimental** (diagnostic `TRUEPATH001`): more kinds may be added later, e.g. for UNC paths.
-- [#202: `path.GetFiles(LocalPathPattern)`](https://github.com/ForNeVeR/TruePath/issues/202).
+## [2.0.0] - 2026-10-25
+This is a major release with certain breaking changes. No public APIs have been broken, but the amount of minor behavior changes required us to bump the major version.
+
+The main change (outlined below) is the introduction of the _relative path kinds_ (most important for Windows). TruePath's path resolve APIs now follow the new rules regarding the relative path resolve (especially regarding more exotic relative path kinds on Windows); check the relevant documentation.
+
+Another notable change is that, while `LocalPath` still considers an empty path to designate the current directory, current directory now always gets normalized as `"."` and not an empty string.
+
+There were a bunch of unrelated important (sometimes breaking) changes to other APIs, read the details below.
 
 ### Changed
-- **Breaking:** on Windows, `LocalPath.IsAbsolute` now only returns `true` for fully qualified paths, such as `C:\Windows`. Paths rooted without a drive letter (`\Windows`), and paths relative to the current directory of a drive (`C:Windows`, `C:`) are not absolute anymore, and `AbsolutePath` now rejects them. Previously, this was following the `Path.IsPathRooted` API.
-- **Breaking:** `LocalPath.IsPrefixOf` and `StartsWith` now consider paths of different `PathKind` unrelated: an absolute path is never a prefix of a relative one, nor the other way round, and on Windows `\Windows`, `C:Windows` and `Windows` are all unrelated to each other. Previously, the result depended on a string comparison.
-- **Breaking:** on Windows, the `/` operator of `LocalPath` and `AbsolutePath` no longer delegates to `Path.Combine`, and instead follows the algorithm of C++ `std::filesystem::path::operator/` ([fs.path.append](https://eel.is/c++draft/fs.path.append)) with case-insensitive drive letters. In particular, `C:\base / \x` is now `C:\x` (was `\x`), `C:\base / C:x` is now `C:\base\x` (was `C:x`), and `C: / x` is now `C:x` (was `C:\x`). On Unix, the behavior is unchanged.
-- **Breaking:** `PathExtensions.WithExtension` now throws an `ArgumentException` unless the path ends with a file name and the result of the change is a file name in its place: an extension change may no longer alter the number or the kind of a path's segments. It used to do so silently — `new LocalPath(@"C:\foo\.gitignore").WithExtension(null)` returned `C:\foo`, `new LocalPath(".gitignore").WithExtension(null)` returned the empty path, and `new LocalPath(@"C:\").WithExtension("bar")` returned `C:\.bar`.
-- On Windows, `AbsolutePath / LocalPath` now resolves a path relative to the current directory of another drive against the current directory of that drive, so the result is always absolute: e.g. `C:\base / D:x` is `D:\x` if the current directory of drive `D:` is its root. Previously, the result was `D:x`, which is not absolute.
-- On Windows, `LocalPath.ResolveToCurrentDirectory` now resolves `\x` against the drive of the current directory, and `D:x` against the current directory of drive `D:`.
-- **Breaking:** `LocalPath.StartsWith` and `AbsolutePath.StartsWith` now compare whole path segments instead of raw strings, which makes them exact inverses of `IsPrefixOf` as originally intended in [#43](https://github.com/ForNeVeR/TruePath/issues/43). For example, `new LocalPath("/foo1").StartsWith(new LocalPath("/foo"))` is now `false`, where it used to be `true`.
+- **Breaking:** ([#224](https://github.com/ForNeVeR/TruePath/issues/224)) on Windows, `LocalPath.IsAbsolute` now only returns `true` for fully qualified paths, such as `C:\Windows`. Paths rooted without a drive letter (`\Windows`), and paths relative to the current directory of a drive (`C:Windows`, `C:`) are not absolute anymore, and `AbsolutePath` now rejects them. Previously, this was following the `Path.IsPathRooted` API.
+- **Breaking:** ([#224](https://github.com/ForNeVeR/TruePath/issues/224)) on Windows, the `/` operator of `LocalPath` and `AbsolutePath` no longer delegates to `Path.Combine`, and instead follows the algorithm of C++ `std::filesystem::path::operator/` ([fs.path.append](https://eel.is/c++draft/fs.path.append)) with case-insensitive drive letters. In particular, `C:\base / \x` is now `C:\x` (was `\x`), `C:\base / C:x` is now `C:\base\x` (was `C:x`), and `C: / x` is now `C:x` (was `C:\x`). On Unix, the behavior is unchanged.
 - **Breaking:** path normalization now represents the current directory as `.` instead of an empty string: `PathStrings.Normalize` returns `"."` for `""`, `"."` and `"a/.."`, and so do `LocalPath.Value` and `ToString()` (and `LocalPath.Parent` of a single-segment relative path is `.`). As a consequence, `LocalPath.FileName` of such a path is `.`, the same way it is `..` for `..`, and `GetExtensionWithDot` returns `.` for it.
-- `LocalPath.IsPrefixOf` now treats the current directory path `.` — the normalized form of `""`, `"."` and `"a/.."`, and the parent of any single-segment relative path — as the current directory, so it is a prefix of every path of kind `PathKind.Relative` that does not begin with a `..` reference.
-- [#240](https://github.com/ForNeVeR/TruePath/issues/240): more performant `AbsolutePath.ReadKind`: it now queries the entry attributes only once, and on Windows it no longer allocates or performs additional IO in cases not concerning reparse points. Thanks to @FalconTechDev!
+- **Breaking:** `LocalPath.IsPrefixOf` and `StartsWith` now consider paths of different `PathKind` unrelated: an absolute path is never a prefix of a relative one, nor the other way round, and on Windows `\Windows`, `C:Windows` and `Windows` are all unrelated to each other.
+- **Breaking:** `PathExtensions.WithExtension` now throws an `ArgumentException` unless the path ends with a file name and the result of the change is a file name in its place: an extension change may no longer alter the number or the kind of any path's segments. It used to do so, e.g.:
+  - `new LocalPath(@"C:\foo\.gitignore").WithExtension(null)` returned `C:\foo`,
+  - `new LocalPath(".gitignore").WithExtension(null)` returned the empty path,
+  - and `new LocalPath(@"C:\").WithExtension("bar")` returned `C:\.bar`.
+
+  None of the examples above take place anymore.
+- [#224](https://github.com/ForNeVeR/TruePath/issues/224): on Windows, `AbsolutePath / LocalPath` now resolves a path relative to the current directory of another drive against the current directory of that drive, so the result is always absolute: e.g. `C:\base / D:x` is `D:\x` if the current directory of drive `D:` is its root. Previously, the result was `D:x`, which is not absolute.
+- [#224](https://github.com/ForNeVeR/TruePath/issues/224): on Windows, `LocalPath.ResolveToCurrentDirectory` now resolves `\x` against the drive of the current directory, and `D:x` against the current directory of drive `D:`.
+- [#240](https://github.com/ForNeVeR/TruePath/issues/240): more performant `AbsolutePath.ReadKind`: it now queries the entry attributes only once, and on Windows it no longer allocates or performs additional IO in cases not concerning reparse points. Thanks to @FalconTechDev for help!
 - `AbsolutePath.ReadKind` now only returns `null` if the entry doesn't exist, and throws an exception if its attributes cannot be read for another reason: e.g. an `UnauthorizedAccessException` if the access is denied, or an `IOException` if the path contains a name rejected by the file system (on .NET Framework, also `ArgumentException` or `PathTooLongException`). Previously, it returned `null` in these cases.
 - The platform-default path comparers (`LocalPath.PlatformDefaultComparer`, `AbsolutePath.PlatformDefaultComparer`) are now case-insensitive on iOS and tvOS as well, matching the .NET runtime.
 
+### Added
+- [#215](https://github.com/ForNeVeR/TruePath/issues/215): `AbsolutePath.PathRoot` property. Thanks to @fskalkan!
+- `LocalPath.PathRoot` property, similar to the previous entry, returning the root of an absolute path, or the drive root of a drive-relative path (e.g. `C:foo`, which only exists on Windows, will return `C:`), or `null` when the root can't be determined.
+- [#202: `path.GetFiles(LocalPathPattern)`](https://github.com/ForNeVeR/TruePath/issues/202). Thanks to @hamdiakin!
+- [#224](https://github.com/ForNeVeR/TruePath/issues/224): `PathKind` enumeration and `LocalPath.Kind` property, telling an absolute path from a relative one, and on Windows also from a path rooted without a drive letter (`\Windows`) and from a path relative to the current directory of a drive (`C:Windows`). These are **experimental** (diagnostic `TRUEPATH001`): more kinds may be added later, e.g. for UNC paths.
+
 ### Fixed
-- `AbsolutePath.ReadKind` no longer throws an exception if the entry gets deleted during the call.
 - [#239](https://github.com/ForNeVeR/TruePath/issues/239): on Unix, `AbsolutePath.Canonicalize()` no longer closes the file descriptor 0 when the path doesn't exist. This used to close the standard input of the process, or any file or socket that later took this descriptor number. Also, it no longer leaks the memory allocated for the resolved path.
-- [#226](https://github.com/ForNeVeR/TruePath/issues/226): `LocalPath.IsPrefixOf` and `StartsWith` now take leading `..` references of relative paths into account instead of comparing them as strings. For example, `new LocalPath("..").IsPrefixOf(new LocalPath("foo"))` is now `true`, and `new LocalPath("..").IsPrefixOf(new LocalPath("../.."))` is now `false`.
-- [#225](https://github.com/ForNeVeR/TruePath/issues/225): Make path prefix checks use the same platform-default case sensitivity as path equality.
-- `LocalPath.IsPrefixOf` and `StartsWith` now compare path strings ordinally. Previously they used the current culture, which ignores collation-ignorable characters, so a path could be reported as a prefix of an unrelated one.
-- Path normalization no longer drops the root separator when a rooted path ends with `..`: `C:\base\..` is now normalized to `C:\` (was `C:`, a path relative to the current directory of drive `C:`), and `/base/..` to `/` (was an empty path, i.e. the current directory). This affects `PathStrings.Normalize`, `LocalPath` and `AbsolutePath`.
+- [#217](https://github.com/ForNeVeR/TruePath/issues/217): the `IsPrefixOf` and `StartsWith` methods for both `LocalPath` and `AbsolutePath` are now exact opposites (use same code), and always operate on whole path segments (file and directory names) instead of raw strings. For example, `new AbsolutePath("/foo1").StartsWith(new AbsolutePath("/foo"))` is now `false`, where it used to be `true`. Thanks to @berkcantmr for help on this fix!
+- [#221](https://github.com/ForNeVeR/TruePath/issues/221): `IsPrefixOf` now handles the root folders correctly as prefixes of all the absolute paths under the same root. Thanks to @berkcantmr and @t957095!
+- `IsPrefixOf` and `StartsWith` now compare path strings using ordinal string comparison.
+- [#225](https://github.com/ForNeVeR/TruePath/issues/225): `IsPrefixOf` and `StartsWith` now compare path strings using the same platform-default case sensitivity as path equality. Thanks to @amirani8137!
+- [#224](https://github.com/ForNeVeR/TruePath/issues/224): path normalization no longer drops the root separator when a rooted path ends with `..`: `C:\base\..` is now normalized to `C:\` (was `C:`, a path relative to the current directory of drive `C:`), and `/base/..` to `/` (was an empty path, i.e. the current directory).
+- [#219](https://github.com/ForNeVeR/TruePath/issues/219): path normalization no longer applies Windows drive-specific logic to all paths. Thanks to @hamdiakin!
 - [#95](https://github.com/ForNeVeR/TruePath/issues/95): Path normalization now drops a `..` directly after the root, since the root has no parent: `/..` is normalized to `/`, and `C:\..\x` to `C:\x`, the same as `Path.GetFullPath` does. Thanks to @sinthu-14 for help!
+- [#226](https://github.com/ForNeVeR/TruePath/issues/226): `LocalPath.IsPrefixOf` and `StartsWith` now take leading `..` references of relative paths into account instead of comparing them as strings. For example, `new LocalPath("..").IsPrefixOf(new LocalPath("foo"))` is now `true`, and `new LocalPath("..").IsPrefixOf(new LocalPath("../.."))` is now `false`. Thanks to @rghvgrv!
+- In .NET Standard 2.0's version of TruePath (e.g., the one targeting .NET Framework), `LocalPath.RelativeTo` and `AbsolutePath.RelativeTo` now use a port of the .NET runtime's `Path.GetRelativePath`, and return the same results as on .NET 8+ (except for the stream syntax, see [#235](https://github.com/ForNeVeR/TruePath/issues/235)). Previously, the result was wrong for a destination equal to or above the base path, and for names containing `%XX` sequences.
+- `AbsolutePath.ReadKind` no longer throws an exception if the entry gets deleted during the call.
 - `LocalPath.RelativeTo` no longer throws an exception when either path designates the current directory.
-- On .NET Standard 2.0 (e.g., .NET Framework), `LocalPath.RelativeTo` and `AbsolutePath.RelativeTo` now use a port of the .NET runtime's `Path.GetRelativePath`, and return the same results as on .NET 8+ (except for the stream syntax, see [#235](https://github.com/ForNeVeR/TruePath/issues/235)). Previously, the result was wrong for a destination equal to or above the base path, and for names containing `%XX` sequences.
 
 ## [1.12.0] - 2026-03-14
 ### Changed
@@ -227,4 +241,5 @@ This is the first published version of the package. It doesn't contain any featu
 [1.10.0]: https://github.com/ForNeVeR/TruePath/compare/v1.9.0...v1.10.0
 [1.11.0]: https://github.com/ForNeVeR/TruePath/compare/v1.10.0...v1.11.0
 [1.12.0]: https://github.com/ForNeVeR/TruePath/compare/v1.11.0...v1.12.0
-[Unreleased]: https://github.com/ForNeVeR/TruePath/compare/v1.12.0...HEAD
+[2.0.0]: https://github.com/ForNeVeR/TruePath/compare/v1.12.0...v2.0.0
+[Unreleased]: https://github.com/ForNeVeR/TruePath/compare/v2.0.0...HEAD
