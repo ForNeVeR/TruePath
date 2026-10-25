@@ -146,6 +146,23 @@ public sealed class IncrementalityTests
     }
 
     [Theory]
+    [InlineData("\u0085")]
+    [InlineData("\u2028")]
+    [InlineData("\u2029")]
+    public void UnicodeDocumentationLineBreaksKeepEveryGeneratedLineCommented(string newline)
+    {
+        var compilation = TestHelper.CreateCompilation(TestHelper.DefaultSources);
+        var docs = new InMemoryAdditionalText("System.Runtime.xml", Docs("first" + newline + "second"));
+        var driver = CreateDriver(docs).RunGenerators(compilation, TestContext.Current.CancellationToken);
+
+        Assert.Contains("/// <summary>first" + Environment.NewLine + "    /// second</summary>", Source(driver));
+        Assert.DoesNotContain(newline, Source(driver));
+        var updated = compilation.AddSyntaxTrees(driver.GetRunResult().GeneratedTrees);
+        Assert.Empty(updated.GetDiagnostics(TestContext.Current.CancellationToken)
+            .Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error));
+    }
+
+    [Theory]
     [InlineData("<!-- first -->", "<!-- second -->")]
     [InlineData("<?example first?>", "<?example second?>")]
     public void CommentsAndProcessingInstructionsInsideDocumentationInvalidateOutput(string before, string after)
