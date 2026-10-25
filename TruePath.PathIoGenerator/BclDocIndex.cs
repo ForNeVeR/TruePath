@@ -103,9 +103,11 @@ public sealed class BclDocIndex
                 if (!Matches(text, end - "</member>".Length, end, "</member>")) continue;
                 try
                 {
-                    // Allocate only a relevant member. XElement normalizes CR/LF while parsing, just as the
-                    // previous line-by-line reconstruction did; unrelated documentation never becomes a string.
-                    builder[currentName] = XElement.Parse(text.ToString(TextSpan.FromBounds(memberStart, span.End)));
+                    // Allocate only a relevant member. Roslyn also recognizes Unicode line breaks that XML
+                    // does not normalize; preserve the previous line-by-line reconstruction's LF conversion.
+                    var memberText = text.ToString(TextSpan.FromBounds(memberStart, span.End))
+                        .Replace('\u0085', '\n').Replace('\u2028', '\n').Replace('\u2029', '\n');
+                    builder[currentName] = XElement.Parse(memberText);
                 }
                 catch (System.Xml.XmlException)
                 {

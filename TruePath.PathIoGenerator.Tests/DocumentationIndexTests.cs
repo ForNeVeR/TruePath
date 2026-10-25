@@ -17,6 +17,9 @@ public sealed class DocumentationIndexTests
     [InlineData("\n")]
     [InlineData("\r\n")]
     [InlineData("\r")]
+    [InlineData("\u0085")]
+    [InlineData("\u2028")]
+    [InlineData("\u2029")]
     public void ReadsRelevantMembersWithAnyLineEndingsAndTrailingWhitespace(string newline)
     {
         var text = string.Join(newline, new[]
