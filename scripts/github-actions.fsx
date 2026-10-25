@@ -164,8 +164,9 @@ let workflows = [
                 ]
             )
 
+            let whenPushingTag = "startsWith(github.ref, 'refs/tags/v')"
             step(
-                condition = "startsWith(github.ref, 'refs/tags/v')",
+                condition = whenPushingTag,
                 name = "Create a release",
                 usesSpec = Auto "softprops/action-gh-release",
                 options = Map.ofList [
@@ -175,14 +176,23 @@ let workflows = [
                 ]
             )
             step(
-                condition = "startsWith(github.ref, 'refs/tags/v')",
+                condition = whenPushingTag,
+                id = "nuget-login",
+                name = "Log in to NuGet",
+                usesSpec = Auto "NuGet/login",
+                options = Map.ofList [
+                    "user", "${{ secrets.NUGET_USER }}"
+                ]
+            )
+            step(
+                condition = whenPushingTag,
                 name = "Push TruePath to NuGet",
                 run = $"dotnet nuget push ./TruePath/bin/Release/TruePath.{versionField}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{{{ secrets.NUGET_TOKEN_TRUE_PATH }}}}"
             )
             step(
-                condition = "startsWith(github.ref, 'refs/tags/v')",
+                condition = whenPushingTag,
                 name = "Push TruePath.SystemIo to NuGet",
-                run = $"dotnet nuget push ./TruePath.SystemIo/bin/Release/TruePath.SystemIo.{versionField}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{{{ secrets.NUGET_TOKEN_TRUE_PATH_SYSTEM_IO }}}}"
+                run = $"dotnet nuget push ./TruePath.SystemIo/bin/Release/TruePath.SystemIo.{versionField}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{{{ steps.nuget-login.outputs.NUGET_API_KEY }}}}"
             )
         ]
     ]
