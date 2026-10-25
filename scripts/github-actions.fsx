@@ -122,6 +122,7 @@ let workflows = [
         dotNetJob "nuget" [
             runsOn ubuntu
             jobPermission(PermissionKind.Contents, AccessKind.Write)
+            jobPermission(PermissionKind.IdToken, AccessKind.Write)
 
             let configuration = "Release"
 
