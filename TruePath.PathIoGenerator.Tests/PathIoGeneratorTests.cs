@@ -119,7 +119,7 @@ public sealed class PathIoGeneratorTests
     public void BclDocIndexFindsBclMembers()
     {
         var index = BclDocIndex.Build(
-            [new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)]);
+            [new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)], TestContext.Current.CancellationToken);
 
         Assert.True(index.TryGetMethodMember("M:System.IO.File.ReadAllText(System.String)", out var member));
         Assert.Contains("OPENS A TEXT FILE, READS ALL THE TEXT IN THE FILE.", member.ToString());
@@ -142,7 +142,7 @@ public sealed class PathIoGeneratorTests
     public void BclDocIndexToleratesBrokenMembersInNetStandardDoc()
     {
         var index = BclDocIndex.Build(
-            [new InMemoryAdditionalText("/ref/netstandard.xml", BrokenBclDocs)]);
+            [new InMemoryAdditionalText("/ref/netstandard.xml", BrokenBclDocs)], TestContext.Current.CancellationToken);
 
         Assert.True(index.TryGetMethodMember("M:System.IO.File.ReadAllText(System.String)", out _));
         Assert.False(index.TryGetMethodMember("M:System.IO.File.Delete(System.String)", out _));
@@ -152,7 +152,7 @@ public sealed class PathIoGeneratorTests
     public void BclDocIndexRejectsInvalidXmlInOtherDocs()
     {
         Assert.Throws<XmlException>(() => BclDocIndex.Build(
-            [new InMemoryAdditionalText("/ref/System.Runtime.xml", BrokenBclDocs)]));
+            [new InMemoryAdditionalText("/ref/System.Runtime.xml", BrokenBclDocs)], TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -160,11 +160,11 @@ public sealed class PathIoGeneratorTests
     {
         var compilation = TestHelper.CreateCompilation(TestHelper.DefaultSources);
         var index = BclDocIndex.Build(
-            [new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)]);
+            [new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)], TestContext.Current.CancellationToken);
 
         var result = PathIoGeneratorCore.Generate(
             compilation, "TruePath.SystemIo.PathIo", markedTypeIsNested: false, UserDefinedMembersInfo.Empty,
-            ImmutableHashSet<string>.Empty, index);
+            ImmutableHashSet<string>.Empty, index, TestContext.Current.CancellationToken);
 
         Assert.Contains("/// <summary>OPENS A TEXT FILE, READS ALL THE TEXT IN THE FILE.</summary>", result.Source);
     }

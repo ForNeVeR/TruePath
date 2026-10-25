@@ -24,22 +24,22 @@ public sealed class PathIoSourceGenerator : IIncrementalGenerator
         var markedTypes = context.SyntaxProvider.ForAttributeWithMetadataName<MarkedType>(
             PathIoRules.MarkerAttributeName,
             static (node, _) => node is ClassDeclarationSyntax,
-            static (attributeContext, _) => new MarkedType(
+            static (attributeContext, cancellationToken) => new MarkedType(
                 attributeContext.TargetSymbol.ToDisplayString(),
                 attributeContext.TargetSymbol.ContainingType != null,
                 PathIoGeneratorCore.CollectUserDefinedMembersInfo(
                     attributeContext.SemanticModel.Compilation,
-                    (INamedTypeSymbol)attributeContext.TargetSymbol)));
+                    (INamedTypeSymbol)attributeContext.TargetSymbol, cancellationToken)));
 
         var exclusionTexts = context.AdditionalTextsProvider
             .Where(static file => Path.GetFileName(file.Path) == PathIoRules.ExclusionFileName)
-            .Select(static (file, _) => file.GetText()?.ToString() ?? string.Empty)
+            .Select(static (file, cancellationToken) => file.GetText(cancellationToken)?.ToString() ?? string.Empty)
             .Collect();
 
         var docIndex = context.AdditionalTextsProvider
             .Where(static file => file.Path.EndsWith(".xml", StringComparison.Ordinal))
             .Collect()
-            .Select(static (files, _) => BclDocIndex.Build(files));
+            .Select(static (files, cancellationToken) => BclDocIndex.Build(files, cancellationToken));
 
         var input = markedTypes.Collect()
             .Combine(exclusionTexts)
@@ -50,7 +50,7 @@ public sealed class PathIoSourceGenerator : IIncrementalGenerator
         {
             var (((typeInfos, exclusionTexts), docIndex), compilation) = tuple;
 
-            var exclusions = Exclusions.Parse(exclusionTexts);
+            var exclusions = Exclusions.Parse(exclusionTexts, productionContext.CancellationToken);
             foreach (var diagnostic in exclusions.Diagnostics) productionContext.ReportDiagnostic(diagnostic);
 
             foreach (var typeInfo in typeInfos.Sort((left, right) => string.CompareOrdinal(left.TypeName, right.TypeName)))
@@ -61,7 +61,8 @@ public sealed class PathIoSourceGenerator : IIncrementalGenerator
                     typeInfo.IsNested,
                     typeInfo.UserDefinedMembers,
                     exclusions.DocIds,
-                    docIndex);
+                    docIndex,
+                    productionContext.CancellationToken);
                 foreach (var diagnostic in result.Diagnostics) productionContext.ReportDiagnostic(diagnostic);
 
                 if (result.Source is { } source)
@@ -69,6 +70,7 @@ public sealed class PathIoSourceGenerator : IIncrementalGenerator
                     // Nested marked types are rejected with TPG004, so the simple type name is unambiguous here.
                     // Should two same-named top-level types ever be marked, AddSource fails loudly.
                     var hintName = typeInfo.TypeName.Substring(typeInfo.TypeName.LastIndexOf('.') + 1) + ".Generated.g.cs";
+                    productionContext.CancellationToken.ThrowIfCancellationRequested();
                     productionContext.AddSource(hintName, SourceText.From(source, Encoding.UTF8));
                 }
             }

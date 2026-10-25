@@ -34,21 +34,23 @@ public sealed class BclDocIndex
         return _members.TryGetValue(docId, out member!);
     }
 
-    public static BclDocIndex Build(ImmutableArray<AdditionalText> files)
+    public static BclDocIndex Build(ImmutableArray<AdditionalText> files, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         // netstandard.xml is processed first, so that the framework-specific System.Runtime.xml wins on conflicts.
         var orderedFiles = files.OrderBy(file => IsNetStandardDoc(file) ? 0 : 1);
 
         var builder = ImmutableDictionary.CreateBuilder<string, XElement>();
         foreach (var file in orderedFiles)
         {
-            var text = file.GetText();
+            cancellationToken.ThrowIfCancellationRequested();
+            var text = file.GetText(cancellationToken);
             if (text == null) continue;
 
             if (IsNetStandardDoc(file))
-                ExtractMembersLeniently(text, builder);
+                ExtractMembersLeniently(text, builder, cancellationToken);
             else
-                ExtractMembers(text, builder);
+                ExtractMembers(text, builder, cancellationToken);
         }
 
         return new BclDocIndex(files, builder.ToImmutable());
@@ -67,11 +69,16 @@ public sealed class BclDocIndex
                || name.StartsWith("M:System.IO.Directory.", StringComparison.Ordinal);
     }
 
-    private static void ExtractMembers(SourceText text, ImmutableDictionary<string, XElement>.Builder builder)
+    private static void ExtractMembers(
+        SourceText text,
+        ImmutableDictionary<string, XElement>.Builder builder,
+        CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var document = XDocument.Parse(text.ToString());
         foreach (var member in document.Descendants("member"))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var name = member.Attribute("name")?.Value;
             if (name == null || !IsIndexedMember(name)) continue;
 
@@ -81,7 +88,8 @@ public sealed class BclDocIndex
 
     private static void ExtractMembersLeniently(
         SourceText text,
-        ImmutableDictionary<string, XElement>.Builder builder)
+        ImmutableDictionary<string, XElement>.Builder builder,
+        CancellationToken cancellationToken)
     {
         // netstandard.xml contains invalid XML, so member elements are extracted line by line and parsed one by one:
         // a broken member is then skipped instead of failing the whole file.
@@ -91,6 +99,7 @@ public sealed class BclDocIndex
         string? currentName = null;
         foreach (var textLine in text.Lines)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var line = textLine.ToString();
             var trimmed = line.TrimStart();
             if (currentName == null)
@@ -160,8 +169,9 @@ internal static class DocFormatting
     ///     normalized against the actual parameter names of the generated method: the BCL documentation sometimes
     ///     mismatches them (in casing or entirely), which would break XML documentation checks.
     /// </summary>
-    public static ImmutableArray<string> ToDocLines(XElement member, ImmutableArray<string> parameterNames)
+    public static ImmutableArray<string> ToDocLines(XElement member, ImmutableArray<string> parameterNames, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         // Work on a copy: the element may be a cached BclDocIndex entry shared across runs, and this method
         // renames its param elements in place.
         member = new XElement(member);
@@ -170,6 +180,7 @@ internal static class DocFormatting
         var elements = new List<string>();
         foreach (var element in member.Elements())
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (element.Name.LocalName == "param")
             {
                 var name = element.Attribute("name")?.Value;
