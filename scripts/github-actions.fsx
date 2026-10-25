@@ -188,7 +188,7 @@ let workflows = [
             step(
                 condition = whenPushingTag,
                 name = "Push TruePath to NuGet",
-                run = $"dotnet nuget push ./TruePath/bin/Release/TruePath.{versionField}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{{{ secrets.NUGET_TOKEN_TRUE_PATH }}}}"
+                run = $"dotnet nuget push ./TruePath/bin/Release/TruePath.{versionField}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{{{ steps.nuget-login.outputs.NUGET_API_KEY }}}}"
             )
             step(
                 condition = whenPushingTag,
