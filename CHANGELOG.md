@@ -10,6 +10,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html), with one exception: the behavior of the members and types marked as `[System.Diagnostics.CodeAnalysis.ExperimentalAttribute]` may change without a major version bump (see [Versioning](README.md#versioning)).
 
+## [Unreleased]
+### Changed
+- [#252](https://github.com/ForNeVeR/TruePath/issues/252): on Windows, canonical path resolution now stops after a hard `GetFinalPathNameByHandle` failure and uses the exact required buffer size when retrying long paths.
+
 ## [2.0.0] - 2026-10-25
 This is a major release with certain breaking changes. No public APIs have been broken, but the amount of minor behavior changes required us to bump the major version.
 
