@@ -125,6 +125,14 @@ let workflows = [
             jobPermission(PermissionKind.IdToken, AccessKind.Write)
 
             let configuration = "Release"
+            let whenPushingTag = "startsWith(github.ref, 'refs/tags/v')"
+
+            step(
+                condition = whenPushingTag,
+                name = "Verify that all the public API is marked as shipped",
+                shell = "pwsh",
+                run = "scripts/Test-PublicApiShipped.ps1"
+            )
 
             let versionStepId = "version"
             let versionField = "${{ steps." + versionStepId + ".outputs.version }}"
@@ -165,7 +173,6 @@ let workflows = [
                 ]
             )
 
-            let whenPushingTag = "startsWith(github.ref, 'refs/tags/v')"
             step(
                 condition = whenPushingTag,
                 name = "Create a release",

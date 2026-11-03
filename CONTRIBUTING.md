@@ -32,6 +32,27 @@ process. Developer Mode lets an unelevated process create symbolic links, as doc
 [`CreateSymbolicLinkW`][create-symbolic-link] API. When neither is available, these tests are skipped locally; CI
 runners fail instead, ensuring that the tests are not silently skipped in automation.
 
+Public API
+----------
+In TruePath, we track the changes made to the public API, for the package stability purposes.
+
+The public API of every packable project is recorded per target framework in the `PublicAPI/<target framework>/` directories:
+- `PublicAPI.Shipped.txt` lists the API of the latest release,
+- `PublicAPI.Unshipped.txt` lists the changes made since then.
+
+If you change the public API, the build-time diagnostic will report any difference as `RS0000`-style errors. These are warnings in local builds (for the development purpose) and errors on CI.
+
+To update the files, either use the code fix for these diagnostics in your IDE, or run the following shell command for every changed project, e.g.:
+```console
+$ dotnet format analyzers <path to project> --diagnostics RS0016 --severity info --include-generated
+```
+
+This command only updates one target framework per run, so you might need to run it several times.
+
+Removed members are not handled by this command, so they need to be removed separately:
+- if the member is listed in `PublicAPI.Unshipped.txt`, delete that line;
+- if the member is listed in `PublicAPI.Shipped.txt`, add a copy of that line prefixed with `*REMOVED*` to `PublicAPI.Unshipped.txt`.
+
 Test Documentation
 ------------------
 To open the project documentation site locally, use the following shell commands:

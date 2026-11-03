@@ -1,0 +1,102 @@
+#nullable enable
+override TruePath.AbsolutePath.Equals(object? obj) -> bool
+override TruePath.AbsolutePath.GetHashCode() -> int
+override TruePath.AbsolutePath.ToString() -> string!
+override TruePath.LocalPath.Equals(object? obj) -> bool
+override TruePath.LocalPath.GetHashCode() -> int
+override TruePath.LocalPath.ToString() -> string!
+override TruePath.LocalPathPattern.GetHashCode() -> int
+override TruePath.LocalPathPattern.ToString() -> string!
+static readonly TruePath.AbsolutePath.PlatformDefaultComparer -> TruePath.Comparers.IPathComparer<TruePath.AbsolutePath>!
+static readonly TruePath.AbsolutePath.StrictStringComparer -> TruePath.Comparers.IPathComparer<TruePath.AbsolutePath>!
+static readonly TruePath.LocalPath.PlatformDefaultComparer -> TruePath.Comparers.IPathComparer<TruePath.LocalPath>!
+static readonly TruePath.LocalPath.StrictStringComparer -> TruePath.Comparers.IPathComparer<TruePath.LocalPath>!
+static TruePath.AbsolutePath.Create(string! value) -> TruePath.AbsolutePath
+static TruePath.AbsolutePath.CurrentWorkingDirectory.get -> TruePath.AbsolutePath
+static TruePath.AbsolutePath.CurrentWorkingDirectory.set -> void
+static TruePath.AbsolutePath.operator !=(TruePath.AbsolutePath left, TruePath.AbsolutePath right) -> bool
+static TruePath.AbsolutePath.operator /(TruePath.AbsolutePath basePath, string! b) -> TruePath.AbsolutePath
+static TruePath.AbsolutePath.operator /(TruePath.AbsolutePath basePath, TruePath.LocalPath b) -> TruePath.AbsolutePath
+static TruePath.AbsolutePath.operator ==(TruePath.AbsolutePath left, TruePath.AbsolutePath right) -> bool
+static TruePath.LocalPath.Create(string! value) -> TruePath.LocalPath
+static TruePath.LocalPath.implicit operator TruePath.LocalPath(TruePath.AbsolutePath path) -> TruePath.LocalPath
+static TruePath.LocalPath.operator !=(TruePath.LocalPath left, TruePath.LocalPath right) -> bool
+static TruePath.LocalPath.operator /(TruePath.LocalPath basePath, string! b) -> TruePath.LocalPath
+static TruePath.LocalPath.operator /(TruePath.LocalPath basePath, TruePath.LocalPath b) -> TruePath.LocalPath
+static TruePath.LocalPath.operator ==(TruePath.LocalPath left, TruePath.LocalPath right) -> bool
+static TruePath.LocalPathPattern.operator !=(TruePath.LocalPathPattern left, TruePath.LocalPathPattern right) -> bool
+static TruePath.LocalPathPattern.operator ==(TruePath.LocalPathPattern left, TruePath.LocalPathPattern right) -> bool
+static TruePath.PathExtensions.GetExtensionWithDot(this TruePath.IPath! path) -> string!
+static TruePath.PathExtensions.GetExtensionWithoutDot(this TruePath.IPath! path) -> string!
+static TruePath.PathExtensions.GetFilenameWithoutExtension(this TruePath.IPath! path) -> string!
+static TruePath.PathExtensions.WithExtension<TPath>(this TPath path, string? extension) -> TPath
+static TruePath.PathStrings.Normalize(string! path) -> string!
+static TruePath.Temporary.CreateTempFile() -> TruePath.AbsolutePath
+static TruePath.Temporary.CreateTempFolder(string? prefix = null) -> TruePath.AbsolutePath
+static TruePath.Temporary.SystemTempDirectory() -> TruePath.AbsolutePath
+TruePath.AbsolutePath
+TruePath.AbsolutePath.AbsolutePath() -> void
+TruePath.AbsolutePath.AbsolutePath(string! value) -> void
+TruePath.AbsolutePath.AbsolutePath(TruePath.LocalPath localPath) -> void
+TruePath.AbsolutePath.Canonicalize() -> TruePath.AbsolutePath
+TruePath.AbsolutePath.CompareTo(TruePath.AbsolutePath other) -> int
+TruePath.AbsolutePath.Equals(TruePath.AbsolutePath other) -> bool
+TruePath.AbsolutePath.Equals(TruePath.AbsolutePath other, System.Collections.Generic.IEqualityComparer<TruePath.AbsolutePath>! comparer) -> bool
+TruePath.AbsolutePath.FileName.get -> string!
+TruePath.AbsolutePath.IsPrefixOf(TruePath.AbsolutePath other) -> bool
+TruePath.AbsolutePath.Parent.get -> TruePath.AbsolutePath?
+TruePath.AbsolutePath.PathRoot.get -> TruePath.AbsolutePath
+TruePath.AbsolutePath.ReadKind() -> TruePath.FileEntryKind?
+TruePath.AbsolutePath.RelativeTo(TruePath.AbsolutePath basePath) -> TruePath.LocalPath
+TruePath.AbsolutePath.StartsWith(TruePath.AbsolutePath other) -> bool
+TruePath.AbsolutePath.Value.get -> string!
+TruePath.Comparers.IPathComparer<TPath>
+TruePath.FileEntryKind
+TruePath.FileEntryKind.Directory = 2 -> TruePath.FileEntryKind
+TruePath.FileEntryKind.File = 1 -> TruePath.FileEntryKind
+TruePath.FileEntryKind.Junction = 4 -> TruePath.FileEntryKind
+TruePath.FileEntryKind.Symlink = 3 -> TruePath.FileEntryKind
+TruePath.FileEntryKind.Unknown = 0 -> TruePath.FileEntryKind
+TruePath.IPath
+TruePath.IPath.FileName.get -> string!
+TruePath.IPath.Parent.get -> TruePath.IPath?
+TruePath.IPath.Value.get -> string!
+TruePath.IPath<TPath>
+TruePath.IPath<TPath>.Create(string! value) -> TPath
+TruePath.IPath<TPath>.IsPrefixOf(TPath other) -> bool
+TruePath.IPath<TPath>.operator /(TPath basePath, string! appended) -> TPath
+TruePath.IPath<TPath>.operator /(TPath basePath, TruePath.LocalPath appended) -> TPath
+TruePath.IPath<TPath>.StartsWith(TPath other) -> bool
+TruePath.LocalPath
+TruePath.LocalPath.CompareTo(TruePath.LocalPath other) -> int
+TruePath.LocalPath.Equals(TruePath.LocalPath other) -> bool
+TruePath.LocalPath.Equals(TruePath.LocalPath other, System.Collections.Generic.IEqualityComparer<TruePath.LocalPath>! comparer) -> bool
+TruePath.LocalPath.FileName.get -> string!
+TruePath.LocalPath.IsAbsolute.get -> bool
+TruePath.LocalPath.IsPrefixOf(TruePath.LocalPath other) -> bool
+TruePath.LocalPath.Kind.get -> TruePath.PathKind
+TruePath.LocalPath.LocalPath() -> void
+TruePath.LocalPath.LocalPath(string! value) -> void
+TruePath.LocalPath.LocalPath(TruePath.AbsolutePath path) -> void
+TruePath.LocalPath.Parent.get -> TruePath.LocalPath?
+TruePath.LocalPath.PathRoot.get -> TruePath.AbsolutePath?
+TruePath.LocalPath.RelativeTo(TruePath.LocalPath basePath) -> TruePath.LocalPath
+TruePath.LocalPath.ResolveToCurrentDirectory() -> TruePath.AbsolutePath
+TruePath.LocalPath.StartsWith(TruePath.LocalPath other) -> bool
+TruePath.LocalPath.Value.get -> string!
+TruePath.LocalPathPattern
+TruePath.LocalPathPattern.Deconstruct(out string! Value) -> void
+TruePath.LocalPathPattern.Equals(TruePath.LocalPathPattern other) -> bool
+TruePath.LocalPathPattern.LocalPathPattern() -> void
+TruePath.LocalPathPattern.LocalPathPattern(string! Value) -> void
+TruePath.LocalPathPattern.Value.get -> string!
+TruePath.LocalPathPattern.Value.set -> void
+TruePath.PathExtensions
+TruePath.PathStrings
+TruePath.Temporary
+[TRUEPATH001]TruePath.PathKind
+[TRUEPATH001]TruePath.PathKind.Absolute = 0 -> TruePath.PathKind
+[TRUEPATH001]TruePath.PathKind.DriveCurrentDirectoryRelative = 3 -> TruePath.PathKind
+[TRUEPATH001]TruePath.PathKind.DriveRootRelative = 2 -> TruePath.PathKind
+[TRUEPATH001]TruePath.PathKind.Relative = 1 -> TruePath.PathKind
+~override TruePath.LocalPathPattern.Equals(object obj) -> bool
