@@ -20,8 +20,8 @@ SPDX-License-Identifier: MIT
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <!-- Public API baseline mismatches are only warnings for local development; CI treats them as errors. -->
-        <WarningsNotAsErrors Condition="$(CI) == ''">$(WarningsNotAsErrors);RS0016;RS0017</WarningsNotAsErrors>
+        <!-- Public API diagnostics are only warnings for local development; CI treats them as errors. -->
+        <WarningsNotAsErrors Condition="'$(CI)' != 'true'">$(WarningsNotAsErrors);RS0016;RS0017;RS0022;RS0024;RS0025;RS0026;RS0027;RS0036;RS0037;RS0041;RS0048;RS0050</WarningsNotAsErrors>
         <!-- XML documentation warnings are suppressed for local development; CI verifies them with -p:CheckXmlDoc=true. -->
         <NoWarn Condition="'$(CheckXmlDoc)' != 'true'">CS0419;CS1570;CS1571;CS1572;CS1573;CS1574;CS1580;CS1581;CS1584;CS1587;CS1589;CS1590;CS1591;CS1592;CS1598;CS1710;CS1711;CS1712;$(NoWarn)</NoWarn>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
