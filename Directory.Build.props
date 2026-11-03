@@ -20,6 +20,8 @@ SPDX-License-Identifier: MIT
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <!-- Public API baseline mismatches are only warnings for local development; CI treats them as errors. -->
+        <WarningsNotAsErrors Condition="$(CI) == ''">$(WarningsNotAsErrors);RS0016;RS0017</WarningsNotAsErrors>
         <!-- XML documentation warnings are suppressed for local development; CI verifies them with -p:CheckXmlDoc=true. -->
         <NoWarn Condition="'$(CheckXmlDoc)' != 'true'">CS0419;CS1570;CS1571;CS1572;CS1573;CS1574;CS1580;CS1581;CS1584;CS1587;CS1589;CS1590;CS1591;CS1592;CS1598;CS1710;CS1711;CS1712;$(NoWarn)</NoWarn>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -33,6 +35,9 @@ SPDX-License-Identifier: MIT
     <ItemGroup Condition="$(IsPackable) == 'true'">
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.403" PrivateAssets="All" />
         <PackageReference Include="ChangelogAutomation.MSBuild" Version="3.0.5" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="5.6.0" PrivateAssets="All" />
+        <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
+        <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
         <None Visible="false" Include="$(MSBuildThisFileDirectory)\LICENSES\**" Pack="true" PackagePath="\LICENSES" />
         <None Visible="false" Include="$(MSBuildThisFileDirectory)\CHANGELOG.md" Pack="true" PackagePath="\" />
         <None Visible="false" Include="$(MSBuildThisFileDirectory)\README.md" Pack="true" PackagePath="\" />

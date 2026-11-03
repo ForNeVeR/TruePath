@@ -11,6 +11,8 @@ SPDX-License-Identifier: MIT
         <IsPackable>true</IsPackable>
         <PackageDescription>Adapters to use System.IO.File and System.IO.Directory APIs together with TruePath.</PackageDescription>
         <RootNamespace>TruePath.SystemIO</RootNamespace>
+        <!-- This project intentionally mirrors the overloads of System.IO.File, including their optional parameters. -->
+        <NoWarn>$(NoWarn);RS0026</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

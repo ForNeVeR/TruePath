@@ -37,6 +37,10 @@ jobs:
       with:
         key: ${{ runner.os }}.nuget.${{ hashFiles('**/*.*proj', '**/*.props') }}
         path: ${{ env.NUGET_PACKAGES }}
+    - if: startsWith(github.ref, 'refs/tags/v')
+      name: Verify that all the public API is marked as shipped
+      shell: pwsh
+      run: scripts/Test-PublicApiShipped.ps1
     - id: version
       name: Get version
       shell: pwsh

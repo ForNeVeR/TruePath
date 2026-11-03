@@ -1,0 +1,86 @@
+#nullable enable
+static TruePath.SystemIo.PathIo.AppendAllLines(this TruePath.AbsolutePath path, System.Collections.Generic.IEnumerable<string!>! contents) -> void
+static TruePath.SystemIo.PathIo.AppendAllLines(this TruePath.AbsolutePath path, System.Collections.Generic.IEnumerable<string!>! contents, System.Text.Encoding! encoding) -> void
+static TruePath.SystemIo.PathIo.AppendAllLinesAsync(this TruePath.AbsolutePath path, System.Collections.Generic.IEnumerable<string!>! contents, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+static TruePath.SystemIo.PathIo.AppendAllLinesAsync(this TruePath.AbsolutePath path, System.Collections.Generic.IEnumerable<string!>! contents, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+static TruePath.SystemIo.PathIo.AppendAllText(this TruePath.AbsolutePath path, string? contents) -> void
+static TruePath.SystemIo.PathIo.AppendAllText(this TruePath.AbsolutePath path, string? contents, System.Text.Encoding! encoding) -> void
+static TruePath.SystemIo.PathIo.AppendAllTextAsync(this TruePath.AbsolutePath path, string? contents, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+static TruePath.SystemIo.PathIo.AppendAllTextAsync(this TruePath.AbsolutePath path, string? contents, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+static TruePath.SystemIo.PathIo.AppendText(this TruePath.AbsolutePath path) -> System.IO.StreamWriter!
+static TruePath.SystemIo.PathIo.Copy(this TruePath.AbsolutePath sourceFile, TruePath.AbsolutePath destFile) -> void
+static TruePath.SystemIo.PathIo.Copy(this TruePath.AbsolutePath sourceFile, TruePath.AbsolutePath destFile, bool overwrite) -> void
+static TruePath.SystemIo.PathIo.Create(this TruePath.AbsolutePath path) -> System.IO.FileStream!
+static TruePath.SystemIo.PathIo.Create(this TruePath.AbsolutePath path, int bufferSize) -> System.IO.FileStream!
+static TruePath.SystemIo.PathIo.Create(this TruePath.AbsolutePath path, int bufferSize, System.IO.FileOptions options) -> System.IO.FileStream!
+static TruePath.SystemIo.PathIo.CreateDirectory(this TruePath.AbsolutePath path) -> void
+static TruePath.SystemIo.PathIo.CreateText(this TruePath.AbsolutePath path) -> System.IO.StreamWriter!
+static TruePath.SystemIo.PathIo.Delete(this TruePath.AbsolutePath path) -> void
+static TruePath.SystemIo.PathIo.DeleteDirectoryRecursively(this TruePath.AbsolutePath path) -> void
+static TruePath.SystemIo.PathIo.DeleteEmptyDirectory(this TruePath.AbsolutePath path) -> void
+static TruePath.SystemIo.PathIo.EnumerateFiles(this TruePath.AbsolutePath path) -> System.Collections.Generic.IEnumerable<TruePath.AbsolutePath>!
+static TruePath.SystemIo.PathIo.EnumerateFiles(this TruePath.AbsolutePath path, string! searchPattern) -> System.Collections.Generic.IEnumerable<TruePath.AbsolutePath>!
+static TruePath.SystemIo.PathIo.EnumerateFiles(this TruePath.AbsolutePath path, string! searchPattern, System.IO.EnumerationOptions! enumerationOptions) -> System.Collections.Generic.IEnumerable<TruePath.AbsolutePath>!
+static TruePath.SystemIo.PathIo.EnumerateFiles(this TruePath.AbsolutePath path, string! searchPattern, System.IO.SearchOption searchOption) -> System.Collections.Generic.IEnumerable<TruePath.AbsolutePath>!
+static TruePath.SystemIo.PathIo.Exists(this TruePath.AbsolutePath path) -> bool
+static TruePath.SystemIo.PathIo.ExistsDirectory(this TruePath.AbsolutePath path) -> bool
+static TruePath.SystemIo.PathIo.ExistsFile(this TruePath.AbsolutePath path) -> bool
+static TruePath.SystemIo.PathIo.GetAttributes(this TruePath.AbsolutePath path) -> System.IO.FileAttributes
+static TruePath.SystemIo.PathIo.GetCreationTime(this TruePath.AbsolutePath path) -> System.DateTime
+static TruePath.SystemIo.PathIo.GetCreationTimeUtc(this TruePath.AbsolutePath path) -> System.DateTime
+static TruePath.SystemIo.PathIo.GetDirectories(this TruePath.AbsolutePath path) -> string![]!
+static TruePath.SystemIo.PathIo.GetDirectories(this TruePath.AbsolutePath path, string! searchPattern) -> string![]!
+static TruePath.SystemIo.PathIo.GetDirectories(this TruePath.AbsolutePath path, string! searchPattern, System.IO.EnumerationOptions! enumerationOptions) -> string![]!
+static TruePath.SystemIo.PathIo.GetDirectories(this TruePath.AbsolutePath path, string! searchPattern, System.IO.SearchOption searchOption) -> string![]!
+static TruePath.SystemIo.PathIo.GetFiles(this TruePath.AbsolutePath path) -> string![]!
+static TruePath.SystemIo.PathIo.GetFiles(this TruePath.AbsolutePath path, string! searchPattern) -> string![]!
+static TruePath.SystemIo.PathIo.GetFiles(this TruePath.AbsolutePath path, string! searchPattern, System.IO.EnumerationOptions! enumerationOptions) -> string![]!
+static TruePath.SystemIo.PathIo.GetFiles(this TruePath.AbsolutePath path, string! searchPattern, System.IO.SearchOption searchOption) -> string![]!
+static TruePath.SystemIo.PathIo.GetFiles(this TruePath.AbsolutePath path, TruePath.LocalPathPattern searchPattern) -> TruePath.AbsolutePath[]!
+static TruePath.SystemIo.PathIo.GetLastAccessTime(this TruePath.AbsolutePath path) -> System.DateTime
+static TruePath.SystemIo.PathIo.GetLastAccessTimeUtc(this TruePath.AbsolutePath path) -> System.DateTime
+static TruePath.SystemIo.PathIo.GetLastWriteTime(this TruePath.AbsolutePath path) -> System.DateTime
+static TruePath.SystemIo.PathIo.GetLastWriteTimeUtc(this TruePath.AbsolutePath path) -> System.DateTime
+static TruePath.SystemIo.PathIo.GetUnixFileMode(this TruePath.AbsolutePath path) -> System.IO.UnixFileMode
+static TruePath.SystemIo.PathIo.Move(this TruePath.AbsolutePath sourceFile, TruePath.AbsolutePath destFile) -> void
+static TruePath.SystemIo.PathIo.Move(this TruePath.AbsolutePath sourceFile, TruePath.AbsolutePath destFile, bool overwrite) -> void
+static TruePath.SystemIo.PathIo.Open(this TruePath.AbsolutePath path, System.IO.FileMode mode) -> System.IO.FileStream!
+static TruePath.SystemIo.PathIo.Open(this TruePath.AbsolutePath path, System.IO.FileMode mode, System.IO.FileAccess access) -> System.IO.FileStream!
+static TruePath.SystemIo.PathIo.Open(this TruePath.AbsolutePath path, System.IO.FileMode mode, System.IO.FileAccess access, System.IO.FileShare share) -> System.IO.FileStream!
+static TruePath.SystemIo.PathIo.OpenRead(this TruePath.AbsolutePath path) -> System.IO.FileStream!
+static TruePath.SystemIo.PathIo.OpenText(this TruePath.AbsolutePath path) -> System.IO.StreamReader!
+static TruePath.SystemIo.PathIo.OpenWrite(this TruePath.AbsolutePath path) -> System.IO.FileStream!
+static TruePath.SystemIo.PathIo.ReadAllBytes(this TruePath.AbsolutePath path) -> byte[]!
+static TruePath.SystemIo.PathIo.ReadAllBytesAsync(this TruePath.AbsolutePath path, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<byte[]!>!
+static TruePath.SystemIo.PathIo.ReadAllLines(this TruePath.AbsolutePath path) -> string![]!
+static TruePath.SystemIo.PathIo.ReadAllLines(this TruePath.AbsolutePath path, System.Text.Encoding! encoding) -> string![]!
+static TruePath.SystemIo.PathIo.ReadAllLinesAsync(this TruePath.AbsolutePath path, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string![]!>!
+static TruePath.SystemIo.PathIo.ReadAllLinesAsync(this TruePath.AbsolutePath path, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string![]!>!
+static TruePath.SystemIo.PathIo.ReadAllText(this TruePath.AbsolutePath path) -> string!
+static TruePath.SystemIo.PathIo.ReadAllText(this TruePath.AbsolutePath path, System.Text.Encoding! encoding) -> string!
+static TruePath.SystemIo.PathIo.ReadAllTextAsync(this TruePath.AbsolutePath path, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+static TruePath.SystemIo.PathIo.ReadAllTextAsync(this TruePath.AbsolutePath path, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+static TruePath.SystemIo.PathIo.ReadLines(this TruePath.AbsolutePath path) -> System.Collections.Generic.IEnumerable<string!>!
+static TruePath.SystemIo.PathIo.ReadLines(this TruePath.AbsolutePath path, System.Text.Encoding! encoding) -> System.Collections.Generic.IEnumerable<string!>!
+static TruePath.SystemIo.PathIo.ReadLinesAsync(this TruePath.AbsolutePath path, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Collections.Generic.IAsyncEnumerable<string!>!
+static TruePath.SystemIo.PathIo.ReadLinesAsync(this TruePath.AbsolutePath path, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Collections.Generic.IAsyncEnumerable<string!>!
+static TruePath.SystemIo.PathIo.SetAttributes(this TruePath.AbsolutePath path, System.IO.FileAttributes fileAttributes) -> void
+static TruePath.SystemIo.PathIo.SetCreationTime(this TruePath.AbsolutePath path, System.DateTime creationTime) -> void
+static TruePath.SystemIo.PathIo.SetCreationTimeUtc(this TruePath.AbsolutePath path, System.DateTime creationTimeUtc) -> void
+static TruePath.SystemIo.PathIo.SetLastAccessTime(this TruePath.AbsolutePath path, System.DateTime lastAccessTime) -> void
+static TruePath.SystemIo.PathIo.SetLastAccessTimeUtc(this TruePath.AbsolutePath path, System.DateTime lastAccessTimeUtc) -> void
+static TruePath.SystemIo.PathIo.SetLastWriteTime(this TruePath.AbsolutePath path, System.DateTime lastWriteTime) -> void
+static TruePath.SystemIo.PathIo.SetLastWriteTimeUtc(this TruePath.AbsolutePath path, System.DateTime lastWriteTimeUtc) -> void
+static TruePath.SystemIo.PathIo.WriteAllBytes(this TruePath.AbsolutePath path, byte[]! bytes) -> void
+static TruePath.SystemIo.PathIo.WriteAllBytesAsync(this TruePath.AbsolutePath path, byte[]! bytes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+static TruePath.SystemIo.PathIo.WriteAllLines(this TruePath.AbsolutePath path, string![]! contents) -> void
+static TruePath.SystemIo.PathIo.WriteAllLines(this TruePath.AbsolutePath path, string![]! contents, System.Text.Encoding! encoding) -> void
+static TruePath.SystemIo.PathIo.WriteAllLines(this TruePath.AbsolutePath path, System.Collections.Generic.IEnumerable<string!>! contents) -> void
+static TruePath.SystemIo.PathIo.WriteAllLines(this TruePath.AbsolutePath path, System.Collections.Generic.IEnumerable<string!>! contents, System.Text.Encoding! encoding) -> void
+static TruePath.SystemIo.PathIo.WriteAllLinesAsync(this TruePath.AbsolutePath path, System.Collections.Generic.IEnumerable<string!>! contents, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+static TruePath.SystemIo.PathIo.WriteAllLinesAsync(this TruePath.AbsolutePath path, System.Collections.Generic.IEnumerable<string!>! contents, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+static TruePath.SystemIo.PathIo.WriteAllText(this TruePath.AbsolutePath path, string? contents) -> void
+static TruePath.SystemIo.PathIo.WriteAllText(this TruePath.AbsolutePath path, string? contents, System.Text.Encoding! encoding) -> void
+static TruePath.SystemIo.PathIo.WriteAllTextAsync(this TruePath.AbsolutePath path, string? contents, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+static TruePath.SystemIo.PathIo.WriteAllTextAsync(this TruePath.AbsolutePath path, string? contents, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+TruePath.SystemIo.PathIo
