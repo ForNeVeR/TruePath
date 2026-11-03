@@ -42,9 +42,18 @@ function Write-ApiFile($Path, $Entries) {
 try {
     Push-Location $SourceRoot
 
-    [array] $files = git -c core.quotepath=off ls-files --cached --others --exclude-standard -- ':(glob)**/PublicAPI.Unshipped*.txt' |
+    $gitOutput = git ls-files -z --cached -- ':(glob)**/PublicAPI.Unshipped*.txt'
+    if ($LASTEXITCODE -ne 0) {
+        throw "git ls-files failed with exit code $LASTEXITCODE."
+    }
+
+    # Tracked files deleted from the working tree are still listed by Git, so filter them out.
+    [array] $files = "$gitOutput".Split("`0", [StringSplitOptions]::RemoveEmptyEntries) |
         Where-Object { Test-Path -LiteralPath $_ }
-    Write-Output "Unshipped public API files in the repository: $(if ($files) { $files.Length } else { 0 })"
+    if (!$files) {
+        throw "No PublicAPI.Unshipped files found in $(Get-Location)."
+    }
+    Write-Output "Unshipped public API files in the repository: $($files.Length)"
 
     $errors = @()
     $updates = @()
@@ -73,7 +82,6 @@ try {
         $removedEntries = @($entries | Where-Object { $_.Text.StartsWith($removedPrefix, [StringComparison]::Ordinal) })
         $addedEntries = @($entries | Where-Object { !$_.Text.StartsWith($removedPrefix, [StringComparison]::Ordinal) })
 
-        # The removals go first: a member can be removed and then added back in the same release.
         foreach ($entry in $removedEntries) {
             if (!$api.Remove($entry.Text.Substring($removedPrefix.Length))) {
                 $errors += "${file}:$($entry.LineNumber): no matching entry in ${shippedFile}: $($entry.Text)"
