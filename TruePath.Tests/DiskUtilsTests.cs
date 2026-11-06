@@ -45,6 +45,31 @@ public class DiskUtilsTests
     }
 
     [Fact]
+    public void DiskUtils_OnWindows_PassLongPath_ReturnCanonicalPath()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        var tempFolder = Temporary.CreateTempFolder();
+        try
+        {
+            var longPath = tempFolder;
+            while (longPath.Value.Length <= 256)
+            {
+                longPath /= new string('a', 100);
+                longPath.CreateDirectory();
+            }
+
+            var actual = DiskUtils.GetRealPath(longPath.Value);
+
+            Assert.Equal(longPath.Value, actual);
+        }
+        finally
+        {
+            tempFolder.DeleteDirectoryRecursively();
+        }
+    }
+
+    [Fact]
     public void DiskUtils_PassNonExistentPath_KeepFileDescriptorZeroOpen()
     {
         // Arrange
