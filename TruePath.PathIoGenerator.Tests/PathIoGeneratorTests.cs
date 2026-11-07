@@ -4,6 +4,7 @@
 
 using System.Collections.Immutable;
 using System.Text;
+using Basic.Reference.Assemblies;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
@@ -65,16 +66,16 @@ public static class TestHelper
         // reliable on CI, where the test host runtime and the SDK with the packs may live in different roots.
         return CSharpCompilation.Create(
             "TestAssembly",
-            new[] { CSharpSyntaxTree.ParseText(sources, new CSharpParseOptions(LanguageVersion.Latest)) },
-            Basic.Reference.Assemblies.Net100.References.All,
+            [CSharpSyntaxTree.ParseText(sources, new CSharpParseOptions(LanguageVersion.Latest))],
+            Net100.References.All,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
     }
 
     public static string Generate(CSharpCompilation compilation, params AdditionalText[] additionalTexts)
     {
         GeneratorDriver driver = CSharpGeneratorDriver.Create(
-            new[] { new PathIoSourceGenerator().AsSourceGenerator() },
-            additionalTexts.ToImmutableArray());
+            [new PathIoSourceGenerator().AsSourceGenerator()],
+            [.. additionalTexts]);
         driver = driver.RunGenerators(compilation);
         var runResult = driver.GetRunResult();
         var tree = runResult.GeneratedTrees.FirstOrDefault(generated => generated.FilePath.Contains("PathIo.Generated"));
@@ -117,7 +118,7 @@ public sealed class PathIoGeneratorTests
     public void BclDocIndexFindsBclMembers()
     {
         var index = BclDocIndex.Build(
-            ImmutableArray.Create<AdditionalText>(new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)));
+            [new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)]);
 
         Assert.True(index.TryGetMethodMember("M:System.IO.File.ReadAllText(System.String)", out var member));
         Assert.Contains("OPENS A TEXT FILE, READS ALL THE TEXT IN THE FILE.", member.ToString());
@@ -128,7 +129,7 @@ public sealed class PathIoGeneratorTests
     {
         var compilation = TestHelper.CreateCompilation(TestHelper.DefaultSources);
         var index = BclDocIndex.Build(
-            ImmutableArray.Create<AdditionalText>(new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)));
+            [new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)]);
 
         var result = PathIoGeneratorCore.Generate(
             compilation, "TruePath.SystemIo.PathIo", markedTypeIsNested: false, HandWrittenInfo.Empty,
@@ -166,7 +167,7 @@ public sealed class PathIoGeneratorTests
             """;
         var compilation = TestHelper.CreateCompilation(sources);
         GeneratorDriver driver = CSharpGeneratorDriver.Create(
-            new[] { new PathIoSourceGenerator().AsSourceGenerator() },
+            [new PathIoSourceGenerator().AsSourceGenerator()],
             ImmutableArray<AdditionalText>.Empty);
         driver = driver.RunGenerators(compilation, TestContext.Current.CancellationToken);
 
@@ -332,7 +333,7 @@ public sealed class PathIoGeneratorTests
     {
         var compilation = TestHelper.CreateCompilation(TestHelper.DefaultSources);
         GeneratorDriver driver = CSharpGeneratorDriver.Create(
-            new[] { new PathIoSourceGenerator().AsSourceGenerator() },
+            [new PathIoSourceGenerator().AsSourceGenerator()],
             ImmutableArray<AdditionalText>.Empty);
         driver = driver.RunGenerators(compilation, TestContext.Current.CancellationToken);
         var updated = compilation.AddSyntaxTrees(driver.GetRunResult().GeneratedTrees);
