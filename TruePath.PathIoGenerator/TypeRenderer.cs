@@ -44,13 +44,23 @@ internal sealed class TypeRenderer
         return new TypeRenderer(namespaces);
     }
 
-    public string Render(ITypeSymbol type)
+    public string Render(ITypeSymbol type) => RenderCore(type, includeNullability: true);
+
+    /// <summary>
+    ///     Renders a type for signature identity: overload keys and handwritten-member matching. Nullability is
+    ///     omitted because it is not part of overload identity in C#, and because a reference assembly compiled
+    ///     before nullable reference types existed reports every reference type as oblivious. A handwritten
+    ///     <c>string?</c> and such an oblivious <c>string</c> are one and the same parameter type.
+    /// </summary>
+    public string RenderSignature(ITypeSymbol type) => RenderCore(type, includeNullability: false);
+
+    private string RenderCore(ITypeSymbol type, bool includeNullability)
     {
         var name = type switch
         {
-            IArrayTypeSymbol array => Render(array.ElementType)
+            IArrayTypeSymbol array => RenderCore(array.ElementType, includeNullability)
                 + (array.Rank == 1 ? "[]" : "[" + new string(',', array.Rank - 1) + "]"),
-            INamedTypeSymbol named => RenderNamed(named),
+            INamedTypeSymbol named => RenderNamed(named, includeNullability),
             _ => type.ToDisplayString(),
         };
 
@@ -75,11 +85,12 @@ internal sealed class TypeRenderer
             _ => name,
         };
 
-        if (type.IsReferenceType && type.NullableAnnotation == NullableAnnotation.Annotated) name += "?";
+        if (includeNullability && type.IsReferenceType && type.NullableAnnotation == NullableAnnotation.Annotated)
+            name += "?";
         return name;
     }
 
-    private string RenderNamed(INamedTypeSymbol named)
+    private string RenderNamed(INamedTypeSymbol named, bool includeNullability)
     {
         var namespaceName = named.ContainingNamespace is { IsGlobalNamespace: false } namespaceSymbol
             ? namespaceSymbol.ToDisplayString()
@@ -88,7 +99,7 @@ internal sealed class TypeRenderer
 
         var result = qualifier + ContainingTypesPrefix(named) + named.Name;
         if (named.TypeArguments.Length > 0)
-            result += "<" + string.Join(", ", named.TypeArguments.Select(Render)) + ">";
+            result += "<" + string.Join(", ", named.TypeArguments.Select(argument => RenderCore(argument, includeNullability))) + ">";
         return result;
     }
 

@@ -3,6 +3,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Text;
+
 namespace TruePath.SystemIo;
 
 /// <summary>
@@ -163,4 +165,43 @@ public static partial class PathIo
     /// </returns>
     public static AbsolutePath[] GetFiles(this AbsolutePath path, LocalPathPattern searchPattern) =>
         Directory.GetFiles(path.Value, searchPattern.Value).Select(x => new AbsolutePath(x)).ToArray();
+
+    // These four members are handwritten for their nullability contract: the netstandard2.0 reference assembly was
+    // compiled before nullable reference types existed, so the generator sees an oblivious `string` and renders a
+    // non-nullable parameter. The BCL accepts null here (it writes an empty file or nothing at all), and the released
+    // API records that as `string?`, so the annotation has to come from source rather than from the generator.
+
+    /// <summary>
+    /// Appends the specified string to the file, creating the file if it does not already exist.
+    /// </summary>
+    /// <param name="path">The file to append the specified string to.</param>
+    /// <param name="contents">The string to append to the file.</param>
+    public static void AppendAllText(this AbsolutePath path, string? contents) => File.AppendAllText(path.Value, contents);
+
+    /// <summary>
+    /// Appends the specified string to the file using the specified encoding, creating the file if it does not already exist.
+    /// </summary>
+    /// <param name="path">The file to append the specified string to.</param>
+    /// <param name="contents">The string to append to the file.</param>
+    /// <param name="encoding">The character encoding to use.</param>
+    public static void AppendAllText(this AbsolutePath path, string? contents, Encoding encoding) =>
+        File.AppendAllText(path.Value, contents, encoding);
+
+    /// <summary>
+    /// Creates a new file, writes the specified string to the file, and then closes the file.
+    /// If the target file already exists, it is overwritten.
+    /// </summary>
+    /// <param name="path">The file to write to.</param>
+    /// <param name="contents">The string to write to the file.</param>
+    public static void WriteAllText(this AbsolutePath path, string? contents) => File.WriteAllText(path.Value, contents);
+
+    /// <summary>
+    /// Creates a new file, writes the specified string to the file using the specified encoding, and then closes the file.
+    /// If the target file already exists, it is overwritten.
+    /// </summary>
+    /// <param name="path">The file to write to.</param>
+    /// <param name="contents">The string to write to the file.</param>
+    /// <param name="encoding">The encoding to apply to the string.</param>
+    public static void WriteAllText(this AbsolutePath path, string? contents, Encoding encoding) =>
+        File.WriteAllText(path.Value, contents, encoding);
 }

@@ -224,6 +224,43 @@ public sealed class PathIoGeneratorTests
     }
 
     [Fact]
+    public void ForwardingCallWithDifferentParameterTypeDoesNotSuppressTheBclOverload()
+    {
+        // GetFiles(LocalPathPattern) forwards to Directory.GetFiles(string, string), but its second parameter has a
+        // different type, so it is an overload added next to the generated member rather than a specialization of it.
+        // Suppressing the BCL-shaped overload would silently drop GetFiles(AbsolutePath, string) from the public API.
+        const string members = """
+            public static TruePath.AbsolutePath[] GetFiles(TruePath.AbsolutePath path, TruePath.LocalPathPattern searchPattern) =>
+                System.IO.Directory.GetFiles(path.Value, searchPattern.Value)
+                    .Select(name => new TruePath.AbsolutePath(name)).ToArray();
+            """;
+        var source = TestHelper.Generate(
+            TestHelper.CreateCompilation(
+                TestHelper.SourcesWithHandWrittenMembers(members)
+                    .Replace(
+                        "    public readonly struct AbsolutePath",
+                        "    public record struct LocalPathPattern(string Value);\n    public readonly struct AbsolutePath")));
+
+        Assert.Contains(
+            "public static string[] GetFiles(this AbsolutePath path, string searchPattern) => Directory.GetFiles(path.Value, searchPattern);",
+            source);
+    }
+
+    [Fact]
+    public void ForwardingCallWithPinnedTrailingArgumentSuppressesItsBclOverload()
+    {
+        // The parameter list of the handwritten member is the leading part of Directory.Delete(string, bool), which
+        // makes it a specialization of that overload, so the generated Delete(AbsolutePath, bool) must not appear.
+        const string members = """
+            public static void DeleteEmptyDirectory(TruePath.AbsolutePath path) => System.IO.Directory.Delete(path.Value, recursive: false);
+            """;
+        var source = TestHelper.Generate(
+            TestHelper.CreateCompilation(TestHelper.SourcesWithHandWrittenMembers(members)));
+
+        Assert.DoesNotContain("public static void Delete(this AbsolutePath path, bool", source);
+    }
+
+    [Fact]
     public void ExplicitExclusionListSuppressesGeneration()
     {
         var compilation = TestHelper.CreateCompilation(TestHelper.DefaultSources);

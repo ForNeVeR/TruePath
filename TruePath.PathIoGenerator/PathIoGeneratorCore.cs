@@ -150,7 +150,7 @@ public static class PathIoGeneratorCore
 
         foreach (var member in markedType.GetMembers().OfType<IMethodSymbol>())
         {
-            signatures.Add(SignatureKey(member.Name, member.Parameters.Select(p => TypeDisplay(p, null, absolutePathType, renderer))));
+            signatures.Add(SignatureKey(member.Name, member.Parameters.Select(p => SignatureTypeDisplay(p, null, absolutePathType, renderer))));
 
             foreach (var reference in member.DeclaringSyntaxReferences)
             {
@@ -165,8 +165,7 @@ public static class PathIoGeneratorCore
                     if (!comparer.Equals(owner, fileType.OriginalDefinition)
                         && !comparer.Equals(owner, directoryType.OriginalDefinition)) continue;
 
-                    if (!FirstArgumentDerivesFromPathParameter(
-                            invocation.ArgumentList.Arguments[0], member, absolutePathType)) continue;
+                    if (!CoversForwardedOverload(invocation, member, target, absolutePathType, renderer)) continue;
 
                     forwardedDocIds.Add(DocId.ForMethod(target));
                 }
@@ -176,6 +175,49 @@ public static class PathIoGeneratorCore
         return new HandWrittenInfo(
             signatures.OrderBy(signature => signature, StringComparer.Ordinal).ToImmutableArray(),
             forwardedDocIds.OrderBy(docId => docId, StringComparer.Ordinal).ToImmutableArray());
+    }
+
+    /// <summary>
+    ///     Decides whether a handwritten member covers the BCL overload it forwards to. A member covers the overload
+    ///     when its own parameter list is the leading part of the overload's generated parameter list: such a member
+    ///     is that overload with its trailing arguments pinned by the forwarding call (e.g.
+    ///     <c>DeleteEmptyDirectory</c> pins <c>recursive: false</c> of <c>Directory.Delete(string, bool)</c>).
+    ///
+    ///     A different parameter type at any position means a different overload that merely forwards to the same BCL
+    ///     method, so it is an addition next to the generated member rather than a replacement of it. Return types do
+    ///     not take part: overload identity is the parameter list alone.
+    /// </summary>
+    private static bool CoversForwardedOverload(
+        InvocationExpressionSyntax invocation,
+        IMethodSymbol member,
+        IMethodSymbol target,
+        INamedTypeSymbol absolutePathType,
+        TypeRenderer renderer)
+    {
+        if (member.Parameters.Length > target.Parameters.Length) return false;
+        if (!FirstArgumentDerivesFromPathParameter(
+                invocation.ArgumentList.Arguments[0], member, absolutePathType)) return false;
+
+        var targetPathOrdinals = PathParameterOrdinals(target);
+        for (var index = 0; index < member.Parameters.Length; index++)
+        {
+            var memberType = SignatureTypeDisplay(member.Parameters[index], null, absolutePathType, renderer);
+            var targetType = SignatureTypeDisplay(target.Parameters[index], targetPathOrdinals, absolutePathType, renderer);
+            if (memberType != targetType) return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Ordinals of the <c>System.String</c> parameters of a BCL method that the generator rewrites into
+    ///     <c>AbsolutePath</c>, i.e. the positions computed the same way for both sides of the coverage check.
+    /// </summary>
+    private static ImmutableHashSet<int> PathParameterOrdinals(IMethodSymbol method)
+    {
+        return method.Parameters
+            .Where(p => p.Type.SpecialType == SpecialType.System_String && PathIoRules.IsPathParameterName(p.Name))
+            .Select(p => p.Ordinal).ToImmutableHashSet();
     }
 
     /// <summary>
@@ -313,6 +355,22 @@ public static class PathIoGeneratorCore
                      && pathOrdinals != null
                      && pathOrdinals.Contains(parameter.Ordinal);
         return isPath ? renderer.Render(absolutePathType) : renderer.Render(parameter.Type);
+    }
+
+    /// <summary>
+    ///     Renders a parameter type for signature identity (see <see cref="TypeRenderer.RenderSignature"/>), with the
+    ///     path parameters already rewritten to <c>AbsolutePath</c>.
+    /// </summary>
+    private static string SignatureTypeDisplay(
+        IParameterSymbol parameter,
+        ImmutableHashSet<int>? pathOrdinals,
+        INamedTypeSymbol absolutePathType,
+        TypeRenderer renderer)
+    {
+        var isPath = parameter.Type.SpecialType == SpecialType.System_String
+                     && pathOrdinals != null
+                     && pathOrdinals.Contains(parameter.Ordinal);
+        return isPath ? renderer.RenderSignature(absolutePathType) : renderer.RenderSignature(parameter.Type);
     }
 
     private static string SignatureKey(string name, IEnumerable<string> parameterTypes)

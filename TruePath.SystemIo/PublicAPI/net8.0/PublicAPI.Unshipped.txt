@@ -1,1 +1,26 @@
 #nullable enable
+static TruePath.SystemIo.PathIo.CreateDirectory(this TruePath.AbsolutePath path, System.IO.UnixFileMode unixCreateMode) -> System.IO.DirectoryInfo!
+static TruePath.SystemIo.PathIo.CreateSymbolicLink(this TruePath.AbsolutePath path, TruePath.AbsolutePath pathToTarget) -> System.IO.FileSystemInfo!
+static TruePath.SystemIo.PathIo.Decrypt(this TruePath.AbsolutePath path) -> void
+static TruePath.SystemIo.PathIo.Encrypt(this TruePath.AbsolutePath path) -> void
+static TruePath.SystemIo.PathIo.EnumerateDirectories(this TruePath.AbsolutePath path) -> System.Collections.Generic.IEnumerable<string!>!
+static TruePath.SystemIo.PathIo.EnumerateDirectories(this TruePath.AbsolutePath path, string! searchPattern) -> System.Collections.Generic.IEnumerable<string!>!
+static TruePath.SystemIo.PathIo.EnumerateDirectories(this TruePath.AbsolutePath path, string! searchPattern, System.IO.EnumerationOptions! enumerationOptions) -> System.Collections.Generic.IEnumerable<string!>!
+static TruePath.SystemIo.PathIo.EnumerateDirectories(this TruePath.AbsolutePath path, string! searchPattern, System.IO.SearchOption searchOption) -> System.Collections.Generic.IEnumerable<string!>!
+static TruePath.SystemIo.PathIo.EnumerateFileSystemEntries(this TruePath.AbsolutePath path) -> System.Collections.Generic.IEnumerable<string!>!
+static TruePath.SystemIo.PathIo.EnumerateFileSystemEntries(this TruePath.AbsolutePath path, string! searchPattern) -> System.Collections.Generic.IEnumerable<string!>!
+static TruePath.SystemIo.PathIo.EnumerateFileSystemEntries(this TruePath.AbsolutePath path, string! searchPattern, System.IO.EnumerationOptions! enumerationOptions) -> System.Collections.Generic.IEnumerable<string!>!
+static TruePath.SystemIo.PathIo.EnumerateFileSystemEntries(this TruePath.AbsolutePath path, string! searchPattern, System.IO.SearchOption searchOption) -> System.Collections.Generic.IEnumerable<string!>!
+static TruePath.SystemIo.PathIo.GetDirectoryRoot(this TruePath.AbsolutePath path) -> string!
+static TruePath.SystemIo.PathIo.GetFileSystemEntries(this TruePath.AbsolutePath path) -> string![]!
+static TruePath.SystemIo.PathIo.GetFileSystemEntries(this TruePath.AbsolutePath path, string! searchPattern) -> string![]!
+static TruePath.SystemIo.PathIo.GetFileSystemEntries(this TruePath.AbsolutePath path, string! searchPattern, System.IO.EnumerationOptions! enumerationOptions) -> string![]!
+static TruePath.SystemIo.PathIo.GetFileSystemEntries(this TruePath.AbsolutePath path, string! searchPattern, System.IO.SearchOption searchOption) -> string![]!
+static TruePath.SystemIo.PathIo.GetParent(this TruePath.AbsolutePath path) -> System.IO.DirectoryInfo?
+static TruePath.SystemIo.PathIo.Open(this TruePath.AbsolutePath path, System.IO.FileStreamOptions! options) -> System.IO.FileStream!
+static TruePath.SystemIo.PathIo.OpenHandle(this TruePath.AbsolutePath path, System.IO.FileMode mode = System.IO.FileMode.Open, System.IO.FileAccess access = System.IO.FileAccess.Read, System.IO.FileShare share = System.IO.FileShare.Read, System.IO.FileOptions options = System.IO.FileOptions.None, long preallocationSize = 0) -> Microsoft.Win32.SafeHandles.SafeFileHandle!
+static TruePath.SystemIo.PathIo.Replace(this TruePath.AbsolutePath sourceFile, TruePath.AbsolutePath destinationFile, TruePath.AbsolutePath destinationBackupFile) -> void
+static TruePath.SystemIo.PathIo.Replace(this TruePath.AbsolutePath sourceFile, TruePath.AbsolutePath destinationFile, TruePath.AbsolutePath destinationBackupFile, bool ignoreMetadataErrors) -> void
+static TruePath.SystemIo.PathIo.ResolveLinkTarget(this TruePath.AbsolutePath linkPath, bool returnFinalTarget) -> System.IO.FileSystemInfo?
+static TruePath.SystemIo.PathIo.SetCurrentDirectory(this TruePath.AbsolutePath path) -> void
+static TruePath.SystemIo.PathIo.SetUnixFileMode(this TruePath.AbsolutePath path, System.IO.UnixFileMode mode) -> void
