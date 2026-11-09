@@ -1,0 +1,15 @@
+#nullable enable
+static TruePath.SystemIo.PathIo.AppendAllBytes(this TruePath.AbsolutePath path, byte[]! bytes) -> void
+static TruePath.SystemIo.PathIo.AppendAllBytes(this TruePath.AbsolutePath path, System.ReadOnlySpan<byte> bytes) -> void
+static TruePath.SystemIo.PathIo.AppendAllBytesAsync(this TruePath.AbsolutePath path, byte[]! bytes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+static TruePath.SystemIo.PathIo.AppendAllBytesAsync(this TruePath.AbsolutePath path, System.ReadOnlyMemory<byte> bytes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+static TruePath.SystemIo.PathIo.AppendAllText(this TruePath.AbsolutePath path, System.ReadOnlySpan<char> contents) -> void
+static TruePath.SystemIo.PathIo.AppendAllText(this TruePath.AbsolutePath path, System.ReadOnlySpan<char> contents, System.Text.Encoding! encoding) -> void
+static TruePath.SystemIo.PathIo.AppendAllTextAsync(this TruePath.AbsolutePath path, System.ReadOnlyMemory<char> contents, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+static TruePath.SystemIo.PathIo.AppendAllTextAsync(this TruePath.AbsolutePath path, System.ReadOnlyMemory<char> contents, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+static TruePath.SystemIo.PathIo.WriteAllBytes(this TruePath.AbsolutePath path, System.ReadOnlySpan<byte> bytes) -> void
+static TruePath.SystemIo.PathIo.WriteAllBytesAsync(this TruePath.AbsolutePath path, System.ReadOnlyMemory<byte> bytes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+static TruePath.SystemIo.PathIo.WriteAllText(this TruePath.AbsolutePath path, System.ReadOnlySpan<char> contents) -> void
+static TruePath.SystemIo.PathIo.WriteAllText(this TruePath.AbsolutePath path, System.ReadOnlySpan<char> contents, System.Text.Encoding! encoding) -> void
+static TruePath.SystemIo.PathIo.WriteAllTextAsync(this TruePath.AbsolutePath path, System.ReadOnlyMemory<char> contents, System.Text.Encoding! encoding, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+static TruePath.SystemIo.PathIo.WriteAllTextAsync(this TruePath.AbsolutePath path, System.ReadOnlyMemory<char> contents, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
