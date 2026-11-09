@@ -5,6 +5,7 @@
 using System.Collections.Immutable;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml;
 using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -46,6 +47,8 @@ public sealed class BclDocIndex
             // Some of the BCL documentation files (netstandard.xml in particular) contain invalid XML, so member
             // elements are extracted line by line and parsed one by one: a broken member is then skipped instead
             // of failing the whole file.
+            //
+            // See https://github.com/dotnet/standard/issues/1527 on the topic of the broken XML doc.
             var current = new StringBuilder();
             string? currentName = null;
             foreach (var textLine in text.Lines)
@@ -78,7 +81,7 @@ public sealed class BclDocIndex
                     {
                         builder[currentName] = XElement.Parse(current.ToString());
                     }
-                    catch (System.Xml.XmlException)
+                    catch (XmlException)
                     {
                         // Skip a malformed member.
                     }
