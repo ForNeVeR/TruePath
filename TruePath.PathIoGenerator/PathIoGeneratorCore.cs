@@ -112,7 +112,7 @@ public static class PathIoGeneratorCore
                 continue;
             }
 
-            var key = SignatureKey(method.Name, method.Parameters.Select(p => TypeDisplay(p, pathOrdinals, absolutePathType!, renderer)));
+            var key = SignatureKey(method.Name, method.Parameters.Select(p => SignatureTypeDisplay(p, pathOrdinals, absolutePathType!, renderer)));
             if (handWritten.Signatures.Contains(key)) continue;
             if (!generatedKeys.Add(key)) continue;
 

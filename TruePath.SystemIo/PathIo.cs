@@ -166,10 +166,19 @@ public static partial class PathIo
     public static AbsolutePath[] GetFiles(this AbsolutePath path, LocalPathPattern searchPattern) =>
         Directory.GetFiles(path.Value, searchPattern.Value).Select(x => new AbsolutePath(x)).ToArray();
 
-    // These four members are handwritten for their nullability contract: the netstandard2.0 reference assembly was
-    // compiled before nullable reference types existed, so the generator sees an oblivious `string` and renders a
-    // non-nullable parameter. The BCL accepts null here (it writes an empty file or nothing at all), and the released
-    // API records that as `string?`, so the annotation has to come from source rather than from the generator.
+    // These members are handwritten for their nullability contract: the netstandard2.0 reference assembly was compiled
+    // before nullable reference types existed, so the generator sees every reference type as oblivious and renders it
+    // as non-nullable. The annotations here have to come from source rather than from the generator.
+
+    /// <summary>
+    /// Retrieves the parent directory of the specified path, including both absolute and relative paths.
+    /// </summary>
+    /// <param name="path">The path for which to retrieve the parent directory.</param>
+    /// <returns>The parent directory, or <see langword="null"/> if <paramref name="path"/> is the root directory.</returns>
+    public static DirectoryInfo? GetParent(this AbsolutePath path) => Directory.GetParent(path.Value);
+
+    // The BCL accepts null here (it writes an empty file or nothing at all), and the released API records that as
+    // `string?`.
 
     /// <summary>
     /// Appends the specified string to the file, creating the file if it does not already exist.

@@ -11,7 +11,7 @@ static TruePath.SystemIo.PathIo.GetDirectoryRoot(this TruePath.AbsolutePath path
 static TruePath.SystemIo.PathIo.GetFileSystemEntries(this TruePath.AbsolutePath path) -> string![]!
 static TruePath.SystemIo.PathIo.GetFileSystemEntries(this TruePath.AbsolutePath path, string! searchPattern) -> string![]!
 static TruePath.SystemIo.PathIo.GetFileSystemEntries(this TruePath.AbsolutePath path, string! searchPattern, System.IO.SearchOption searchOption) -> string![]!
-static TruePath.SystemIo.PathIo.GetParent(this TruePath.AbsolutePath path) -> System.IO.DirectoryInfo!
+static TruePath.SystemIo.PathIo.GetParent(this TruePath.AbsolutePath path) -> System.IO.DirectoryInfo?
 static TruePath.SystemIo.PathIo.Replace(this TruePath.AbsolutePath sourceFile, TruePath.AbsolutePath destinationFile, TruePath.AbsolutePath destinationBackupFile) -> void
 static TruePath.SystemIo.PathIo.Replace(this TruePath.AbsolutePath sourceFile, TruePath.AbsolutePath destinationFile, TruePath.AbsolutePath destinationBackupFile, bool ignoreMetadataErrors) -> void
 static TruePath.SystemIo.PathIo.SetCurrentDirectory(this TruePath.AbsolutePath path) -> void
