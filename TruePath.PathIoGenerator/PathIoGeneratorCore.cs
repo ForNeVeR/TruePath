@@ -37,10 +37,10 @@ public static class PathIoGeneratorCore
     private const string GeneratorName = "TruePath.PathIoGenerator";
     private const string GeneratorVersion = "1.0.0";
 
-    private static readonly ImmutableHashSet<string> ForwardedAttributes = ImmutableHashSet.Create(
+    private static readonly ImmutableHashSet<string> ForwardedAttributes = [
         "System.Runtime.Versioning.SupportedOSPlatformAttribute",
         "System.Runtime.Versioning.UnsupportedOSPlatformAttribute",
-        "System.ObsoleteAttribute");
+        "System.ObsoleteAttribute"];
 
     public static GenerationResult Generate(
         Compilation compilation,
@@ -87,7 +87,7 @@ public static class PathIoGeneratorCore
         var renderer = TypeRenderer.Create(compilation);
         var generatedMethods = new List<GeneratedMethod>();
         var generatedKeys = new HashSet<string>();
-        var skippedWithoutPath = new SortedSet<string>();
+        var skippedWithoutPath = new SortedSet<string>(StringComparer.Ordinal);
 
         foreach (var owner in new[] { fileType!, directoryType! }) // File first, so File wins on duplicate signatures
         foreach (var method in owner.GetMembers().OfType<IMethodSymbol>())
