@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 
 namespace TruePath.PathIoGenerator;
 
@@ -36,7 +37,7 @@ public sealed class BclDocIndex
     public static BclDocIndex Build(ImmutableArray<AdditionalText> files)
     {
         // netstandard.xml is processed first, so that the framework-specific System.Runtime.xml wins on conflicts.
-        var orderedFiles = files.OrderBy(file => Path.GetFileName(file.Path) == "netstandard.xml" ? 0 : 1);
+        var orderedFiles = files.OrderBy(file => IsNetStandardDoc(file) ? 0 : 1);
 
         var builder = ImmutableDictionary.CreateBuilder<string, XElement>();
         foreach (var file in orderedFiles)
@@ -44,54 +45,87 @@ public sealed class BclDocIndex
             var text = file.GetText();
             if (text == null) continue;
 
-            // Some of the BCL documentation files (netstandard.xml in particular) contain invalid XML, so member
-            // elements are extracted line by line and parsed one by one: a broken member is then skipped instead
-            // of failing the whole file.
-            //
-            // See https://github.com/dotnet/standard/issues/1527 on the topic of the broken XML doc.
-            var current = new StringBuilder();
-            string? currentName = null;
-            foreach (var textLine in text.Lines)
-            {
-                var line = textLine.ToString();
-                var trimmed = line.TrimStart();
-                if (currentName == null)
-                {
-                    if (!trimmed.StartsWith("<member ", StringComparison.Ordinal)) continue;
-
-                    var nameStart = trimmed.IndexOf('"');
-                    var nameEnd = nameStart < 0 ? -1 : trimmed.IndexOf('"', nameStart + 1);
-                    if (nameEnd < 0) continue;
-
-                    var name = trimmed.Substring(nameStart + 1, nameEnd - nameStart - 1);
-                    if (!name.StartsWith("M:System.IO.File.", StringComparison.Ordinal)
-                        && !name.StartsWith("M:System.IO.Directory.", StringComparison.Ordinal)) continue;
-
-                    currentName = name;
-                    current.Clear().Append(line);
-                }
-                else
-                {
-                    current.Append('\n').Append(line);
-                }
-
-                if (trimmed.TrimEnd().EndsWith("</member>", StringComparison.Ordinal))
-                {
-                    try
-                    {
-                        builder[currentName] = XElement.Parse(current.ToString());
-                    }
-                    catch (XmlException)
-                    {
-                        // Skip a malformed member.
-                    }
-
-                    currentName = null;
-                }
-            }
+            if (IsNetStandardDoc(file))
+                ExtractMembersLeniently(text, builder);
+            else
+                ExtractMembers(text, builder);
         }
 
         return new BclDocIndex(files, builder.ToImmutable());
+    }
+
+    private const string NetStandardDocFileName = "netstandard.xml";
+
+    private static bool IsNetStandardDoc(AdditionalText file)
+    {
+        return Path.GetFileName(file.Path) == NetStandardDocFileName;
+    }
+
+    private static bool IsIndexedMember(string name)
+    {
+        return name.StartsWith("M:System.IO.File.", StringComparison.Ordinal)
+               || name.StartsWith("M:System.IO.Directory.", StringComparison.Ordinal);
+    }
+
+    private static void ExtractMembers(SourceText text, ImmutableDictionary<string, XElement>.Builder builder)
+    {
+        var document = XDocument.Parse(text.ToString());
+        foreach (var member in document.Descendants("member"))
+        {
+            var name = member.Attribute("name")?.Value;
+            if (name == null || !IsIndexedMember(name)) continue;
+
+            builder[name] = member;
+        }
+    }
+
+    private static void ExtractMembersLeniently(
+        SourceText text,
+        ImmutableDictionary<string, XElement>.Builder builder)
+    {
+        // netstandard.xml contains invalid XML, so member elements are extracted line by line and parsed one by one:
+        // a broken member is then skipped instead of failing the whole file.
+        //
+        // See https://github.com/dotnet/standard/issues/1527 on the topic of the broken XML doc.
+        var current = new StringBuilder();
+        string? currentName = null;
+        foreach (var textLine in text.Lines)
+        {
+            var line = textLine.ToString();
+            var trimmed = line.TrimStart();
+            if (currentName == null)
+            {
+                if (!trimmed.StartsWith("<member ", StringComparison.Ordinal)) continue;
+
+                var nameStart = trimmed.IndexOf('"');
+                var nameEnd = nameStart < 0 ? -1 : trimmed.IndexOf('"', nameStart + 1);
+                if (nameEnd < 0) continue;
+
+                var name = trimmed.Substring(nameStart + 1, nameEnd - nameStart - 1);
+                if (!IsIndexedMember(name)) continue;
+
+                currentName = name;
+                current.Clear().Append(line);
+            }
+            else
+            {
+                current.Append('\n').Append(line);
+            }
+
+            if (trimmed.TrimEnd().EndsWith("</member>", StringComparison.Ordinal))
+            {
+                try
+                {
+                    builder[currentName] = XElement.Parse(current.ToString());
+                }
+                catch (XmlException)
+                {
+                    // Skip a malformed member.
+                }
+
+                currentName = null;
+            }
+        }
     }
 
     public override bool Equals(object? obj)

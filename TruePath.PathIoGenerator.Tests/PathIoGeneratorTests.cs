@@ -4,6 +4,7 @@
 
 using System.Collections.Immutable;
 using System.Text;
+using System.Xml;
 using Basic.Reference.Assemblies;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -122,6 +123,36 @@ public sealed class PathIoGeneratorTests
 
         Assert.True(index.TryGetMethodMember("M:System.IO.File.ReadAllText(System.String)", out var member));
         Assert.Contains("OPENS A TEXT FILE, READS ALL THE TEXT IN THE FILE.", member.ToString());
+    }
+
+    private const string BrokenBclDocs = """
+        <doc>
+            <members>
+                <member name="M:System.IO.File.ReadAllText(System.String)">
+                    <summary>OPENS A TEXT FILE, READS ALL THE TEXT IN THE FILE.</summary>
+                </member>
+                <member name="M:System.IO.File.Delete(System.String)">
+                    <summary>Broken <see cref="T:System.IO.File"></summary>
+                </member>
+            </members>
+        </doc>
+        """;
+
+    [Fact]
+    public void BclDocIndexToleratesBrokenMembersInNetStandardDoc()
+    {
+        var index = BclDocIndex.Build(
+            [new InMemoryAdditionalText("/ref/netstandard.xml", BrokenBclDocs)]);
+
+        Assert.True(index.TryGetMethodMember("M:System.IO.File.ReadAllText(System.String)", out _));
+        Assert.False(index.TryGetMethodMember("M:System.IO.File.Delete(System.String)", out _));
+    }
+
+    [Fact]
+    public void BclDocIndexRejectsInvalidXmlInOtherDocs()
+    {
+        Assert.Throws<XmlException>(() => BclDocIndex.Build(
+            [new InMemoryAdditionalText("/ref/System.Runtime.xml", BrokenBclDocs)]));
     }
 
     [Fact]
