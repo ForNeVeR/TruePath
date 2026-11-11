@@ -27,8 +27,8 @@ public sealed class GenerationResult(string? source, ImmutableArray<Diagnostic> 
 ///     A BCL method is not generated when:
 ///     <list type="bullet">
 ///         <item>its ID is listed in path-io-exclusions.txt;</item>
-///         <item>a handwritten member of the marked class already occupies the same rewritten signature;</item>
-///         <item>a handwritten member forwards to it (detected by the forwarding call in its body);</item>
+///         <item>a user-defined member of the marked class already occupies the same rewritten signature;</item>
+///         <item>a user-defined member forwards to it (detected by the forwarding call in its body);</item>
 ///         <item>another BCL method (File wins over Directory) already produced the same signature.</item>
 ///     </list>
 /// </summary>
@@ -46,7 +46,7 @@ public static class PathIoGeneratorCore
         Compilation compilation,
         string markedTypeMetadataName,
         bool markedTypeIsNested,
-        HandWrittenInfo handWritten,
+        UserDefinedMembersInfo userDefinedMembers,
         ImmutableHashSet<string> excludedDocIds,
         BclDocIndex docIndex)
     {
@@ -100,7 +100,7 @@ public static class PathIoGeneratorCore
                 continue;
 
             var docId = DocId.ForMethod(method);
-            if (excludedDocIds.Contains(docId) || handWritten.ForwardedDocIds.Contains(docId)) continue;
+            if (excludedDocIds.Contains(docId) || userDefinedMembers.ForwardedDocIds.Contains(docId)) continue;
 
             var pathOrdinals = method.Parameters
                 .Where(p => p.Type.SpecialType == SpecialType.System_String && PathIoRules.IsPathParameterName(p.Name))
@@ -113,7 +113,7 @@ public static class PathIoGeneratorCore
             }
 
             var key = SignatureKey(method.Name, method.Parameters.Select(p => SignatureTypeDisplay(p, pathOrdinals, absolutePathType!, renderer)));
-            if (handWritten.Signatures.Contains(key)) continue;
+            if (userDefinedMembers.Signatures.Contains(key)) continue;
             if (!generatedKeys.Add(key)) continue;
 
             generatedMethods.Add(BuildMethod(owner, method, pathOrdinals, absolutePathType!, docIndex, renderer));
@@ -132,16 +132,18 @@ public static class PathIoGeneratorCore
     }
 
     /// <summary>
-    ///     Collects the exclusion-relevant facts about the hand-written members of the marked type: their rewritten
+    ///     Collects the exclusion-relevant facts about the user-defined members of the marked type: their rewritten
     ///     signatures, and the IDs of the BCL overloads they forward to. Called from the syntax-anchored part of
     ///     the incremental pipeline, so it only re-runs when the marked type's syntax changes.
     /// </summary>
-    public static HandWrittenInfo CollectHandWrittenInfo(Compilation compilation, INamedTypeSymbol markedType)
+    public static UserDefinedMembersInfo CollectUserDefinedMembersInfo(
+        Compilation compilation,
+        INamedTypeSymbol markedType)
     {
         var fileType = compilation.GetTypeByMetadataName("System.IO.File");
         var directoryType = compilation.GetTypeByMetadataName("System.IO.Directory");
         var absolutePathType = compilation.GetTypeByMetadataName(PathIoRules.AbsolutePathTypeName);
-        if (fileType == null || directoryType == null || absolutePathType == null) return HandWrittenInfo.Empty;
+        if (fileType == null || directoryType == null || absolutePathType == null) return UserDefinedMembersInfo.Empty;
 
         var renderer = TypeRenderer.Create(compilation);
         var signatures = new HashSet<string>();
@@ -172,13 +174,13 @@ public static class PathIoGeneratorCore
             }
         }
 
-        return new HandWrittenInfo(
+        return new UserDefinedMembersInfo(
             signatures.OrderBy(signature => signature, StringComparer.Ordinal).ToImmutableArray(),
             forwardedDocIds.OrderBy(docId => docId, StringComparer.Ordinal).ToImmutableArray());
     }
 
     /// <summary>
-    ///     Decides whether a handwritten member covers the BCL overload it forwards to. A member covers the overload
+    ///     Decides whether a user-defined member covers the BCL overload it forwards to. A member covers the overload
     ///     when its own parameter list is the leading part of the overload's generated parameter list: such a member
     ///     is that overload with its trailing arguments pinned by the forwarding call (e.g.
     ///     <c>DeleteEmptyDirectory</c> pins <c>recursive: false</c> of <c>Directory.Delete(string, bool)</c>).
@@ -221,7 +223,7 @@ public static class PathIoGeneratorCore
     }
 
     /// <summary>
-    ///     Matches the forwarding pattern `SomeBclCall(path.Value, …)` where `path` is a parameter of the handwritten
+    ///     Matches the forwarding pattern `SomeBclCall(path.Value, …)` where `path` is a parameter of the user-defined
     ///     method typed as <c>AbsolutePath</c>. Anything less direct is deliberately not treated as a forwarding call,
     ///     so that incidental BCL calls inside custom logic cannot silently suppress generation.
     /// </summary>
@@ -442,18 +444,19 @@ public static class PathIoGeneratorCore
     }
 }
 
-public sealed class HandWrittenInfo(
+public sealed class UserDefinedMembersInfo(
     ImmutableArray<string> signatures,
     ImmutableArray<string> forwardedDocIds)
 {
-    public static HandWrittenInfo Empty { get; } = new(ImmutableArray<string>.Empty, ImmutableArray<string>.Empty);
+    public static UserDefinedMembersInfo Empty { get; } =
+        new(ImmutableArray<string>.Empty, ImmutableArray<string>.Empty);
 
     public ImmutableArray<string> Signatures { get; } = signatures;
     public ImmutableArray<string> ForwardedDocIds { get; } = forwardedDocIds;
 
     public override bool Equals(object? obj)
     {
-        return obj is HandWrittenInfo other
+        return obj is UserDefinedMembersInfo other
                && Signatures.SequenceEqual(other.Signatures)
                && ForwardedDocIds.SequenceEqual(other.ForwardedDocIds);
     }

@@ -45,7 +45,7 @@ public static class TestHelper
         }
         """;
 
-    public static string SourcesWithHandWrittenMembers(string members) => DefaultSources
+    public static string SourcesWithUserDefinedMembers(string members) => DefaultSources
         .Replace(
             """
                 [GenerateSystemIoExtensions]
@@ -163,7 +163,7 @@ public sealed class PathIoGeneratorTests
             [new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)]);
 
         var result = PathIoGeneratorCore.Generate(
-            compilation, "TruePath.SystemIo.PathIo", markedTypeIsNested: false, HandWrittenInfo.Empty,
+            compilation, "TruePath.SystemIo.PathIo", markedTypeIsNested: false, UserDefinedMembersInfo.Empty,
             ImmutableHashSet<string>.Empty, index);
 
         Assert.Contains("/// <summary>OPENS A TEXT FILE, READS ALL THE TEXT IN THE FILE.</summary>", result.Source);
@@ -228,26 +228,26 @@ public sealed class PathIoGeneratorTests
     }
 
     [Fact]
-    public void HandWrittenSignatureSuppressesGeneration()
+    public void UserDefinedSignatureSuppressesGeneration()
     {
         const string members = """
             public static bool Exists(TruePath.AbsolutePath path) => true;
             """;
         var source = TestHelper.Generate(
-            TestHelper.CreateCompilation(TestHelper.SourcesWithHandWrittenMembers(members)));
+            TestHelper.CreateCompilation(TestHelper.SourcesWithUserDefinedMembers(members)));
 
         Assert.DoesNotContain("Exists(", source);
     }
 
     [Fact]
-    public void HandWrittenForwardingCallSuppressesItsBclTarget()
+    public void UserDefinedForwardingCallSuppressesItsBclTarget()
     {
         const string members = """
             public static void DeleteEmptyDirectory(TruePath.AbsolutePath path) => System.IO.Directory.Delete(path.Value, recursive: false);
             public static void DeleteDirectoryRecursively(TruePath.AbsolutePath path) => System.IO.Directory.Delete(path.Value, recursive: true);
             """;
         var source = TestHelper.Generate(
-            TestHelper.CreateCompilation(TestHelper.SourcesWithHandWrittenMembers(members)));
+            TestHelper.CreateCompilation(TestHelper.SourcesWithUserDefinedMembers(members)));
 
         Assert.DoesNotContain("Delete(AbsolutePath path, bool", source);
         Assert.Contains(
@@ -268,7 +268,7 @@ public sealed class PathIoGeneratorTests
             """;
         var source = TestHelper.Generate(
             TestHelper.CreateCompilation(
-                TestHelper.SourcesWithHandWrittenMembers(members)
+                TestHelper.SourcesWithUserDefinedMembers(members)
                     .Replace(
                         "    public readonly struct AbsolutePath",
                         "    public record struct LocalPathPattern(string Value);\n    public readonly struct AbsolutePath")));
@@ -281,13 +281,13 @@ public sealed class PathIoGeneratorTests
     [Fact]
     public void ForwardingCallWithPinnedTrailingArgumentSuppressesItsBclOverload()
     {
-        // The parameter list of the handwritten member is the leading part of Directory.Delete(string, bool), which
+        // The parameter list of the user-defined member is the leading part of Directory.Delete(string, bool), which
         // makes it a specialization of that overload, so the generated Delete(AbsolutePath, bool) must not appear.
         const string members = """
             public static void DeleteEmptyDirectory(TruePath.AbsolutePath path) => System.IO.Directory.Delete(path.Value, recursive: false);
             """;
         var source = TestHelper.Generate(
-            TestHelper.CreateCompilation(TestHelper.SourcesWithHandWrittenMembers(members)));
+            TestHelper.CreateCompilation(TestHelper.SourcesWithUserDefinedMembers(members)));
 
         Assert.DoesNotContain("public static void Delete(this AbsolutePath path, bool", source);
     }

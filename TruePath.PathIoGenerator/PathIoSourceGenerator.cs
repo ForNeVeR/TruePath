@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-using System.Collections.Immutable;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -28,7 +27,7 @@ public sealed class PathIoSourceGenerator : IIncrementalGenerator
             static (attributeContext, _) => new MarkedType(
                 attributeContext.TargetSymbol.ToDisplayString(),
                 attributeContext.TargetSymbol.ContainingType != null,
-                PathIoGeneratorCore.CollectHandWrittenInfo(
+                PathIoGeneratorCore.CollectUserDefinedMembersInfo(
                     attributeContext.SemanticModel.Compilation,
                     (INamedTypeSymbol)attributeContext.TargetSymbol)));
 
@@ -57,7 +56,12 @@ public sealed class PathIoSourceGenerator : IIncrementalGenerator
             foreach (var typeInfo in typeInfos.Sort((left, right) => string.CompareOrdinal(left.TypeName, right.TypeName)))
             {
                 var result = PathIoGeneratorCore.Generate(
-                    compilation, typeInfo.TypeName, typeInfo.IsNested, typeInfo.HandWritten, exclusions.DocIds, docIndex);
+                    compilation,
+                    typeInfo.TypeName,
+                    typeInfo.IsNested,
+                    typeInfo.UserDefinedMembers,
+                    exclusions.DocIds,
+                    docIndex);
                 foreach (var diagnostic in result.Diagnostics) productionContext.ReportDiagnostic(diagnostic);
 
                 if (result.Source is { } source)

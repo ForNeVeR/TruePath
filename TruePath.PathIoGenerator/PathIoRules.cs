@@ -33,7 +33,7 @@ public static class PathIoRules
     /// <summary>
     ///     The parameter name a path parameter gets in the generated API: the BCL `…FileName`/`…DirName` spellings
     ///     lose their `Name` suffix, so that e.g. <c>Copy</c> keeps the <c>sourceFile</c>/<c>destFile</c> parameter
-    ///     names the library used when they were still hand-written.
+    ///     names the library used before these methods were generated via the source generator.
     /// </summary>
     public static string GeneratedParameterName(string bclParameterName)
     {

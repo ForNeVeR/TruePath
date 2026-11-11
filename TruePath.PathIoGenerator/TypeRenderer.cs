@@ -47,9 +47,9 @@ internal sealed class TypeRenderer
     public string Render(ITypeSymbol type) => RenderCore(type, includeNullability: true);
 
     /// <summary>
-    ///     Renders a type for signature identity: overload keys and handwritten-member matching. Nullability is
+    ///     Renders a type for signature identity: overload keys and user-defined-member matching. Nullability is
     ///     omitted because it is not part of overload identity in C#, and because a reference assembly compiled
-    ///     before nullable reference types existed reports every reference type as oblivious. A handwritten
+    ///     before nullable reference types existed reports every reference type as oblivious. A user-defined
     ///     <c>string?</c> and such an oblivious <c>string</c> are one and the same parameter type.
     /// </summary>
     public string RenderSignature(ITypeSymbol type) => RenderCore(type, includeNullability: false);
