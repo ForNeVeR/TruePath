@@ -6,21 +6,21 @@ namespace TruePath.PathIoGenerator;
 
 /// <summary>
 ///     The equatable payload the pipeline computes for every marked class: its display name, whether it is nested
-///     (rejected by <see cref="PathIoGeneratorCore.Generate"/> with a diagnostic), and the hand-written member
+///     (rejected by <see cref="PathIoGeneratorCore.Generate"/> with a diagnostic), and the user-defined member
 ///     analysis. Being equatable lets the incremental pipeline cache it across unrelated edits.
 /// </summary>
-internal sealed class MarkedType(string typeName, bool isNested, HandWrittenInfo handWritten)
+internal sealed class MarkedType(string typeName, bool isNested, UserDefinedMembersInfo userDefinedMembers)
 {
     public string TypeName { get; } = typeName;
     public bool IsNested { get; } = isNested;
-    public HandWrittenInfo HandWritten { get; } = handWritten;
+    public UserDefinedMembersInfo UserDefinedMembers { get; } = userDefinedMembers;
 
     public override bool Equals(object? obj)
     {
         return obj is MarkedType other
                && TypeName == other.TypeName
                && IsNested == other.IsNested
-               && HandWritten.Equals(other.HandWritten);
+               && UserDefinedMembers.Equals(other.UserDefinedMembers);
     }
 
     public override int GetHashCode()

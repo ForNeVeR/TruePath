@@ -166,7 +166,7 @@ public static partial class PathIo
     public static AbsolutePath[] GetFiles(this AbsolutePath path, LocalPathPattern searchPattern) =>
         Directory.GetFiles(path.Value, searchPattern.Value).Select(x => new AbsolutePath(x)).ToArray();
 
-    // These members are handwritten for their nullability contract: the netstandard2.0 reference assembly was compiled
+    // These members are defined here for their nullability contract: the netstandard2.0 reference assembly was compiled
     // before nullable reference types existed, so the generator sees every reference type as oblivious and renders it
     // as non-nullable. The annotations here have to come from source rather than from the generator.
 
