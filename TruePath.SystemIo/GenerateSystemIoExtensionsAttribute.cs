@@ -8,7 +8,7 @@ namespace TruePath.SystemIo;
 ///     Marks a <see langword="partial"/> <see langword="static"/> class as a generation target: the
 ///     TruePath.PathIoGenerator source generator will fill the other partial part with forwarding extension methods
 ///     for every public static method of <c>System.IO.File</c> and <c>System.IO.Directory</c> available in the
-///     current target framework. Hand-written members of the marked class win over generated ones.
+///     current target framework. User-defined members of the marked class win over generated ones.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 internal sealed class GenerateSystemIoExtensionsAttribute : Attribute;

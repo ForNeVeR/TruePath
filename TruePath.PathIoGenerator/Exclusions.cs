@@ -9,8 +9,8 @@ namespace TruePath.PathIoGenerator;
 
 /// <summary>
 ///     The parsed contents of the <c>path-io-exclusions.txt</c> additional file: XML documentation IDs of the BCL
-///     methods that must not be exposed as PathIo extensions. Methods covered by handwritten members (either by
-///     rewritten signature or by the forwarding call inside the handwritten body) are excluded automatically and
+///     methods that must not be exposed as PathIo extensions. Methods covered by user-defined members (either by
+///     rewritten signature or by the forwarding call inside their body) are excluded automatically and
 ///     must not be listed there.
 /// </summary>
 internal sealed class Exclusions

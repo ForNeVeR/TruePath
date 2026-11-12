@@ -4,6 +4,8 @@
 
 using System.Collections.Immutable;
 using System.Text;
+using System.Xml;
+using Basic.Reference.Assemblies;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
@@ -43,7 +45,7 @@ public static class TestHelper
         }
         """;
 
-    public static string SourcesWithHandWrittenMembers(string members) => DefaultSources
+    public static string SourcesWithUserDefinedMembers(string members) => DefaultSources
         .Replace(
             """
                 [GenerateSystemIoExtensions]
@@ -65,16 +67,16 @@ public static class TestHelper
         // reliable on CI, where the test host runtime and the SDK with the packs may live in different roots.
         return CSharpCompilation.Create(
             "TestAssembly",
-            new[] { CSharpSyntaxTree.ParseText(sources, new CSharpParseOptions(LanguageVersion.Latest)) },
-            Basic.Reference.Assemblies.Net100.References.All,
+            [CSharpSyntaxTree.ParseText(sources, new CSharpParseOptions(LanguageVersion.Latest))],
+            Net100.References.All,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
     }
 
     public static string Generate(CSharpCompilation compilation, params AdditionalText[] additionalTexts)
     {
         GeneratorDriver driver = CSharpGeneratorDriver.Create(
-            new[] { new PathIoSourceGenerator().AsSourceGenerator() },
-            additionalTexts.ToImmutableArray());
+            [new PathIoSourceGenerator().AsSourceGenerator()],
+            [.. additionalTexts]);
         driver = driver.RunGenerators(compilation);
         var runResult = driver.GetRunResult();
         var tree = runResult.GeneratedTrees.FirstOrDefault(generated => generated.FilePath.Contains("PathIo.Generated"));
@@ -117,10 +119,40 @@ public sealed class PathIoGeneratorTests
     public void BclDocIndexFindsBclMembers()
     {
         var index = BclDocIndex.Build(
-            ImmutableArray.Create<AdditionalText>(new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)));
+            [new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)]);
 
         Assert.True(index.TryGetMethodMember("M:System.IO.File.ReadAllText(System.String)", out var member));
         Assert.Contains("OPENS A TEXT FILE, READS ALL THE TEXT IN THE FILE.", member.ToString());
+    }
+
+    private const string BrokenBclDocs = """
+        <doc>
+            <members>
+                <member name="M:System.IO.File.ReadAllText(System.String)">
+                    <summary>OPENS A TEXT FILE, READS ALL THE TEXT IN THE FILE.</summary>
+                </member>
+                <member name="M:System.IO.File.Delete(System.String)">
+                    <summary>Broken <see cref="T:System.IO.File"></summary>
+                </member>
+            </members>
+        </doc>
+        """;
+
+    [Fact]
+    public void BclDocIndexToleratesBrokenMembersInNetStandardDoc()
+    {
+        var index = BclDocIndex.Build(
+            [new InMemoryAdditionalText("/ref/netstandard.xml", BrokenBclDocs)]);
+
+        Assert.True(index.TryGetMethodMember("M:System.IO.File.ReadAllText(System.String)", out _));
+        Assert.False(index.TryGetMethodMember("M:System.IO.File.Delete(System.String)", out _));
+    }
+
+    [Fact]
+    public void BclDocIndexRejectsInvalidXmlInOtherDocs()
+    {
+        Assert.Throws<XmlException>(() => BclDocIndex.Build(
+            [new InMemoryAdditionalText("/ref/System.Runtime.xml", BrokenBclDocs)]));
     }
 
     [Fact]
@@ -128,10 +160,10 @@ public sealed class PathIoGeneratorTests
     {
         var compilation = TestHelper.CreateCompilation(TestHelper.DefaultSources);
         var index = BclDocIndex.Build(
-            ImmutableArray.Create<AdditionalText>(new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)));
+            [new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)]);
 
         var result = PathIoGeneratorCore.Generate(
-            compilation, "TruePath.SystemIo.PathIo", markedTypeIsNested: false, HandWrittenInfo.Empty,
+            compilation, "TruePath.SystemIo.PathIo", markedTypeIsNested: false, UserDefinedMembersInfo.Empty,
             ImmutableHashSet<string>.Empty, index);
 
         Assert.Contains("/// <summary>OPENS A TEXT FILE, READS ALL THE TEXT IN THE FILE.</summary>", result.Source);
@@ -166,7 +198,7 @@ public sealed class PathIoGeneratorTests
             """;
         var compilation = TestHelper.CreateCompilation(sources);
         GeneratorDriver driver = CSharpGeneratorDriver.Create(
-            new[] { new PathIoSourceGenerator().AsSourceGenerator() },
+            [new PathIoSourceGenerator().AsSourceGenerator()],
             ImmutableArray<AdditionalText>.Empty);
         driver = driver.RunGenerators(compilation, TestContext.Current.CancellationToken);
 
@@ -196,26 +228,26 @@ public sealed class PathIoGeneratorTests
     }
 
     [Fact]
-    public void HandWrittenSignatureSuppressesGeneration()
+    public void UserDefinedSignatureSuppressesGeneration()
     {
         const string members = """
             public static bool Exists(TruePath.AbsolutePath path) => true;
             """;
         var source = TestHelper.Generate(
-            TestHelper.CreateCompilation(TestHelper.SourcesWithHandWrittenMembers(members)));
+            TestHelper.CreateCompilation(TestHelper.SourcesWithUserDefinedMembers(members)));
 
         Assert.DoesNotContain("Exists(", source);
     }
 
     [Fact]
-    public void HandWrittenForwardingCallSuppressesItsBclTarget()
+    public void UserDefinedForwardingCallSuppressesItsBclTarget()
     {
         const string members = """
             public static void DeleteEmptyDirectory(TruePath.AbsolutePath path) => System.IO.Directory.Delete(path.Value, recursive: false);
             public static void DeleteDirectoryRecursively(TruePath.AbsolutePath path) => System.IO.Directory.Delete(path.Value, recursive: true);
             """;
         var source = TestHelper.Generate(
-            TestHelper.CreateCompilation(TestHelper.SourcesWithHandWrittenMembers(members)));
+            TestHelper.CreateCompilation(TestHelper.SourcesWithUserDefinedMembers(members)));
 
         Assert.DoesNotContain("Delete(AbsolutePath path, bool", source);
         Assert.Contains(
@@ -236,7 +268,7 @@ public sealed class PathIoGeneratorTests
             """;
         var source = TestHelper.Generate(
             TestHelper.CreateCompilation(
-                TestHelper.SourcesWithHandWrittenMembers(members)
+                TestHelper.SourcesWithUserDefinedMembers(members)
                     .Replace(
                         "    public readonly struct AbsolutePath",
                         "    public record struct LocalPathPattern(string Value);\n    public readonly struct AbsolutePath")));
@@ -249,13 +281,13 @@ public sealed class PathIoGeneratorTests
     [Fact]
     public void ForwardingCallWithPinnedTrailingArgumentSuppressesItsBclOverload()
     {
-        // The parameter list of the handwritten member is the leading part of Directory.Delete(string, bool), which
+        // The parameter list of the user-defined member is the leading part of Directory.Delete(string, bool), which
         // makes it a specialization of that overload, so the generated Delete(AbsolutePath, bool) must not appear.
         const string members = """
             public static void DeleteEmptyDirectory(TruePath.AbsolutePath path) => System.IO.Directory.Delete(path.Value, recursive: false);
             """;
         var source = TestHelper.Generate(
-            TestHelper.CreateCompilation(TestHelper.SourcesWithHandWrittenMembers(members)));
+            TestHelper.CreateCompilation(TestHelper.SourcesWithUserDefinedMembers(members)));
 
         Assert.DoesNotContain("public static void Delete(this AbsolutePath path, bool", source);
     }
@@ -332,7 +364,7 @@ public sealed class PathIoGeneratorTests
     {
         var compilation = TestHelper.CreateCompilation(TestHelper.DefaultSources);
         GeneratorDriver driver = CSharpGeneratorDriver.Create(
-            new[] { new PathIoSourceGenerator().AsSourceGenerator() },
+            [new PathIoSourceGenerator().AsSourceGenerator()],
             ImmutableArray<AdditionalText>.Empty);
         driver = driver.RunGenerators(compilation, TestContext.Current.CancellationToken);
         var updated = compilation.AddSyntaxTrees(driver.GetRunResult().GeneratedTrees);
