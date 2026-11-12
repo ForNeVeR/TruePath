@@ -16,12 +16,6 @@ namespace TruePath;
 /// </summary>
 internal static class DiskUtils
 {
-    // from https://github.com/dotnet/corefx/blob/9c06da6a34fcefa6fb37776ac57b80730e37387c/src/Common/src/System/IO/PathInternal.Windows.cs#L52
-    /// <summary>
-    /// The maximum path length for Windows.
-    /// </summary>
-    private const short WindowsMaxPath = short.MaxValue;
-
     private const string WindowsOnlyJustification = "Only called on Windows, which is checked by the callers.";
 
     /// <summary>
@@ -146,11 +140,18 @@ internal static class DiskUtils
     [SuppressMessage("Interoperability", "CA1416", Justification = WindowsOnlyJustification)]
     private static string? GetWindowsRealPathByHandle(SafeFileHandle handle)
     {
-        // this is called for each storage environment for the Data, Journals and Temp paths
-        // WindowsMaxPath is 32K and although this is called only once we can have a lot of storage environments
-        if (GetPath(256, out var realPath) == false)
+        const uint initialBufferSize = 256;
+        var result = GetPath(initialBufferSize, out var realPath);
+        if (result == 0)
         {
-            if (GetPath((uint)WindowsMaxPath, out realPath) == false)
+            return null;
+        }
+
+        if (result > initialBufferSize)
+        {
+            var requiredBufferSize = result;
+            result = GetPath(requiredBufferSize, out realPath);
+            if (result == 0 || result > requiredBufferSize)
                 return null;
         }
 
@@ -174,32 +175,25 @@ internal static class DiskUtils
 
         return realPath;
 
-        bool GetPath(uint bufferSize, out string? outputPath)
+        uint GetPath(uint bufferSize, out string? outputPath)
         {
             var charArray = ArrayPool<char>.Shared.Rent((int)bufferSize);
-
-            var result = PInvoke.GetFinalPathNameByHandle(
-                handle,
-                charArray.AsSpan(0, (int)bufferSize),
-                GETFINALPATHNAMEBYHANDLE_FLAGS.FILE_NAME_NORMALIZED);
-            if (result == 0)
+            try
             {
-                outputPath = null;
-                ArrayPool<char>.Shared.Return(charArray);
-                return false;
-            }
+                var pathLength = PInvoke.GetFinalPathNameByHandle(
+                    handle,
+                    charArray.AsSpan(0, (int)bufferSize),
+                    GETFINALPATHNAMEBYHANDLE_FLAGS.FILE_NAME_NORMALIZED);
 
-            // return value is the size of the path
-            if (result > bufferSize)
+                outputPath = pathLength == 0 || pathLength > bufferSize
+                    ? null
+                    : new string(charArray, 0, (int)pathLength);
+                return pathLength;
+            }
+            finally
             {
-                outputPath = null;
                 ArrayPool<char>.Shared.Return(charArray);
-                return false;
             }
-
-            outputPath = new string(charArray, 0, (int)result);
-            ArrayPool<char>.Shared.Return(charArray);
-            return true;
         }
     }
 }
