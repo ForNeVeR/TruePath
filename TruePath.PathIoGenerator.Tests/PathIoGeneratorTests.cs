@@ -117,7 +117,7 @@ public sealed class PathIoGeneratorTests
     public void BclDocIndexFindsBclMembers()
     {
         var index = BclDocIndex.Build(
-            ImmutableArray.Create<AdditionalText>(new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)));
+            ImmutableArray.Create<AdditionalText>(new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)), TestContext.Current.CancellationToken);
 
         Assert.True(index.TryGetMethodMember("M:System.IO.File.ReadAllText(System.String)", out var member));
         Assert.Contains("OPENS A TEXT FILE, READS ALL THE TEXT IN THE FILE.", member.ToString());
@@ -128,11 +128,11 @@ public sealed class PathIoGeneratorTests
     {
         var compilation = TestHelper.CreateCompilation(TestHelper.DefaultSources);
         var index = BclDocIndex.Build(
-            ImmutableArray.Create<AdditionalText>(new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)));
+            ImmutableArray.Create<AdditionalText>(new InMemoryAdditionalText("/ref/System.Runtime.xml", BclDocs)), TestContext.Current.CancellationToken);
 
         var result = PathIoGeneratorCore.Generate(
             compilation, "TruePath.SystemIo.PathIo", markedTypeIsNested: false, HandWrittenInfo.Empty,
-            ImmutableHashSet<string>.Empty, index);
+            ImmutableHashSet<string>.Empty, index, TestContext.Current.CancellationToken);
 
         Assert.Contains("/// <summary>OPENS A TEXT FILE, READS ALL THE TEXT IN THE FILE.</summary>", result.Source);
     }

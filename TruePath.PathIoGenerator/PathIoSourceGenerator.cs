@@ -11,63 +11,65 @@ using Microsoft.CodeAnalysis.Text;
 namespace TruePath.PathIoGenerator;
 
 /// <summary>
-///     Fills the other partial part of every class marked with <c>TruePath.SystemIo.GenerateSystemIoExtensionsAttribute</c>
-///     with the BCL-forwarding extension methods described in <see cref="PathIoGeneratorCore"/>.
+///     Generates System.IO forwarding extensions for marked partial classes. Semantic projections may rerun on
+///     any compilation change; value equality stops unchanged facts before documentation formatting and rendering.
 /// </summary>
 [Generator]
 public sealed class PathIoSourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        // The expensive per-type analysis runs in the syntax-anchored transform, so it is cached across edits in
-        // unrelated files; everything else that is independent of the compilation (exclusion texts, the XML
-        // documentation index) is also computed in nodes of its own instead of inside the output stage.
-        var markedTypes = context.SyntaxProvider.ForAttributeWithMetadataName<MarkedType>(
+        var analyses = context.SyntaxProvider.ForAttributeWithMetadataName(
             PathIoRules.MarkerAttributeName,
             static (node, _) => node is ClassDeclarationSyntax,
-            static (attributeContext, _) => new MarkedType(
-                attributeContext.TargetSymbol.ToDisplayString(),
-                attributeContext.TargetSymbol.ContainingType != null,
-                PathIoGeneratorCore.CollectHandWrittenInfo(
-                    attributeContext.SemanticModel.Compilation,
-                    (INamedTypeSymbol)attributeContext.TargetSymbol)));
+            static (attributeContext, cancellationToken) => PathIoGeneratorCore.AnalyzeMarkedType(
+                attributeContext.SemanticModel.Compilation,
+                (INamedTypeSymbol)attributeContext.TargetSymbol, cancellationToken));
+        var markedTypes = analyses.Select(static (analysis, _) => analysis.Type).WithTrackingName("MarkedTypes");
 
-        var exclusionTexts = context.AdditionalTextsProvider
+        var parsedExclusions = context.AdditionalTextsProvider
             .Where(static file => Path.GetFileName(file.Path) == PathIoRules.ExclusionFileName)
-            .Select(static (file, _) => file.GetText()?.ToString() ?? string.Empty)
-            .Collect();
+            .Select(static (file, cancellationToken) => file.GetText(cancellationToken)?.ToString() ?? string.Empty)
+            .Collect()
+            .Select(static (texts, cancellationToken) => Exclusions.Parse(texts, cancellationToken));
+        var exclusions = parsedExclusions.Select(static (parsed, _) => parsed.DocIds)
+            .WithComparer(DocIdSetComparer.Instance).WithTrackingName("ExclusionIds");
+        context.RegisterSourceOutput(parsedExclusions, static (output, parsed) =>
+        {
+            foreach (var diagnostic in parsed.Diagnostics) output.ReportDiagnostic(diagnostic);
+        });
 
         var docIndex = context.AdditionalTextsProvider
             .Where(static file => file.Path.EndsWith(".xml", StringComparison.Ordinal))
+            .Select(static (file, cancellationToken) => BclDocIndex.Build(ImmutableArray.Create(file), cancellationToken))
+            .WithTrackingName("DocumentFiles")
             .Collect()
-            .Select(static (files, _) => BclDocIndex.Build(files));
+            .Select(static (indexes, cancellationToken) => BclDocIndex.Merge(indexes, cancellationToken))
+            .WithTrackingName("DocumentationIndex");
+        var api = context.CompilationProvider
+            .Select(static (compilation, cancellationToken) => PathIoGeneratorCore.ExtractBclApi(compilation, cancellationToken))
+            .WithTrackingName("BclApi");
+        var templates = api.Combine(docIndex)
+            .Select(static (pair, cancellationToken) => PathIoGeneratorCore.AddDocumentation(pair.Left, pair.Right, cancellationToken))
+            .WithTrackingName("MethodTemplates");
 
-        var input = markedTypes.Collect()
-            .Combine(exclusionTexts)
-            .Combine(docIndex)
-            .Combine(context.CompilationProvider);
-
-        context.RegisterSourceOutput(input, static (productionContext, tuple) =>
+        // Diagnostics retain current source locations without invalidating the source rendering cache.
+        context.RegisterSourceOutput(analyses.Combine(api), static (output, pair) =>
         {
-            var (((typeInfos, exclusionTexts), docIndex), compilation) = tuple;
+            foreach (var diagnostic in PathIoGeneratorCore.GetTypeDiagnostics(pair.Left, pair.Right))
+                output.ReportDiagnostic(diagnostic);
+        });
 
-            var exclusions = Exclusions.Parse(exclusionTexts);
-            foreach (var diagnostic in exclusions.Diagnostics) productionContext.ReportDiagnostic(diagnostic);
-
-            foreach (var typeInfo in typeInfos.Sort((left, right) => string.CompareOrdinal(left.TypeName, right.TypeName)))
-            {
-                var result = PathIoGeneratorCore.Generate(
-                    compilation, typeInfo.TypeName, typeInfo.IsNested, typeInfo.HandWritten, exclusions.DocIds, docIndex);
-                foreach (var diagnostic in result.Diagnostics) productionContext.ReportDiagnostic(diagnostic);
-
-                if (result.Source is { } source)
-                {
-                    // Nested marked types are rejected with TPG004, so the simple type name is unambiguous here.
-                    // Should two same-named top-level types ever be marked, AddSource fails loudly.
-                    var hintName = typeInfo.TypeName.Substring(typeInfo.TypeName.LastIndexOf('.') + 1) + ".Generated.g.cs";
-                    productionContext.AddSource(hintName, SourceText.From(source, Encoding.UTF8));
-                }
-            }
+        var sources = markedTypes.Combine(templates).Combine(exclusions)
+            .Select(static (input, cancellationToken) => (
+                HintName: input.Left.Left.SimpleName + ".Generated.g.cs",
+                Source: PathIoGeneratorCore.Render(input.Left.Left, input.Left.Right, input.Right, cancellationToken)))
+            .WithTrackingName("RenderedSource");
+        context.RegisterSourceOutput(sources, static (output, source) =>
+        {
+            output.CancellationToken.ThrowIfCancellationRequested();
+            if (source.Source != null)
+                output.AddSource(source.HintName, SourceText.From(source.Source, Encoding.UTF8));
         });
     }
 }
