@@ -16,3 +16,7 @@ M:System.IO.Directory.GetFileSystemEntries(System.String)
 M:System.IO.Directory.GetFileSystemEntries(System.String,System.String)
 M:System.IO.Directory.GetFileSystemEntries(System.String,System.String,System.IO.EnumerationOptions)
 M:System.IO.Directory.GetFileSystemEntries(System.String,System.String,System.IO.SearchOption)
+
+# Covered by the AbsolutePath.Parent and AbsolutePath.PathRoot properties.
+M:System.IO.Directory.GetParent(System.String)
+M:System.IO.Directory.GetDirectoryRoot(System.String)
