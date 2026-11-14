@@ -3,10 +3,10 @@ static TruePath.SystemIo.PathIo.CreateDirectory(this TruePath.AbsolutePath path,
 static TruePath.SystemIo.PathIo.CreateSymbolicLink(this TruePath.AbsolutePath path, TruePath.AbsolutePath pathToTarget) -> System.IO.FileSystemInfo!
 static TruePath.SystemIo.PathIo.Decrypt(this TruePath.AbsolutePath path) -> void
 static TruePath.SystemIo.PathIo.Encrypt(this TruePath.AbsolutePath path) -> void
-static TruePath.SystemIo.PathIo.EnumerateDirectories(this TruePath.AbsolutePath path) -> System.Collections.Generic.IEnumerable<string!>!
-static TruePath.SystemIo.PathIo.EnumerateDirectories(this TruePath.AbsolutePath path, string! searchPattern) -> System.Collections.Generic.IEnumerable<string!>!
-static TruePath.SystemIo.PathIo.EnumerateDirectories(this TruePath.AbsolutePath path, string! searchPattern, System.IO.EnumerationOptions! enumerationOptions) -> System.Collections.Generic.IEnumerable<string!>!
-static TruePath.SystemIo.PathIo.EnumerateDirectories(this TruePath.AbsolutePath path, string! searchPattern, System.IO.SearchOption searchOption) -> System.Collections.Generic.IEnumerable<string!>!
+static TruePath.SystemIo.PathIo.EnumerateDirectories(this TruePath.AbsolutePath path) -> System.Collections.Generic.IEnumerable<TruePath.AbsolutePath>!
+static TruePath.SystemIo.PathIo.EnumerateDirectories(this TruePath.AbsolutePath path, string! searchPattern) -> System.Collections.Generic.IEnumerable<TruePath.AbsolutePath>!
+static TruePath.SystemIo.PathIo.EnumerateDirectories(this TruePath.AbsolutePath path, string! searchPattern, System.IO.EnumerationOptions! enumerationOptions) -> System.Collections.Generic.IEnumerable<TruePath.AbsolutePath>!
+static TruePath.SystemIo.PathIo.EnumerateDirectories(this TruePath.AbsolutePath path, string! searchPattern, System.IO.SearchOption searchOption) -> System.Collections.Generic.IEnumerable<TruePath.AbsolutePath>!
 static TruePath.SystemIo.PathIo.EnumerateFileSystemEntries(this TruePath.AbsolutePath path) -> System.Collections.Generic.IEnumerable<string!>!
 static TruePath.SystemIo.PathIo.EnumerateFileSystemEntries(this TruePath.AbsolutePath path, string! searchPattern) -> System.Collections.Generic.IEnumerable<string!>!
 static TruePath.SystemIo.PathIo.EnumerateFileSystemEntries(this TruePath.AbsolutePath path, string! searchPattern, System.IO.EnumerationOptions! enumerationOptions) -> System.Collections.Generic.IEnumerable<string!>!

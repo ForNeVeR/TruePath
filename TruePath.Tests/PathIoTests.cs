@@ -55,6 +55,26 @@ public class PathIoTests
         });
     }
 
+    [Fact]
+    public void EnumerateDirectoriesTest()
+    {
+        DoWithTempFolder(tempFolder =>
+        {
+            var alpha = tempFolder / "alpha";
+            var beta = tempFolder / "beta";
+            var nested = alpha / "nested";
+            nested.CreateDirectory();
+            beta.CreateDirectory();
+            (tempFolder / "file.txt").WriteAllText("test");
+
+            Assert.Equal([alpha, beta], tempFolder.EnumerateDirectories().OrderBy(x => x.Value));
+            Assert.Equal([alpha], tempFolder.EnumerateDirectories("a*"));
+            Assert.Equal(
+                [alpha, nested, beta],
+                tempFolder.EnumerateDirectories("*", SearchOption.AllDirectories).OrderBy(x => x.Value));
+        });
+    }
+
     private static void DoWithTempFolder(Action<AbsolutePath> test)
     {
         var tempFolder = Temporary.CreateTempFolder();
