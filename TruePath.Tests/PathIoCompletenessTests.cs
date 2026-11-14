@@ -83,7 +83,7 @@ public class PathIoCompletenessTests
 
     private static HashSet<string> LoadExclusions()
     {
-        return File.ReadAllLines(Path.Combine(RepositoryRoot(), "TruePath.SystemIo", "path-io-exclusions.txt"))
+        return (RepositoryRoot() / "TruePath.SystemIo" / "path-io-exclusions.txt").ReadAllLines()
             .Select(line => line.Trim())
             .Where(line => line.Length > 0 && !line.StartsWith("#", StringComparison.Ordinal))
             .ToHashSet();
@@ -95,7 +95,7 @@ public class PathIoCompletenessTests
     /// </summary>
     private static HashSet<(string TypeName, string MethodName, int ArgumentCount)> LoadForwardedCalls()
     {
-        var source = File.ReadAllText(Path.Combine(RepositoryRoot(), "TruePath.SystemIo", "PathIo.cs"));
+        var source = (RepositoryRoot() / "TruePath.SystemIo" / "PathIo.cs").ReadAllText();
         var calls = new HashSet<(string, string, int)>();
         foreach (Match match in Regex.Matches(source, @"\b(?<type>File|Directory)\.(?<method>\w+)\((?<args>[^()]*)\)"))
         {
@@ -108,14 +108,14 @@ public class PathIoCompletenessTests
         return calls;
     }
 
-    private static string RepositoryRoot()
+    private static AbsolutePath RepositoryRoot()
     {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory != null && !File.Exists(Path.Combine(directory.FullName, "TruePath.slnx")))
-            directory = directory.Parent;
+        AbsolutePath? directory = new AbsolutePath(AppContext.BaseDirectory);
+        while (directory != null && !(directory.Value / "TruePath.slnx").ExistsFile())
+            directory = directory.Value.Parent;
 
-        if (directory == null) Assert.Skip("Repository root with TruePath.slnx not found.");
-        return directory.FullName;
+        if (directory == null) Assert.Fail("Repository root with TruePath.slnx not found.");
+        return directory.Value;
     }
 
     private static string DocId(MethodInfo method)
