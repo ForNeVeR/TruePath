@@ -20,3 +20,6 @@ M:System.IO.Directory.GetFileSystemEntries(System.String,System.String,System.IO
 # Covered by the AbsolutePath.Parent and AbsolutePath.PathRoot properties.
 M:System.IO.Directory.GetParent(System.String)
 M:System.IO.Directory.GetDirectoryRoot(System.String)
+
+# Covered by the AbsolutePath.CurrentWorkingDirectory property.
+M:System.IO.Directory.SetCurrentDirectory(System.String)

@@ -9,4 +9,3 @@ static TruePath.SystemIo.PathIo.EnumerateFileSystemEntries(this TruePath.Absolut
 static TruePath.SystemIo.PathIo.EnumerateFileSystemEntries(this TruePath.AbsolutePath path, string! searchPattern, System.IO.SearchOption searchOption) -> System.Collections.Generic.IEnumerable<TruePath.AbsolutePath>!
 static TruePath.SystemIo.PathIo.Replace(this TruePath.AbsolutePath sourceFile, TruePath.AbsolutePath destinationFile, TruePath.AbsolutePath destinationBackupFile) -> void
 static TruePath.SystemIo.PathIo.Replace(this TruePath.AbsolutePath sourceFile, TruePath.AbsolutePath destinationFile, TruePath.AbsolutePath destinationBackupFile, bool ignoreMetadataErrors) -> void
-static TruePath.SystemIo.PathIo.SetCurrentDirectory(this TruePath.AbsolutePath path) -> void
