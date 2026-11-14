@@ -289,6 +289,140 @@ public static partial class PathIo
     }
 
     /// <summary>
+    /// Returns an enumerable collection of the absolute paths of the files and directories in a specified path.
+    /// </summary>
+    /// <param name="path">The directory to search.</param>
+    /// <exception cref="DirectoryNotFoundException"><paramref name="path"/> is invalid, such as referring to an unmapped drive.</exception>
+    /// <exception cref="IOException"><paramref name="path"/> is a file name.</exception>
+    /// <exception cref="PathTooLongException">The specified path, file name, or combined exceed the system-defined maximum length.</exception>
+    /// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+    /// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
+    /// <returns>An enumerable collection of the absolute paths of the file-system entries in the directory specified by <paramref name="path"/>.</returns>
+    public static IEnumerable<AbsolutePath> EnumerateFileSystemEntries(this AbsolutePath path)
+    {
+        return Directory.EnumerateFileSystemEntries(path.Value)
+            .Select(entry => path / entry);
+    }
+
+    /// <summary>
+    /// Returns an enumerable collection of the absolute paths of the files and directories that match a search pattern in a specified path.
+    /// </summary>
+    /// <param name="path">The directory to search.</param>
+    /// <param name="searchPattern">
+    ///     <para>
+    ///     The search string to match against the names of file-system entries in <paramref name="path"/>. It may
+    ///     combine literal characters with the <c>*</c> and <c>?</c> wildcards, but it does not support regular
+    ///     expressions. This overload matches with Win32 semantics, where <c>*</c> stands for zero or more
+    ///     characters and <c>?</c> for exactly one, except immediately before a period or at the end of the
+    ///     name, where it may also match none: <c>a?.txt</c> matches both <c>ab.txt</c> and <c>a.txt</c>,
+    ///     while <c>?ello.txt</c> matches only <c>hello.txt</c>.
+    ///     </para>
+    ///     <para>
+    ///     When running on .NET Framework on Windows, the pattern is also matched against the short (8.3) name of
+    ///     each file or directory, if it has one. Since a short name keeps at most three characters of the
+    ///     extension, <c>*.htm</c> may also return <c>index.html</c> (whose short name is <c>INDEX~1.HTM</c>), and
+    ///     a pattern such as <c>*1*</c> may match many entries with no <c>1</c> in their long names, through the
+    ///     <c>~1</c> suffix of their short names. Whether an entry has a short name depends on the volume settings
+    ///     at the time the entry was created, so the results may differ between machines and even between
+    ///     entries in the same directory. See
+    ///     <see href="https://devblogs.microsoft.com/oldnewthing/20140313-00/?p=1513">Raymond Chen's explanation</see>
+    ///     for details.
+    ///     </para>
+    ///     <para>
+    ///     For the full pattern syntax and its caveats, see
+    ///     <see href="https://learn.microsoft.com/dotnet/api/system.io.directory.enumeratefilesystementries"/>.
+    ///     </para>
+    /// </param>
+    /// <exception cref="ArgumentNullException"><paramref name="searchPattern"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="searchPattern"/> does not contain a valid pattern.</exception>
+    /// <exception cref="DirectoryNotFoundException"><paramref name="path"/> is invalid, such as referring to an unmapped drive.</exception>
+    /// <exception cref="IOException"><paramref name="path"/> is a file name.</exception>
+    /// <exception cref="PathTooLongException">The specified path, file name, or combined exceed the system-defined maximum length.</exception>
+    /// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+    /// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
+    /// <returns>An enumerable collection of the absolute paths of the file-system entries in the directory specified by <paramref name="path"/> and that match the specified search pattern.</returns>
+    public static IEnumerable<AbsolutePath> EnumerateFileSystemEntries(this AbsolutePath path, string searchPattern)
+    {
+        return Directory.EnumerateFileSystemEntries(path.Value, searchPattern)
+            .Select(entry => path / entry);
+    }
+
+#if NET8_0_OR_GREATER
+    /// <summary>
+    /// Returns an enumerable collection of the absolute paths of the files and directories that match a search pattern and enumeration options in a specified path.
+    /// </summary>
+    /// <param name="path">The directory to search.</param>
+    /// <param name="searchPattern">
+    /// The search string to match against the names of file-system entries in <paramref name="path"/>. It may
+    /// combine literal characters with the <c>*</c> (zero or more characters) and <c>?</c> wildcards, but it does
+    /// not support regular expressions. Under the default <see cref="MatchType.Simple"/>, <c>?</c> matches exactly
+    /// one character; under <see cref="MatchType.Win32"/>, selected through <paramref name="enumerationOptions"/>,
+    /// it may also match none immediately before a period or at the end of the name. For the full pattern syntax
+    /// and its caveats, see
+    /// <see href="https://learn.microsoft.com/dotnet/api/system.io.directory.enumeratefilesystementries"/>.
+    /// </param>
+    /// <param name="enumerationOptions">An object that describes the search and enumeration configuration to use.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="searchPattern"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="searchPattern"/> does not contain a valid pattern.</exception>
+    /// <exception cref="DirectoryNotFoundException"><paramref name="path"/> is invalid, such as referring to an unmapped drive.</exception>
+    /// <exception cref="IOException"><paramref name="path"/> is a file name.</exception>
+    /// <exception cref="PathTooLongException">The specified path, file name, or combined exceed the system-defined maximum length.</exception>
+    /// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+    /// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
+    /// <returns>An enumerable collection of the absolute paths of the file-system entries in the directory specified by <paramref name="path"/>, that match the specified search pattern and the specified enumeration options.</returns>
+    public static IEnumerable<AbsolutePath> EnumerateFileSystemEntries(this AbsolutePath path, string searchPattern, EnumerationOptions enumerationOptions)
+    {
+        return Directory.EnumerateFileSystemEntries(path.Value, searchPattern, enumerationOptions)
+            .Select(entry => path / entry);
+    }
+#endif
+
+    /// <summary>
+    /// Returns an enumerable collection of the absolute paths of the files and directories that match a search pattern in a specified path, and optionally searches subdirectories.
+    /// </summary>
+    /// <param name="path">The directory to search.</param>
+    /// <param name="searchPattern">
+    ///     <para>
+    ///     The search string to match against the names of file-system entries in <paramref name="path"/>. It may
+    ///     combine literal characters with the <c>*</c> and <c>?</c> wildcards, but it does not support regular
+    ///     expressions. This overload matches with Win32 semantics, where <c>*</c> stands for zero or more
+    ///     characters and <c>?</c> for exactly one, except immediately before a period or at the end of the
+    ///     name, where it may also match none: <c>a?.txt</c> matches both <c>ab.txt</c> and <c>a.txt</c>,
+    ///     while <c>?ello.txt</c> matches only <c>hello.txt</c>.
+    ///     </para>
+    ///     <para>
+    ///     When running on .NET Framework on Windows, the pattern is also matched against the short (8.3) name of
+    ///     each file or directory, if it has one. Since a short name keeps at most three characters of the
+    ///     extension, <c>*.htm</c> may also return <c>index.html</c> (whose short name is <c>INDEX~1.HTM</c>), and
+    ///     a pattern such as <c>*1*</c> may match many entries with no <c>1</c> in their long names, through the
+    ///     <c>~1</c> suffix of their short names. Whether an entry has a short name depends on the volume settings
+    ///     at the time the entry was created, so the results may differ between machines and even between
+    ///     entries in the same directory. See
+    ///     <see href="https://devblogs.microsoft.com/oldnewthing/20140313-00/?p=1513">Raymond Chen's explanation</see>
+    ///     for details.
+    ///     </para>
+    ///     <para>
+    ///     For the full pattern syntax and its caveats, see
+    ///     <see href="https://learn.microsoft.com/dotnet/api/system.io.directory.enumeratefilesystementries"/>.
+    ///     </para>
+    /// </param>
+    /// <param name="searchOption">One of the enumeration values that specifies whether the search operation should include only the current directory or should include all subdirectories.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="searchPattern"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="searchPattern"/> does not contain a valid pattern.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="searchOption"/> is not a valid <see cref="SearchOption"/> value.</exception>
+    /// <exception cref="DirectoryNotFoundException"><paramref name="path"/> is invalid, such as referring to an unmapped drive.</exception>
+    /// <exception cref="IOException"><paramref name="path"/> is a file name.</exception>
+    /// <exception cref="PathTooLongException">The specified path, file name, or combined exceed the system-defined maximum length.</exception>
+    /// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+    /// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
+    /// <returns>An enumerable collection of the absolute paths of the file-system entries in the directory specified by <paramref name="path"/> and that match the specified search pattern and option.</returns>
+    public static IEnumerable<AbsolutePath> EnumerateFileSystemEntries(this AbsolutePath path, string searchPattern, SearchOption searchOption)
+    {
+        return Directory.EnumerateFileSystemEntries(path.Value, searchPattern, searchOption)
+            .Select(entry => path / entry);
+    }
+
+    /// <summary>
     /// Returns the names of files (including their paths) that match the specified search pattern in the specified directory.
     /// </summary>
     /// <param name="path">The directory to search.</param>

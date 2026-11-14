@@ -10,4 +10,9 @@
 # argument (e.g. DeleteEmptyDirectory/DeleteDirectoryRecursively forwarding to
 # Directory.Delete(string, bool)).
 #
-# (No entries yet.)
+
+# Covered by the EnumerateFileSystemEntries extensions.
+M:System.IO.Directory.GetFileSystemEntries(System.String)
+M:System.IO.Directory.GetFileSystemEntries(System.String,System.String)
+M:System.IO.Directory.GetFileSystemEntries(System.String,System.String,System.IO.EnumerationOptions)
+M:System.IO.Directory.GetFileSystemEntries(System.String,System.String,System.IO.SearchOption)
