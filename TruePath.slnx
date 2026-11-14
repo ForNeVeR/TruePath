@@ -1,0 +1,51 @@
+<Solution>
+  <Folder Name="/.config/">
+    <File Path=".config/dotnet-tools.json" />
+    <File Path=".config/dotnet-tools.json.license" />
+  </Folder>
+  <Folder Name="/.github/" />
+  <Folder Name="/.github/workflows/">
+    <File Path=".github/workflows/docs.yml" />
+    <File Path=".github/workflows/main.yml" />
+    <File Path=".github/workflows/release.yml" />
+  </Folder>
+  <Folder Name="/docs/">
+    <File Path="docs/docfx.json" />
+    <File Path="docs/docfx.json.license" />
+    <File Path="docs/index.md" />
+    <File Path="docs/toc.yml" />
+  </Folder>
+  <Folder Name="/LICENSES/">
+    <File Path="LICENSES/CC0-1.0.txt" />
+    <File Path="LICENSES/MIT.txt" />
+  </Folder>
+  <Folder Name="/scripts/">
+    <File Path="scripts/Get-Version.ps1" />
+    <File Path="scripts/github-actions.fsx" />
+    <File Path="scripts/Test-Encoding.ps1" />
+    <File Path="scripts/Test-PublicApiShipped.ps1" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="CHANGELOG.md" />
+    <File Path="CONTRIBUTING.md" />
+    <File Path="Directory.Build.props" />
+    <File Path="global.json" />
+    <File Path="global.json.license" />
+    <File Path="LICENSE.txt" />
+    <File Path="MAINTAINING.md" />
+    <File Path="README.md" />
+    <File Path="renovate.json" />
+    <File Path="renovate.json.license" />
+    <File Path="REUSE.toml" />
+    <File Path="TruePath.slnx.DotSettings" />
+    <File Path="TruePath.slnx.license" />
+  </Folder>
+  <Project Path="TruePath.Benchmarks/TruePath.Benchmarks.csproj" />
+  <Project Path="TruePath.PathIoGenerator.Tests/TruePath.PathIoGenerator.Tests.csproj" />
+  <Project Path="TruePath.PathIoGenerator/TruePath.PathIoGenerator.csproj" />
+  <Project Path="TruePath.SystemIo/TruePath.SystemIo.csproj" />
+  <Project Path="TruePath.Tests/TruePath.Tests.csproj" />
+  <Project Path="TruePath/TruePath.csproj" />
+</Solution>

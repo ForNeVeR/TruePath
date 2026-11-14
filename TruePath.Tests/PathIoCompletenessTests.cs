@@ -111,10 +111,10 @@ public class PathIoCompletenessTests
     private static string RepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory != null && !File.Exists(Path.Combine(directory.FullName, "TruePath.sln")))
+        while (directory != null && !File.Exists(Path.Combine(directory.FullName, "TruePath.slnx")))
             directory = directory.Parent;
 
-        if (directory == null) Assert.Skip("Repository root with TruePath.sln not found.");
+        if (directory == null) Assert.Skip("Repository root with TruePath.slnx not found.");
         return directory.FullName;
     }
 
