@@ -5,26 +5,27 @@
 namespace TruePath.PathIoGenerator;
 
 /// <summary>
-///     The equatable payload the pipeline computes for every marked class: its display name, whether it is nested
-///     (rejected by <see cref="PathIoGeneratorCore.Generate"/> with a diagnostic), and the user-defined member
-///     analysis. Being equatable lets the incremental pipeline cache it across unrelated edits.
+///     The value-equatable facts needed to render one marked class. Semantic analysis may run after any edit;
+///     equal facts stop the downstream rendering pipeline, including after edits in another partial declaration.
 /// </summary>
-internal sealed class MarkedType(string typeName, bool isNested, UserDefinedMembersInfo userDefinedMembers)
+internal sealed class MarkedType(
+    string typeName, string simpleName, string namespaceName,
+    bool isNested, bool isPartial, bool resolves, UserDefinedMembersInfo userDefinedMembers)
 {
     public string TypeName { get; } = typeName;
+    public string SimpleName { get; } = simpleName;
+    public string NamespaceName { get; } = namespaceName;
     public bool IsNested { get; } = isNested;
+    public bool IsPartial { get; } = isPartial;
+    public bool Resolves { get; } = resolves;
     public UserDefinedMembersInfo UserDefinedMembers { get; } = userDefinedMembers;
 
-    public override bool Equals(object? obj)
-    {
-        return obj is MarkedType other
-               && TypeName == other.TypeName
-               && IsNested == other.IsNested
-               && UserDefinedMembers.Equals(other.UserDefinedMembers);
-    }
+    public bool CanGenerate => !IsNested && IsPartial && Resolves;
 
-    public override int GetHashCode()
-    {
-        return TypeName.GetHashCode();
-    }
+    public override bool Equals(object? obj) => obj is MarkedType other
+        && TypeName == other.TypeName && SimpleName == other.SimpleName && NamespaceName == other.NamespaceName
+        && IsNested == other.IsNested && IsPartial == other.IsPartial && Resolves == other.Resolves
+        && UserDefinedMembers.Equals(other.UserDefinedMembers);
+
+    public override int GetHashCode() => TypeName.GetHashCode();
 }

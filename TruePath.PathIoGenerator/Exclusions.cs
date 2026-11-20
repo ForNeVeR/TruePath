@@ -24,14 +24,16 @@ internal sealed class Exclusions
         Diagnostics = diagnostics;
     }
 
-    public static Exclusions Parse(ImmutableArray<string> fileTexts)
+    public static Exclusions Parse(ImmutableArray<string> fileTexts, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var docIds = ImmutableHashSet.CreateBuilder<string>();
         var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
 
         foreach (var text in fileTexts)
         foreach (var rawLine in text.Replace("\r\n", "\n").Split('\n'))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var line = rawLine.Trim();
             if (line.Length == 0 || line.StartsWith("#", StringComparison.Ordinal)) continue;
 
